@@ -782,6 +782,10 @@ export default {
         quote:
           "They registered the company for us and have handled the monthly filings ever since. We hear from them before a deadline rather than after it, and that is the part we did not expect to matter as much as it does.",
         organisation: "Rare Events",
+        logo: "/images/logos/rare-events.webp",
+        // Gold and white on black, so it carries its own ground and must not
+        // sit on the light tile the other marks need.
+        logoTile: "none",
       },
     ],
   },

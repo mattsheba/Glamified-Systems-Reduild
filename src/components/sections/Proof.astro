@@ -41,7 +41,7 @@ const hasContent = clients.length > 0 || testimonials.length > 0;
               <figcaption>
                 {t.logo && (
                   <img
-                    class="quote-logo"
+                    class:list={["quote-logo", t.logoTile === "none" && "quote-logo--bare"]}
                     src={t.logo}
                     alt={t.organisation}
                     width="440"
@@ -146,6 +146,12 @@ const hasContent = clients.length > 0 || testimonials.length > 0;
     padding: 4px 8px;
     background: var(--band-logo-tile, var(--logo-tile));
     border-radius: var(--r-sm);
+  }
+
+  /* Supplies its own ground, so it needs neither tile nor padding. */
+  .quote-logo--bare {
+    background: none;
+    padding: 0;
   }
 
   .who {

@@ -134,6 +134,14 @@ export interface Testimonial {
   role?: string;
   /** Path under /images/logos. Omit and the card falls back to the name. */
   logo?: string;
+  /**
+   * "none" suppresses the tile behind the logo.
+   *
+   * Most client marks are dark ink on transparent and need a light tile to be
+   * legible on an inverse band. A mark that is light ink on its own dark ground
+   * is the opposite case: a tile would show as bars either side of it.
+   */
+  logoTile?: "none";
 }
 
 export interface ProcessStep {
