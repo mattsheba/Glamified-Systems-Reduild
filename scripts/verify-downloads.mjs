@@ -14,14 +14,25 @@
 import site from "../site.config.js";
 
 const base = site.downloads?.baseUrl;
-const products = (site.products ?? []).filter((p) => p.download);
+
+// Installers and user guides are the same problem: a filename in config that
+// may or may not exist in the bucket. Check both.
+const targets = [];
+for (const product of site.products ?? []) {
+  if (product.download) {
+    targets.push({ name: product.name, file: product.download.file, kind: "installer" });
+  }
+  if (product.guide) {
+    targets.push({ name: product.name, file: product.guide.file, kind: "guide" });
+  }
+}
 
 if (!base || base === "PLACEHOLDER") {
   console.log("\n  downloads.baseUrl is not set. Nothing to check.\n");
   process.exit(0);
 }
 
-if (!products.length) {
+if (!targets.length) {
   console.log("\n  No products have a download configured. Nothing to check.\n");
   process.exit(0);
 }
@@ -31,8 +42,8 @@ let failed = 0;
 
 console.log("");
 
-for (const product of products) {
-  const url = `${host}/${product.download.file}`;
+for (const target of targets) {
+  const url = `${host}/${target.file}`;
   let line;
 
   try {
@@ -45,16 +56,16 @@ for (const product of products) {
       // mismatch against config is obvious rather than alarming.
       const mib = bytes ? ` ${(bytes / 1048576).toFixed(0)} MB` : "";
       const type = res.headers.get("content-type") ?? "";
-      line = `  ok    ${product.name}${mib}  ${type}`;
+      line = `  ok    ${target.name} ${target.kind}${mib}  ${type}`;
     } else {
       failed++;
       line =
-        `  FAIL  ${product.name}: HTTP ${res.status} for ${product.download.file}\n` +
+        `  FAIL  ${target.name} ${target.kind}: HTTP ${res.status} for ${target.file}\n` +
         `        ${url}`;
     }
   } catch (error) {
     failed++;
-    line = `  FAIL  ${product.name}: ${error.message}\n        ${url}`;
+    line = `  FAIL  ${target.name} ${target.kind}: ${error.message}\n        ${url}`;
   }
 
   console.log(line);
@@ -64,10 +75,10 @@ console.log("");
 
 if (failed) {
   console.error(
-    `  ${failed} download link(s) broken. Upload the file, or comment the\n` +
-      `  download block out so the page falls back to the WhatsApp CTA.\n`
+    `  ${failed} link(s) broken. Upload the file, or comment the block out so\n` +
+      `  the page stops advertising it.\n`
   );
   process.exit(1);
 }
 
-console.log(`  downloads OK — ${products.length} installer(s) reachable\n`);
+console.log(`  downloads OK — ${targets.length} file(s) reachable\n`);

@@ -68,10 +68,17 @@ export interface Product {
     /** Filename in the bucket, joined onto `downloads.baseUrl`. */
     file: string;
     version: string;
-    /** Human readable, shown on the button: "119 MB". */
+    /** Human readable: "119 MB". Not shown on the button, but kept so the
+     *  download gate can report it and a future layout can use it. */
     size: string;
     platform?: string;
   };
+  /**
+   * User guide PDF in the same bucket. Rendered as a text link rather than a
+   * button: it is a secondary action, and two buttons of equal weight make
+   * neither of them the obvious one.
+   */
+  guide?: { file: string };
 }
 
 export interface Service {
@@ -271,6 +278,8 @@ export interface SiteConfig {
      * than below it.
      */
     trial?: string;
+    /** Link text for the user guide, e.g. "User guide (PDF)". */
+    guideLabel?: string;
   };
 
   products: Product[];

@@ -2,7 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import StructuredData from "../../components/StructuredData.astro";
-import site, { whatsappHref, downloadHref } from "../../lib/site";
+import site, { whatsappHref, downloadHref, guideHref } from "../../lib/site";
 
 // FR-8: one page per configured product, generated at build time.
 export function getStaticPaths() {
@@ -15,6 +15,7 @@ export function getStaticPaths() {
 const { product } = Astro.props;
 const wa = whatsappHref();
 const download = downloadHref(product);
+const guide = guideHref(product);
 
 // The heading leads with the problem where a headline is given; the product
 // name moves to the eyebrow so the brand is still the first thing read.
@@ -73,14 +74,10 @@ const crumbs = [
           <div class="actions">
             {download ? (
               <>
-                <a class="btn btn--primary" href={download} download>
+                <a class="btn btn--primary btn--compact" href={download} download>
                   {site.downloads?.label}
-                  <span class="meta">
-                    {product.download?.size}
-                    {product.download?.version && ` · v${product.download.version}`}
-                  </span>
                 </a>
-                <a class="btn btn--ghost" href={wa} rel="noopener">
+                <a class="btn btn--ghost btn--compact" href={wa} rel="noopener">
                   {site.hero.primaryCta.label}
                 </a>
               </>
@@ -95,6 +92,16 @@ const crumbs = [
               the button. */}
           {download && site.downloads?.trial && (
             <p class="trial">{site.downloads.trial}</p>
+          )}
+
+          {/* A text link, not a third button. The guide is a secondary action,
+              and giving it equal weight would leave no obvious primary one. */}
+          {guide && site.downloads?.guideLabel && (
+            <p class="guide">
+              <a href={guide} target="_blank" rel="noopener">
+                {site.downloads.guideLabel}
+              </a>
+            </p>
           )}
         </div>
 
@@ -164,17 +171,21 @@ const crumbs = [
     margin-top: var(--s-5);
   }
 
-  /* Size and version sit inside the button rather than beside it. On a 119MB
-     installer over a Zambian mobile connection, the size is the single most
-     useful thing to know before tapping. */
-  .actions .meta {
-    display: block;
-    margin-top: 3px;
-    font-size: var(--t-meta);
-    font-weight: 500;
-    letter-spacing: 0;
-    text-transform: none;
-    opacity: 0.85;
+  /* The buttons carried the file size and version stacked inside them, which
+     made them two lines tall and heavier than anything else on the page. The
+     label alone is enough; the size is in the download itself. */
+  .actions .btn--compact {
+    padding: 11px 20px;
+  }
+
+  .guide {
+    margin: var(--s-2) 0 0;
+    font-size: var(--t-small);
+  }
+
+  .guide a {
+    color: var(--accent);
+    text-underline-offset: 3px;
   }
 
   /* Carries the accent so it reads as an offer, not a disclaimer. */

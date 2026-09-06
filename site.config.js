@@ -170,6 +170,7 @@ export default {
     label: "Download for Windows",
     note: "Windows 10 and 11",
     trial: "Runs free for 30 days. After that it needs a licence key.",
+    guideLabel: "User guide (PDF)",
   },
 
   hero: {
@@ -209,6 +210,7 @@ export default {
         size: "119 MB",
         platform: "Windows 10 and 11",
       },
+      guide: { file: "GlamifiedHR-User-Guide-1.0.0.pdf" },
       features: [
         "PAYE, NAPSA and NHIMA to current ZRA rules",
         "Leave, attendance and separations",
@@ -383,6 +385,9 @@ export default {
         size: "94 MB",
         platform: "Windows 10 and 11",
       },
+      // CONFIRM the exact object key in the bucket, then uncomment. Guessed
+      // names all returned 404, and a guide link that 404s is worse than none.
+      // guide: { file: "GlamifiedFleet-User-Guide-?.?.?.pdf" },
       features: [
         "Cost per vehicle, built from real records",
         "Fuel, trips, servicing and licence renewals",

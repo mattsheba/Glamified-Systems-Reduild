@@ -34,6 +34,14 @@ export function downloadHref(product: Product): string | null {
   return `${base.replace(/\/+$/, "")}/${product.download.file}`;
 }
 
+/** Same rules as downloadHref: null unless there is a real host and a file. */
+export function guideHref(product: Product): string | null {
+  const base = site.downloads?.baseUrl;
+  if (!base || !product.guide) return null;
+  if (!/^https?:\/\//.test(base)) return null;
+  return `${base.replace(/\/+$/, "")}/${product.guide.file}`;
+}
+
 /** FR-8: product detail route. */
 export function productHref(slug: string): string {
   return `/products/${slug}`;
