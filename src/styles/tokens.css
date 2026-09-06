@@ -303,6 +303,24 @@ img {
   text-wrap: pretty;
 }
 
+/*
+ * Justification is a wide-screen device. On a phone these paragraphs run to
+ * about thirty characters a line, and justifying that short a measure with
+ * hyphenation off forces the same few words apart into visible rivers of white
+ * space. That is the printing-error look we removed hyphens to avoid, so the
+ * fix has to be consistent: below this width the text sets ragged right.
+ */
+@media (max-width: 640px) {
+  .prose p,
+  .chapter--aside p,
+  .intro,
+  .answer p,
+  .legal p,
+  .legal li {
+    text-align: left;
+  }
+}
+
 /* ------------------------------------------------------------------ *
  * Homepage section headings
  *
@@ -333,6 +351,18 @@ img {
   max-width: var(--container);
   margin-inline: auto;
   padding-inline: var(--gutter);
+}
+
+/*
+ * A 24px gutter costs 48px of a 320px screen, which is 15% of the viewport
+ * spent on nothing. On the small Androids still common here that was enough to
+ * push the header wider than the screen. 16px keeps the text off the edge
+ * without taking the room the content needs.
+ */
+@media (max-width: 400px) {
+  .container {
+    padding-inline: 16px;
+  }
 }
 
 .section {
@@ -377,7 +407,14 @@ img {
 .grid {
   display: grid;
   gap: var(--s-4);
-  grid-template-columns: repeat(auto-fit, minmax(var(--col, 280px), 1fr));
+  /*
+   * `min(--col, 100%)` rather than `--col` alone. A bare minmax() minimum is a
+   * hard floor: set --col to 420px for a two-column quote layout and the track
+   * stays 420px wide on a 360px phone, pushing the whole document sideways.
+   * Capping the minimum at the container width lets it collapse instead, so a
+   * wide --col can never cause a horizontal scrollbar.
+   */
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--col, 280px), 100%), 1fr));
 }
 
 .card {

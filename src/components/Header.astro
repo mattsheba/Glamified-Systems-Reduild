@@ -87,6 +87,7 @@ const isCurrent = (href: string) =>
             </li>
           ))}
         </ul>
+        <ThemeToggle variant="menu" />
       </nav>
     </details>
   </div>
@@ -356,8 +357,13 @@ const isCurrent = (href: string) =>
   }
 
   .mobile-panel a {
-    display: block;
-    padding: 7px 0 7px var(--s-2);
+    /* min-height rather than padding alone: the top-level rows use a smaller
+       display face, so equal padding left them at 40px while the child rows
+       reached 45. A flex row with a floor hits 44 whatever the type does. */
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 4px 0 4px var(--s-2);
     font-size: var(--t-small);
     text-decoration: none;
     color: var(--ink);
@@ -376,9 +382,15 @@ const isCurrent = (href: string) =>
     color: var(--accent);
   }
 
-  /* Below 767 the links fold into the disclosure, but the CTA never does —
-     it is the primary conversion path (FR-13). */
-  @media (max-width: 767px) {
+  /* The links fold into the disclosure, but the CTA never does — it is the
+     primary conversion path (FR-13).
+     
+     Switched at 1023 rather than 767. The desktop navigation needs about
+     918px once the brand, the four links, the theme control and the WhatsApp
+     button are laid out, so between 768 and 1023 the header was wider than the
+     screen and every page scrolled sideways on a tablet. 1024 is already one of
+     the two breakpoints this design system uses. */
+  @media (max-width: 1023px) {
     .nav {
       display: none;
     }
@@ -392,6 +404,21 @@ const isCurrent = (href: string) =>
     .header-cta {
       margin-inline-start: auto;
       padding: 10px 16px;
+    }
+  }
+
+  /* Brand, theme control, CTA and menu all have to fit 320px. */
+  @media (max-width: 400px) {
+    .header-inner {
+      gap: 6px;
+    }
+    .header-cta {
+      /* nowrap and a step down in size, because the label comes from config
+         and wrapped onto two lines here, which made the whole header taller
+         on exactly the screens with the least room to spare. */
+      padding: 10px 12px;
+      font-size: 0.75rem;
+      white-space: nowrap;
     }
   }
 </style>

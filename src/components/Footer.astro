@@ -56,7 +56,9 @@ const year = new Date().getFullYear();
   .footer-grid {
     display: grid;
     gap: var(--s-6);
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    /* min(...,100%) so the track can collapse below its ideal width.
+       A bare 240px minimum is a hard floor and overflows a 320px phone. */
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
   }
 
   .logo-chip {
@@ -83,6 +85,20 @@ const year = new Date().getFullYear();
   .plain a {
     color: var(--band-ink);
     text-decoration: none;
+  }
+
+  /* Touch only. These links set at 22px, which is half a comfortable thumb
+     target; the padding brings them to 44 without changing how they look on a
+     mouse-driven screen. `pointer: coarse` rather than a width query, because
+     what matters is the input device, not the window. */
+  @media (pointer: coarse) {
+    .plain a {
+      display: inline-block;
+      padding-block: 11px;
+    }
+    .plain {
+      gap: 0;
+    }
   }
 
   .plain a:hover {

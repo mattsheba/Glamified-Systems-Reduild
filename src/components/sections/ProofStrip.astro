@@ -32,7 +32,9 @@ const stats = site.proof?.stats ?? [];
 
   .strip {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    /* min(...,100%) so the track can collapse below its ideal width.
+       A bare 180px minimum is a hard floor and overflows a 320px phone. */
+    grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
     gap: var(--s-5);
   }
 

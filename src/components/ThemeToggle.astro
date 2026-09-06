@@ -13,6 +13,12 @@ import Icon from "./Icon.astro";
  * switches at sunset carries the site with it.
  */
 
+interface Props {
+  /** "menu" renders the control inside the mobile menu instead of the header. */
+  variant?: "header" | "menu";
+}
+const { variant = "header" } = Astro.props;
+
 const OPTIONS = [
   { value: "light", icon: "sun", label: "Light theme" },
   { value: "auto", icon: "auto", label: "Match device theme" },
@@ -20,7 +26,11 @@ const OPTIONS = [
 ];
 ---
 
-<div class="theme" role="group" aria-label="Colour theme">
+<div
+  class:list={["theme", variant === "menu" && "theme--menu"]}
+  role="group"
+  aria-label="Colour theme"
+>
   {OPTIONS.map((option) => (
     <button
       type="button"
@@ -36,9 +46,19 @@ const OPTIONS = [
 
 <script is:inline>
   (() => {
+    // The component renders twice (header and mobile menu), so this inline
+    // script is emitted twice and would otherwise bind every button twice.
+    //
+    // The guard has to be paired with deferring the work. An inline script runs
+    // the moment the parser reaches it, which for the header copy is BEFORE the
+    // mobile menu further down the document exists. Guarding alone therefore
+    // bound only the header's buttons and left the menu's inert — the exact bug
+    // this was meant to prevent, in the other direction. Waiting for the parser
+    // to finish means one run that sees every button.
+    if (window.__themeToggleReady) return;
+    window.__themeToggleReady = true;
+
     const root = document.documentElement;
-    const buttons = document.querySelectorAll("[data-theme-set]");
-    if (!buttons.length) return;
 
     const read = () => {
       try {
@@ -50,6 +70,8 @@ const OPTIONS = [
       }
     };
 
+    let buttons = [];
+
     const apply = (choice) => {
       if (choice === "auto") root.removeAttribute("data-theme");
       else root.setAttribute("data-theme", choice);
@@ -60,20 +82,33 @@ const OPTIONS = [
       });
     };
 
-    buttons.forEach((button) => {
-      button.addEventListener("click", () => {
-        const choice = button.getAttribute("data-theme-set");
-        try {
-          if (choice === "auto") localStorage.removeItem("theme");
-          else localStorage.setItem("theme", choice);
-        } catch {
-          // Choice still applies for this page view even if it cannot persist.
-        }
-        apply(choice);
-      });
-    });
+    const init = () => {
+      buttons = Array.from(document.querySelectorAll("[data-theme-set]"));
+      if (!buttons.length) return;
 
-    apply(read());
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const choice = button.getAttribute("data-theme-set");
+          try {
+            if (choice === "auto") localStorage.removeItem("theme");
+            else localStorage.setItem("theme", choice);
+          } catch {
+            // Choice still applies for this page view even if it cannot persist.
+          }
+          apply(choice);
+        });
+      });
+
+      apply(read());
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init, { once: true });
+    } else {
+      init();
+    }
+    // No apply() here: init() ends with one, and the no-flash script in
+    // Base.astro has already set the attribute before first paint.
   })();
 </script>
 
@@ -105,6 +140,26 @@ const OPTIONS = [
     color: var(--accent);
   }
 
+  /*
+   * The visible pill stays 28px, because three 44px circles would dominate the
+   * header. Instead the touch area is extended past the paint with a
+   * pseudo-element, so a thumb lands on it without the control growing.
+   */
+  @media (pointer: coarse) {
+    .theme-btn {
+      position: relative;
+    }
+    .theme-btn::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 44px;
+      height: 44px;
+      transform: translate(-50%, -50%);
+    }
+  }
+
   .theme-btn[aria-pressed="true"] {
     background: var(--accent);
     color: var(--surface);
@@ -116,9 +171,32 @@ const OPTIONS = [
     color: inherit;
   }
 
-  @media (max-width: 767px) {
-    .theme {
+  /*
+   * Deliberately NOT hidden on small screens. It used to be, which meant the
+   * one place people most often have a system dark-mode preference was the one
+   * place they could not override it. The brand wordmark hides below 480px,
+   * which is where the width for this comes from.
+   */
+  /*
+   * Below 767 the header has to hold the brand, the WhatsApp button and the
+   * menu inside about 288px on a 320px phone. The theme control does not fit,
+   * and the WhatsApp button is the conversion path, so the control moves into
+   * the mobile menu rather than being dropped: hiding it entirely was the old
+   * behaviour, and it left phone users unable to change theme at all.
+   */
+  @media (max-width: 1023px) {
+    .theme:not(.theme--menu) {
       display: none;
     }
+  }
+
+  @media (min-width: 1024px) {
+    .theme--menu {
+      display: none;
+    }
+  }
+
+  .theme--menu {
+    margin-top: var(--s-3);
   }
 </style>
