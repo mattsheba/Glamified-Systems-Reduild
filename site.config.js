@@ -299,6 +299,10 @@ export default {
         size: "94 MB",
         platform: "Windows 10 and 11",
       },
+      // Uncomment once the file is in the bucket, then run:
+      //   npm run verify:downloads
+      // It returns 404 today, and a guide link that 404s is worse than none.
+      // guide: { file: "GlamifiedSales-User-Guide-1.3.0.pdf" },
       features: [
         "Quotations that convert to invoices in one step",
         "Receipts and part-payments linked to the invoice",
