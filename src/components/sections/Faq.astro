@@ -136,5 +136,26 @@ const ctaHref = cta ? (cta.type === "whatsapp" ? whatsappHref() : cta.href!) : n
       grid-template-columns: 1fr;
       gap: var(--s-5);
     }
+
+    /*
+     * Once the two columns stack, the heading no longer anchors anything on the
+     * left: it sits above the questions exactly like every other section
+     * heading on the page, and those are centred. Left-aligning only this one
+     * read as an oversight rather than a choice.
+     *
+     * On desktop it stays left, where it does still anchor the composition.
+     */
+    .faq-intro {
+      /* The whole block, not just the text: centring the heading and standfirst
+         while the button stayed left looked like a mistake. */
+      text-align: center;
+    }
+    .faq-intro h2,
+    .faq-intro p {
+      margin-inline: auto;
+    }
+    .faq-intro p {
+      max-width: var(--measure);
+    }
   }
 </style>
