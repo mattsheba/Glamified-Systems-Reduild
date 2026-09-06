@@ -27,14 +27,18 @@ const variant = process.env.VARIANT_CONFIG;
  * the variant gate pass while testing the wrong config. Intercepting at
  * resolveId catches the specifier whatever its relative shape.
  */
-const variantPlugin = variant && {
+/** @type {import("vite").Plugin | undefined} */
+const variantPlugin = variant ? {
   name: "variant-config",
-  enforce: "pre",
+  // Annotated because "pre" widens to string without it, and Vite's Plugin
+  // type wants the literal.
+  enforce: /** @type {const} */ ("pre"),
+  /** @param {string} source */
   resolveId(source) {
     if (!/(^|[\\/])site\.config\.js$/.test(source)) return null;
     return resolve(root, variant);
   },
-};
+} : undefined;
 
 // astro.config.mjs itself is evaluated before the alias exists, so `site` here
 // is always the real config. Only `site.seo.domain` is read from it, which is

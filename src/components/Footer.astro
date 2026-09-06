@@ -1,8 +1,6 @@
 ---
 import site from "../lib/site";
-import { whatsappHref } from "../lib/site";
 
-const wa = whatsappHref();
 const year = new Date().getFullYear();
 ---
 
@@ -17,9 +15,6 @@ const year = new Date().getFullYear();
           <img src={site.brand.logo} alt={site.brand.name} width="640" height="470" />
         </span>
         <p class="muted">{site.brand.tagline}</p>
-        <a class="btn btn--primary" href={wa} rel="noopener">
-          {site.hero.primaryCta.label}
-        </a>
       </div>
 
       <div>
@@ -50,7 +45,11 @@ const year = new Date().getFullYear();
 
 <style>
   .site-footer {
-    padding-block: var(--section-y) var(--s-5);
+    /* Extra room at the bottom for the floating WhatsApp button, which is fixed
+       over the bottom-right corner. Without it the colophon renders underneath
+       the button on narrow screens, where the copyright line reaches the right
+       edge. Measured: the button occupies 68px of that corner on mobile. */
+    padding-block: var(--section-y) calc(var(--s-5) + 48px);
   }
 
   .footer-grid {
@@ -106,6 +105,9 @@ const year = new Date().getFullYear();
   }
 
   .colophon {
+    /* Keeps the line from running under the button horizontally as well, for
+       the case where it wraps differently than measured. */
+    padding-right: 72px;
     margin: var(--s-6) 0 0;
     padding-top: var(--s-4);
     border-top: 1px solid var(--band-hairline);

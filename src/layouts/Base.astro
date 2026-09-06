@@ -2,6 +2,7 @@
 import site from "../lib/site";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import FloatingWhatsApp from "../components/FloatingWhatsApp.astro";
 import "../styles/fonts.css";
 import "../styles/tokens.css";
 
@@ -80,5 +81,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
       <slot />
     </main>
     <Footer />
+    <FloatingWhatsApp />
   </body>
 </html>
