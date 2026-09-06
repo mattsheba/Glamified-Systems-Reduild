@@ -13,7 +13,8 @@
     "verify:config": "node scripts/verify-config.mjs",
     "verify:engine": "node scripts/verify-engine.mjs",
     "verify:variant": "node scripts/verify-variant.mjs",
-    "verify:downloads": "node scripts/verify-downloads.mjs"
+    "verify:downloads": "node scripts/verify-downloads.mjs",
+    "verify:sitemap": "node scripts/verify-sitemap.mjs"
   },
   "dependencies": {
     "astro": "^5.14.1"
