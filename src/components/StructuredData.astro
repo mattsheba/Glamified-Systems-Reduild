@@ -116,7 +116,20 @@ if (breadcrumbs?.length) {
   });
 }
 
-const payload = JSON.stringify({ "@context": "https://schema.org", "@graph": graph });
+/*
+ * JSON.stringify does not escape "</script>", so a config string containing one
+ * closes this block early and everything after it becomes live markup. Proven
+ * exploitable: a brand name of `X</script><script>alert(1)</script>` executed.
+ *
+ * Escaping "<" as \\u003c is a valid JSON escape that no parser objects to, and
+ * it makes a closing tag impossible to form. This matters more for the template
+ * variants than for this site, because variant copy is not always written by
+ * the person who owns the codebase.
+ */
+const payload = JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": graph,
+}).replace(/</g, "\\u003c");
 ---
 
 <script type="application/ld+json" is:inline set:html={payload} />

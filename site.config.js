@@ -151,6 +151,11 @@ export default {
         },
       ],
     },
+    notFound: {
+      heading: "That page does not exist",
+      standfirst:
+        "The address may have changed, or it may have been mistyped. Everything the site holds is below.",
+    },
     contact: {
       heading: "Talk to us",
       standfirst:

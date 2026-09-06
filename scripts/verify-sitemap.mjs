@@ -27,6 +27,11 @@ if (!existsSync(dist)) {
 
 /* ---------- what was actually built ---------- */
 
+/*
+ * Only index.html counts as a route. That deliberately excludes dist/404.html,
+ * which Astro emits as a bare file: a 404 must never appear in a sitemap, and
+ * listing one tells a crawler the error page is real content.
+ */
 const routesFrom = (dir, base = "") =>
   readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const path = join(dir, entry.name);

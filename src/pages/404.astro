@@ -1,0 +1,102 @@
+---
+import Base from "../layouts/Base.astro";
+import site, { whatsappHref, productHref, serviceHref } from "../lib/site";
+
+/**
+ * Without this the host serves its own default 404, which carries none of the
+ * site's navigation. Someone who mistypes a URL, or follows an old link that
+ * the redirects file does not cover, otherwise reaches a dead end with no way
+ * back into the site.
+ *
+ * The links are built from config so this page cannot go stale, and it is
+ * deliberately useful rather than apologetic: the three products are what most
+ * lost visitors were looking for.
+ */
+const wa = whatsappHref();
+const copy = site.pages?.products;
+const notFound = site.pages?.notFound;
+---
+
+<Base
+  title={`Page not found | ${site.brand.name}`}
+  description="That page does not exist. Links to the products, services and contact details for Glamified Systems."
+>
+  <section class="section mode-light">
+    <div class="container notfound">
+      <p class="eyebrow">404</p>
+      <h1 class="display">{notFound?.heading}</h1>
+      {notFound?.standfirst && <p class="lead">{notFound.standfirst}</p>}
+
+      <div class="cols">
+        <nav aria-label="Products">
+          <p class="eyebrow">{copy?.heading}</p>
+          <ul class="plain">
+            {site.products.map((product) => (
+              <li><a href={productHref(product.slug)}>{product.name}</a></li>
+            ))}
+          </ul>
+        </nav>
+
+        <nav aria-label="Services">
+          <p class="eyebrow">{site.pages?.services?.heading}</p>
+          <ul class="plain">
+            {site.services.map((service) => (
+              <li><a href={serviceHref(service.slug)}>{service.name}</a></li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+
+      <a class="btn btn--primary" href={wa} rel="noopener">
+        {site.hero.primaryCta.label}
+      </a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .notfound {
+    max-width: var(--measure);
+  }
+
+  .lead {
+    font-size: var(--t-lead);
+    line-height: 1.5;
+    margin-bottom: var(--s-6);
+  }
+
+  .cols {
+    display: grid;
+    gap: var(--s-6);
+    /* min(...,100%) so the tracks collapse rather than forcing a scrollbar. */
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    margin-bottom: var(--s-6);
+  }
+
+  .plain {
+    list-style: none;
+    margin: var(--s-2) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  .plain a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .plain a:hover {
+    color: var(--accent);
+  }
+
+  @media (pointer: coarse) {
+    .plain a {
+      display: inline-block;
+      padding-block: 11px;
+    }
+    .plain {
+      gap: 0;
+    }
+  }
+</style>

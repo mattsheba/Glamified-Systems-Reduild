@@ -30,3 +30,31 @@
 
 /
   Cache-Control: public, max-age=0, must-revalidate
+
+# ---------------------------------------------------------------------------
+# Security headers.
+#
+# This site ships no external JavaScript and loads no third-party resources, so
+# the policy can be tight. The one concession is 'unsafe-inline': Astro inlines
+# both the stylesheet and the few progressive-enhancement scripts, and hashing
+# them would couple this file to every build.
+#
+# Even with that concession the policy still blocks the things that matter: an
+# injected <script src> from another origin, this site being framed for
+# clickjacking, and a form being retargeted at somebody else's endpoint.
+# ---------------------------------------------------------------------------
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests
+  # Belt and braces for frame-ancestors, which older browsers ignore.
+  X-Frame-Options: DENY
+  # Stops a browser guessing that a .webp is really something executable.
+  X-Content-Type-Options: nosniff
+  # Send the full URL within the site, only the origin when leaving it.
+  Referrer-Policy: strict-origin-when-cross-origin
+  # Nothing here needs a camera, a microphone or a location.
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  # includeSubDomains covers downloads.glamifiedsystems.com, which is HTTPS-only
+  # on R2. Do not add "preload" without deciding that separately: it is hard to
+  # undo.
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
