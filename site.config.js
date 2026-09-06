@@ -195,8 +195,7 @@ export default {
         // The live site ranks on this URL — keep it working (see public/_redirects).
         previousPath: "/glamifiedhr",
       },
-      // PLACEHOLDER — taken from the current live site. Confirm it is still right.
-      price: { amount: 3000, currency: "ZMW", note: "One-off. Own it forever." },
+      price: { amount: 15000, currency: "ZMW", note: "One-off. Own it forever." },
       summary:
         "HR and payroll for Zambian businesses, with NAPSA, PAYE and NHIMA calculated for you.",
       description:
@@ -288,6 +287,7 @@ export default {
           "Business document software for Zambian companies. Quotations, invoices, receipts and delivery notes, with ZRA Smart Invoice support. Works offline.",
         previousPath: "/glamifiedsales",
       },
+      price: { amount: 1800, currency: "ZMW", note: "One-off. Own it forever." },
       summary:
         "Quotations, invoices, receipts and delivery notes, linked to each other and to the customer.",
       description:
@@ -378,6 +378,7 @@ export default {
           "Fleet management software for Zambian businesses. Track fuel, trips, servicing, licences and the true running cost per vehicle. Runs offline on your own machine.",
         previousPath: "/glamifiedfleet",
       },
+      price: { amount: 6000, currency: "ZMW", note: "One-off. Own it forever." },
       summary:
         "Fuel, trips, servicing and licences, added up into a real cost per vehicle.",
       description:
