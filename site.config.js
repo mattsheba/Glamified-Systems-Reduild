@@ -385,9 +385,10 @@ export default {
         size: "94 MB",
         platform: "Windows 10 and 11",
       },
-      // CONFIRM the exact object key in the bucket, then uncomment. Guessed
-      // names all returned 404, and a guide link that 404s is worse than none.
-      // guide: { file: "GlamifiedFleet-User-Guide-?.?.?.pdf" },
+      // Note the dot before the version, where HR's guide uses a hyphen. The
+      // filename has to match the bucket key exactly, so the inconsistency is
+      // reproduced here rather than tidied.
+      guide: { file: "GlamifiedFleet-User-Guide.1.2.0.pdf" },
       features: [
         "Cost per vehicle, built from real records",
         "Fuel, trips, servicing and licence renewals",
