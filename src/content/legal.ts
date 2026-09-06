@@ -26,16 +26,19 @@ export interface LegalDoc {
 const name = site.legal.registeredName;
 const email = site.contact.email;
 const phone = site.contact.phone;
+const phoneAlt = site.contact.phoneAlt;
+// Both numbers, so a reader is never left with the one that is engaged.
+const phones = [phone, phoneAlt].filter(Boolean).join(" or ");
 const city = site.contact.city;
 const jurisdiction = site.legal.jurisdiction;
 const office = site.legal.registeredOffice;
 const tpin = site.legal.tpin;
 const dpa = site.legal.dataProtectionAct ?? "applicable data protection law";
 
-/** "Glamified Systems Limited of Plot …, TPIN …" where those are configured. */
+/** "Glamified Systems Limited of Lusaka, Zambia (TPIN …)" as configured. */
 const identity = [
   name,
-  office ? `of ${office}` : `of ${city}`,
+  `of ${office ?? city}`,
   tpin ? `(TPIN ${tpin})` : "",
 ]
   .filter(Boolean)
@@ -49,7 +52,7 @@ export const privacy: LegalDoc = {
     {
       heading: "Who we are",
       body: [
-        `${identity} is the data controller for the personal information described in this policy. We are contactable at ${email} and on ${phone}.`,
+        `${identity} is the data controller for the personal information described in this policy. We are contactable at ${email}, and on ${phones}.`,
       ],
     },
     {
@@ -131,7 +134,7 @@ export const privacy: LegalDoc = {
     {
       heading: "Contact",
       body: [
-        `${name}, ${office ?? city}. Questions about this policy, or any request about your information: ${email}.`,
+        `${name}, ${office ?? city}. Questions about this policy, or any request about your information: ${email}, or ${phones}.`,
       ],
     },
   ],
@@ -275,7 +278,7 @@ export const refund: LegalDoc = {
     {
       heading: "How to ask",
       body: [
-        `Email ${email} with your invoice number and what you would like refunded. We reply within one working day and aim to resolve a request within seven.`,
+        `Email ${email} with your invoice number and what you would like refunded, or call ${phones}. We reply within one working day and aim to resolve a request within seven.`,
       ],
     },
     {

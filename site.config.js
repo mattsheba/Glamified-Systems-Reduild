@@ -24,6 +24,7 @@ export default {
 
   contact: {
     phone: "+260 977 669 883",
+    phoneAlt: "+260 770 029 595",
     whatsapp: "260977669883",
     whatsappMessage:
       "Hello Glamified Systems. I'd like to talk about a project.",
@@ -123,8 +124,7 @@ export default {
         label: "Company details",
         items: [
           { label: "Registered name", value: "Glamified Systems Limited" },
-          // CONFIRM: taken from a GlamifiedSales invoice screenshot, not from you.
-          { label: "Registered office", value: "Plot 12175, Kafue Road, Chilanga" },
+          { label: "Based in", value: "Lusaka, Zambia" },
           { label: "TPIN", value: "2001937380" },
           { label: "PACRA registration", value: "PLACEHOLDER" },
           { label: "Trading since", value: "2023" },
@@ -923,8 +923,9 @@ export default {
   legal: {
     jurisdiction: "Zambia",
     registeredName: "Glamified Systems Limited",
-    // CONFIRM: read off a GlamifiedSales invoice, not given to us directly.
-    registeredOffice: "Plot 12175, Kafue Road, Chilanga, Lusaka",
+    registeredOffice: "Lusaka, Zambia",
+    // CONFIRM: read off a GlamifiedSales invoice screenshot, not given to us.
+    // It appears on all three legal pages and the About page. Verify or remove.
     tpin: "2001937380",
     // The statute the privacy policy is written against.
     dataProtectionAct: "the Data Protection Act No. 3 of 2021",

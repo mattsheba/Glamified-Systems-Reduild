@@ -229,6 +229,8 @@ export interface SiteConfig {
 
   contact: {
     phone: string;
+    /** Second line, shown on the legal pages so either number reaches you. */
+    phoneAlt?: string;
     whatsapp: string;
     whatsappMessage: string;
     email: string;
