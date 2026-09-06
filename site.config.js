@@ -923,6 +923,11 @@ export default {
   legal: {
     jurisdiction: "Zambia",
     registeredName: "Glamified Systems Limited",
+    // CONFIRM: read off a GlamifiedSales invoice, not given to us directly.
+    registeredOffice: "Plot 12175, Kafue Road, Chilanga, Lusaka",
+    tpin: "2001937380",
+    // The statute the privacy policy is written against.
+    dataProtectionAct: "the Data Protection Act No. 3 of 2021",
     lastUpdated: "2026-09-06",
   },
 

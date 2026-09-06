@@ -52,9 +52,9 @@ const OPTIONS = [
     // The guard has to be paired with deferring the work. An inline script runs
     // the moment the parser reaches it, which for the header copy is BEFORE the
     // mobile menu further down the document exists. Guarding alone therefore
-    // bound only the header's buttons and left the menu's inert — the exact bug
-    // this was meant to prevent, in the other direction. Waiting for the parser
-    // to finish means one run that sees every button.
+    // bound only the header's buttons and left the menu's inert, which is the
+    // exact bug this was meant to prevent, in the other direction. Waiting for
+    // the parser to finish means one run that sees every button.
     if (window.__themeToggleReady) return;
     window.__themeToggleReady = true;
 

@@ -43,6 +43,7 @@ const EXEMPT = new Set([
   // footer & contact column headings
   "Contact",
   "Legal",
+  "Quick links",
   "Phone",
   "Hours",
   "Privacy policy",

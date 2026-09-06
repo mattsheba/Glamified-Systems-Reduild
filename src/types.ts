@@ -353,6 +353,11 @@ export interface SiteConfig {
   legal: {
     jurisdiction: string;
     registeredName: string;
+    /** Shown in the legal documents so the contracting entity is identifiable. */
+    registeredOffice?: string;
+    tpin?: string;
+    /** Named statute the privacy policy is written against. */
+    dataProtectionAct?: string;
     lastUpdated: string;
   };
 

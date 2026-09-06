@@ -23,12 +23,8 @@ const updated = new Date(site.legal.lastUpdated).toLocaleDateString("en-GB", {
   <article class="section mode-light">
     <div class="container legal">
       <h1 class="display">{doc.title}</h1>
+      {doc.standfirst && <p class="standfirst">{doc.standfirst}</p>}
       <p class="muted updated">Last updated {updated}</p>
-
-      <div class="note">
-        <strong>Template: not yet reviewed.</strong> This document has not been
-        checked by a lawyer. Have it reviewed before relying on it.
-      </div>
 
       {doc.sections.map((section) => (
         <section>
@@ -52,11 +48,12 @@ const updated = new Date(site.legal.lastUpdated).toLocaleDateString("en-GB", {
     font-size: var(--t-small);
   }
   /* Deliberately loud. This should be uncomfortable to ship. */
-  .note {
-    border-left: 3px solid var(--error);
-    background: color-mix(in oklab, var(--error), transparent 94%);
-    padding: var(--s-3) var(--s-4);
-    margin: var(--s-5) 0;
-    font-size: var(--t-small);
+  /* Sets the document up in a sentence before the clauses start, so the reader
+     knows what they are about to read. */
+  .standfirst {
+    font-size: var(--t-lead);
+    line-height: 1.5;
+    max-width: var(--measure);
+    margin: 0 0 var(--s-3);
   }
 </style>
