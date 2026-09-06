@@ -17,6 +17,10 @@ const wa = whatsappHref();
 const download = downloadHref(product);
 const guide = guideHref(product);
 
+// Rendered only when payments are switched on AND this product has a price.
+// Until then the page looks exactly as it does today.
+const canBuy = Boolean(site.payments?.enabled && product.price);
+
 // The heading leads with the problem where a headline is given; the product
 // name moves to the eyebrow so the brand is still the first thing read.
 const heading = product.headline ?? product.name;
@@ -77,6 +81,11 @@ const crumbs = [
                 <a class="btn btn--primary btn--compact" href={download} download>
                   {site.downloads?.label}
                 </a>
+                {canBuy && (
+                  <button class="btn btn--ghost btn--compact buy" type="button" data-buy={product.slug}>
+                    {site.payments?.label}
+                  </button>
+                )}
                 <a class="btn btn--ghost btn--compact" href={wa} rel="noopener">
                   {site.hero.primaryCta.label}
                 </a>
@@ -92,6 +101,37 @@ const crumbs = [
               the button. */}
           {download && site.downloads?.trial && (
             <p class="trial">{site.downloads.trial}</p>
+          )}
+
+          {canBuy && site.payments?.note && (
+            <p class="pay-note">{site.payments.note}</p>
+          )}
+          {canBuy && <p class="pay-status" role="status" aria-live="polite" hidden></p>}
+
+          {/* Revealed by the buy button. Lenco needs a name, an email to send
+              the key to, and a phone number for mobile money, so there is no
+              way to skip collecting them. Kept inline rather than in a modal:
+              a modal is more code and more ways to trap keyboard focus. */}
+          {canBuy && (
+            <form class="pay-form" hidden data-pay-form={product.slug}>
+              <div class="pay-fields">
+                <div class="field">
+                  <label for={`pay-name-${product.slug}`}>{site.form.labels?.name}</label>
+                  <input id={`pay-name-${product.slug}`} name="name" type="text" autocomplete="name" required />
+                </div>
+                <div class="field">
+                  <label for={`pay-email-${product.slug}`}>{site.form.labels?.email}</label>
+                  <input id={`pay-email-${product.slug}`} name="email" type="email" autocomplete="email" required />
+                </div>
+                <div class="field">
+                  <label for={`pay-phone-${product.slug}`}>{site.form.labels?.phone}</label>
+                  <input id={`pay-phone-${product.slug}`} name="phone" type="tel" autocomplete="tel" required />
+                </div>
+              </div>
+              <button class="btn btn--primary btn--compact pay-go" type="submit">
+                {site.payments?.confirmLabel}
+              </button>
+            </form>
           )}
 
           {/* A text link, not a third button. The guide is a secondary action,
@@ -139,6 +179,65 @@ const crumbs = [
     </section>
   )}
 
+  {canBuy && (
+    <script is:inline define:vars={{ payEndpoint: "/api/initiate-payment" }}>
+      /*
+       * Reveals the checkout fields, then exchanges them for a Lenco payment
+       * URL and sends the customer there.
+       *
+       * The amount is deliberately not sent. The function looks the price up
+       * from the product, so nothing here can influence what is charged.
+       */
+      document.querySelectorAll("[data-buy]").forEach((button) => {
+        const slug = button.getAttribute("data-buy");
+        const form = document.querySelector(`[data-pay-form="${slug}"]`);
+        const status = document.querySelector(".pay-status");
+        if (!form || !status) return;
+
+        button.addEventListener("click", () => {
+          form.hidden = false;
+          button.hidden = true;
+          const first = form.querySelector("input");
+          if (first) first.focus();
+        });
+
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const go = form.querySelector(".pay-go");
+          if (go.disabled) return;
+
+          const data = new FormData(form);
+          go.disabled = true;
+          status.hidden = false;
+          status.className = "pay-status";
+          status.textContent = "Starting payment…";
+
+          try {
+            const response = await fetch(payEndpoint, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                slug,
+                name: data.get("name"),
+                email: data.get("email"),
+                phone: data.get("phone"),
+              }),
+            });
+            const result = await response.json();
+            if (!response.ok || !result.paymentUrl) {
+              throw new Error(result.error || "Could not start payment");
+            }
+            // Hand off to Lenco. Nothing sensitive has been handled here.
+            window.location.href = result.paymentUrl;
+          } catch (error) {
+            status.className = "pay-status is-error";
+            status.textContent = error.message;
+            go.disabled = false;
+          }
+        });
+      });
+    </script>
+  )}
 </Base>
 
 <style>
@@ -176,6 +275,54 @@ const crumbs = [
      label alone is enough; the size is in the download itself. */
   .actions .btn--compact {
     padding: 11px 20px;
+  }
+
+  .pay-form {
+    max-width: 420px;
+    margin-top: var(--s-4);
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--hairline);
+  }
+
+  .pay-fields {
+    display: grid;
+    gap: var(--s-3);
+    margin-bottom: var(--s-3);
+  }
+
+  .pay-form label {
+    display: block;
+    font-size: var(--t-small);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .pay-form input {
+    width: 100%;
+    padding: 10px 12px;
+    font: inherit;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-sm);
+  }
+
+  .pay-form input:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 1px;
+  }
+
+  .pay-note,
+  .pay-status {
+    max-width: var(--measure);
+    margin: var(--s-2) 0 0;
+    font-size: var(--t-small);
+    line-height: 1.5;
+    color: var(--ink-muted);
+  }
+
+  .pay-status.is-error {
+    color: var(--error);
   }
 
   .guide {

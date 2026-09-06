@@ -1,0 +1,59 @@
+---
+import Base from "../layouts/Base.astro";
+import site, { whatsappHref } from "../lib/site";
+
+/**
+ * Where Lenco returns the customer after payment.
+ *
+ * Deliberately does not claim the payment succeeded. This page is reached by a
+ * redirect the customer's browser follows, which proves only that they came back
+ * from the gateway — not that money moved. The webhook is what confirms a
+ * payment, and it is the only thing that triggers issuing a key.
+ *
+ * So the copy promises what is actually true: we will be in touch once the
+ * payment confirms. Telling someone "payment complete" on the strength of a
+ * redirect is how people end up believing they own something they do not.
+ */
+const copy = site.pages?.paymentSuccess;
+const wa = whatsappHref();
+---
+
+<Base
+  title={`${copy?.heading ?? "Thank you"} | ${site.brand.name}`}
+  description={copy?.standfirst}
+  noindex
+>
+  <section class="section mode-light">
+    <div class="container thanks">
+      <h1 class="display">{copy?.heading}</h1>
+      {copy?.standfirst && <p class="lead">{copy.standfirst}</p>}
+
+      {copy?.body && copy.body.map((paragraph) => <p>{paragraph}</p>)}
+
+      <div class="actions">
+        <a class="btn btn--primary" href={wa} rel="noopener">
+          {site.hero.primaryCta.label}
+        </a>
+        <a class="btn btn--ghost" href="/products">{site.pages?.products?.heading}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .thanks {
+    max-width: var(--measure);
+  }
+
+  .lead {
+    font-size: var(--t-lead);
+    line-height: 1.5;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-6);
+  }
+</style>

@@ -23,3 +23,6 @@ Thumbs.db
 # Leading slash: root only. A bare "content/" would also match src/content/,
 # which holds the legal page collection the build needs.
 /content/
+
+# Local Netlify folder
+.netlify

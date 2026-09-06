@@ -13,3 +13,21 @@
 # public/_headers and public/_redirects, which Astro copies into dist/ and
 # Netlify reads from there. Keeping them in those files means Cloudflare Pages
 # reads the same two files unchanged if the site ever moves.
+
+[functions]
+  directory = "netlify/functions"
+  # site.config.js sits outside the functions folder and is required by both of
+  # them for prices, so it has to be bundled.
+  included_files = ["site.config.js"]
+
+# Friendlier than /.netlify/functions/initiate-payment, and it keeps the public
+# surface stable if the function is ever renamed.
+[[redirects]]
+  from = "/api/initiate-payment"
+  to = "/.netlify/functions/initiate-payment"
+  status = 200
+
+[[redirects]]
+  from = "/api/lenco-webhook"
+  to = "/.netlify/functions/lenco-webhook"
+  status = 200

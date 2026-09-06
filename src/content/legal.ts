@@ -32,17 +32,16 @@ const phones = [phone, phoneAlt].filter(Boolean).join(" or ");
 const city = site.contact.city;
 const jurisdiction = site.legal.jurisdiction;
 const office = site.legal.registeredOffice;
-const tpin = site.legal.tpin;
 const dpa = site.legal.dataProtectionAct ?? "applicable data protection law";
 
-/** "Glamified Systems Limited of Lusaka, Zambia (TPIN …)" as configured. */
-const identity = [
-  name,
-  `of ${office ?? city}`,
-  tpin ? `(TPIN ${tpin})` : "",
-]
-  .filter(Boolean)
-  .join(" ");
+/**
+ * "Glamified Systems Limited of Lusaka, Zambia".
+ *
+ * The TPIN is deliberately not included. A tax number is not needed to identify
+ * the contracting party in these documents, and publishing one in a contract
+ * invites it being quoted back in places it was never checked against.
+ */
+const identity = [name, `of ${office ?? city}`].filter(Boolean).join(" ");
 
 export const privacy: LegalDoc = {
   slug: "privacy",

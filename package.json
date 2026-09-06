@@ -17,7 +17,8 @@
     "verify:sitemap": "node scripts/verify-sitemap.mjs"
   },
   "dependencies": {
-    "astro": "^5.14.1"
+    "astro": "^5.14.1",
+    "nodemailer": "^10.0.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",

@@ -259,6 +259,8 @@ export interface SiteConfig {
     services?: ServicesCopy;
     about?: AboutCopy;
     contact?: PageCopy;
+    /** Where Lenco returns the customer after payment. */
+    paymentSuccess?: PageCopy & { body?: string[] };
     /** Where a no-JS form submission lands. */
     thankYou?: PageCopy;
     /** 404 page. A variant may want its own wording. */
@@ -281,6 +283,20 @@ export interface SiteConfig {
    * the WhatsApp call to action, because a button that 404s is worse than no
    * button.
    */
+  /** Online payment. See site.config.js for why prices are not repeated here. */
+  payments?: {
+    /** Nothing renders and the functions refuse to run while this is false. */
+    enabled: boolean;
+    provider: "lenco";
+    label: string;
+    /** Button that submits the checkout fields. */
+    confirmLabel: string;
+    note?: string;
+    successPath: string;
+    currency: string;
+    methods: string[];
+  };
+
   downloads?: {
     baseUrl: string;
     label: string;
@@ -347,6 +363,8 @@ export interface SiteConfig {
 
   form: {
     endpoint: string;
+    /** Field labels, shared by the enquiry form and the checkout fields. */
+    labels?: { name: string; email: string; phone: string };
     heading: string;
     standfirst?: string;
     organisationTypes: string[];

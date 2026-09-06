@@ -151,6 +151,15 @@ export default {
         },
       ],
     },
+    paymentSuccess: {
+      heading: "Thank you, your payment is being confirmed",
+      standfirst:
+        "You have been returned from the payment gateway. We confirm every payment before issuing a licence key.",
+      body: [
+        "Once the payment clears we email your licence key to the address you gave at checkout. That is usually within a few hours during working hours.",
+        "If you have not heard from us by the next working day, send us the payment reference on WhatsApp and we will look it up.",
+      ],
+    },
     thankYou: {
       heading: "Thank you, we have your enquiry",
       standfirst:
@@ -175,6 +184,29 @@ export default {
    * Run `npm run verify:downloads` after uploading a new installer. Nothing
    * else in the build can tell whether a file really exists in the bucket.
    */
+  /*
+   * Online payment via Lenco.
+   *
+   * `enabled` is the safety catch. While it is false no buy button renders and
+   * the functions refuse to run, so the code can ship and be reviewed before a
+   * single real transaction is possible. Turn it on only after a sandbox
+   * payment has been taken and the webhook confirmed.
+   *
+   * Prices are NOT repeated here. The functions read them from products[], so a
+   * price change cannot leave the checkout charging the old amount. The
+   * previous implementation hardcoded them and drifted.
+   */
+  payments: {
+    enabled: false,
+    provider: "lenco",
+    label: "Buy now",
+    confirmLabel: "Continue to payment",
+    note: "Pay by Airtel Money, MTN Money or card. Your licence key is sent by email once payment clears.",
+    successPath: "/payment-success",
+    currency: "ZMW",
+    methods: ["airtel", "mtn", "card"],
+  },
+
   downloads: {
     baseUrl: "https://downloads.glamifiedsystems.com",
     label: "Download for Windows",
@@ -912,6 +944,8 @@ export default {
      * the background and shows the success message inline instead.
      */
     endpoint: "/thank-you",
+    // Reused by the checkout fields so the wording stays in one place.
+    labels: { name: "Full name", email: "Email", phone: "Phone number" },
     heading: "Tell us about your project",
     standfirst:
       "For anything bigger than a quick question. Prefer WhatsApp for a fast answer.",
