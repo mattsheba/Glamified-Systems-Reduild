@@ -1,0 +1,303 @@
+---
+import site from "../../lib/site";
+import { whatsappHref } from "../../lib/site";
+
+interface Props { mode: "light" | "inverse"; heading?: string }
+const { mode, heading } = Astro.props;
+
+const f = site.form;
+const wa = whatsappHref();
+---
+
+<section id="enquiry" class={`section mode-${mode}`}>
+  <div class="container">
+    {heading && <h2>{heading}</h2>}
+    {f.standfirst && <p class="lead">{f.standfirst}</p>}
+
+    {/* NFR-9: a real form with action/method, so it still submits with JS off.
+        The inline script below upgrades it to a fetch when JS is available. */}
+    <form class="enquiry" method="post" action={f.endpoint} novalidate>
+      <div class="cols">
+        <div class="col">
+          <div class="row">
+            <div class="field">
+              <label for="firstName">First name</label>
+              <input id="firstName" name="firstName" type="text" autocomplete="given-name" required />
+            </div>
+            <div class="field">
+              <label for="lastName">Last name</label>
+              <input id="lastName" name="lastName" type="text" autocomplete="family-name" required />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" required />
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="phone">Phone number</label>
+              <input id="phone" name="phone" type="tel" autocomplete="tel" />
+            </div>
+            <div class="field">
+              <label for="country">Country</label>
+              <input id="country" name="country" type="text" autocomplete="country-name" value="Zambia" />
+            </div>
+          </div>
+
+          {/* FR-15: real radios inside a fieldset, styled as pills. */}
+          <fieldset class="pills">
+            <legend>Organisation type</legend>
+            <div class="pill-row">
+              {f.organisationTypes.map((type, i) => (
+                <>
+                  <input
+                    class="sr-only pill-input"
+                    type="radio"
+                    name="organisationType"
+                    id={`org-${i}`}
+                    value={type}
+                  />
+                  <label class="pill" for={`org-${i}`}>{type}</label>
+                </>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset class="checks">
+            <legend>What are you looking for?</legend>
+            {f.serviceOptions.map((service, i) => (
+              <div class="check">
+                <input type="checkbox" name="services" id={`svc-${i}`} value={service} />
+                <label for={`svc-${i}`}>{service}</label>
+              </div>
+            ))}
+          </fieldset>
+        </div>
+
+        <div class="col">
+          <div class="field">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="8"></textarea>
+          </div>
+
+          {/* FR-16: discrete bands, never a slider. */}
+          <fieldset class="pills">
+            <legend>Budget</legend>
+            <div class="pill-row">
+              {f.budgetBands.map((band, i) => (
+                <>
+                  <input
+                    class="sr-only pill-input"
+                    type="radio"
+                    name="budgetBand"
+                    id={`budget-${i}`}
+                    value={band.value}
+                  />
+                  <label class="pill" for={`budget-${i}`}>{band.label}</label>
+                </>
+              ))}
+            </div>
+          </fieldset>
+
+          <button class="btn btn--primary submit" type="submit">Send enquiry</button>
+
+          <p class="form-status" role="status" aria-live="polite" hidden></p>
+
+          <p class="fallback muted">
+            Prefer to talk now? <a href={wa} rel="noopener">Message us on WhatsApp</a>.
+          </p>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script is:inline define:vars={{ successMessage: f.successMessage, errorMessage: f.errorMessage }}>
+  // Progressive enhancement only. With JS off the form posts normally (NFR-9).
+  document.querySelectorAll("form.enquiry").forEach((form) => {
+    const status = form.querySelector(".form-status");
+    const submit = form.querySelector(".submit");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (submit.disabled) return; // EC-9: no double submit
+      submit.disabled = true;
+      status.hidden = false;
+      status.textContent = "Sending…";
+      status.className = "form-status";
+
+      const data = new FormData(form);
+      const payload = Object.fromEntries(data.entries());
+      payload.services = data.getAll("services");
+
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!response.ok) throw new Error(String(response.status));
+        status.textContent = successMessage;
+        status.className = "form-status is-ok";
+        form.reset();
+      } catch {
+        // AC-10 / EC-5: keep what they typed, let them try again.
+        status.textContent = errorMessage;
+        status.className = "form-status is-error";
+      } finally {
+        submit.disabled = false;
+      }
+    });
+  });
+</script>
+
+<style>
+  .enquiry {
+    margin-top: var(--s-6);
+  }
+
+  .cols {
+    display: grid;
+    gap: var(--s-6);
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .col {
+    display: grid;
+    gap: var(--s-4);
+    align-content: start;
+  }
+
+  .row {
+    display: grid;
+    gap: var(--s-3);
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .field {
+    display: grid;
+    gap: var(--s-1);
+  }
+
+  /* AC-19: every field keeps a persistent label. */
+  label {
+    font-size: var(--t-small);
+    color: var(--band-ink-muted);
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  textarea {
+    font: inherit;
+    /* 16px minimum stops iOS Safari zooming on focus. */
+    font-size: max(16px, var(--t-body));
+    color: var(--band-ink);
+    background: var(--band-surface);
+    border: 1px solid var(--band-hairline);
+    border-radius: var(--r-sm);
+    padding: 10px 14px;
+    width: 100%;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  legend {
+    font-size: var(--t-small);
+    color: var(--band-ink-muted);
+    padding: 0;
+    margin-bottom: var(--s-2);
+  }
+
+  .pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+
+  .pill {
+    display: inline-block;
+    font-size: var(--t-meta);
+    color: var(--band-ink);
+    border: 1px solid var(--band-hairline);
+    border-radius: var(--r-sm);
+    padding: 8px 15px;
+    cursor: pointer;
+  }
+
+  /* AC-8: selection is not signalled by colour alone — weight and border
+     change too, so it survives greyscale and colour-blindness. */
+  .pill-input:checked + .pill {
+    background: var(--band-accent);
+    border-color: var(--band-accent);
+    color: var(--ground);
+    font-weight: 700;
+  }
+
+  .mode-inverse .pill-input:checked + .pill {
+    color: var(--ground-inverse);
+  }
+
+  .pill-input:focus-visible + .pill {
+    outline: 2px solid var(--band-accent);
+    outline-offset: 3px;
+  }
+
+  .checks {
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  .check {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .check label {
+    font-size: var(--t-body);
+    color: var(--band-ink);
+  }
+
+  .submit {
+    justify-self: start;
+  }
+
+  .form-status {
+    margin: 0;
+    font-size: var(--t-small);
+  }
+
+  .form-status.is-ok {
+    color: var(--success);
+  }
+  .form-status.is-error {
+    color: var(--error);
+  }
+  .mode-inverse .form-status.is-ok,
+  .mode-inverse .form-status.is-error {
+    color: var(--band-ink);
+  }
+
+  .fallback {
+    font-size: var(--t-small);
+    margin: 0;
+  }
+
+  @media (max-width: 767px) {
+    .cols,
+    .row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

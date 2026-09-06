@@ -1,0 +1,271 @@
+---
+import Base from "../../layouts/Base.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import StructuredData from "../../components/StructuredData.astro";
+import site, { whatsappHref, downloadHref } from "../../lib/site";
+
+// FR-8: one page per configured product, generated at build time.
+export function getStaticPaths() {
+  return site.products.map((product) => ({
+    params: { slug: product.slug },
+    props: { product },
+  }));
+}
+
+const { product } = Astro.props;
+const wa = whatsappHref();
+const download = downloadHref(product);
+
+// The heading leads with the problem where a headline is given; the product
+// name moves to the eyebrow so the brand is still the first thing read.
+const heading = product.headline ?? product.name;
+const eyebrow = product.headline ? product.name : site.pages?.products?.heading;
+
+const crumbs = [
+  { name: "Home", path: "/" },
+  { name: site.pages?.products?.heading ?? "Products", path: "/products" },
+  { name: product.name, path: `/products/${product.slug}` },
+];
+---
+
+<Base
+  title={product.seo?.title ?? `${product.name} | ${site.brand.name}`}
+  description={product.seo?.description ?? product.summary}
+>
+  <StructuredData product={product} breadcrumbs={crumbs} />
+  <PageHeader heading={heading} standfirst={product.summary} eyebrow={eyebrow} />
+
+  <section class="section mode-light">
+    <div class="container">
+      <img
+        class="hero-shot"
+        src={product.image}
+        alt={`${product.name} screenshot`}
+        width="1280"
+        height="720"
+      />
+
+      {/* A grouped product stacks: intro across the top, capabilities in a
+          two-column grid beneath. Seven groups squeezed into a side column
+          would be unreadable. */}
+      <div class:list={["detail", product.groups?.length && "detail--stacked"]}>
+        <div class="body">
+          {product.description
+            .split("\n\n")
+            .map((para) => <p class="intro">{para}</p>)}
+
+          {/* Shown because the Offer in the structured data has to reflect a
+              price the visitor can actually see on the page. */}
+          {product.price && (
+            <p class="price">
+              <span class="amount">
+                K{product.price.amount.toLocaleString("en-ZM")}
+              </span>
+              {product.price.note && <span class="note">{product.price.note}</span>}
+            </p>
+          )}
+
+          {/* The installer is the primary action on a product page: someone
+              reading this far wants the software, not a conversation. WhatsApp
+              stays as the secondary, because buying still runs through it.
+              With no download configured the WhatsApp CTA takes the primary
+              slot back, so the page is never left without one. */}
+          <div class="actions">
+            {download ? (
+              <>
+                <a class="btn btn--primary" href={download} download>
+                  {site.downloads?.label}
+                  <span class="meta">
+                    {product.download?.size}
+                    {product.download?.version && ` · v${product.download.version}`}
+                  </span>
+                </a>
+                <a class="btn btn--ghost" href={wa} rel="noopener">
+                  {site.hero.primaryCta.label}
+                </a>
+              </>
+            ) : (
+              <a class="btn btn--primary" href={wa} rel="noopener">
+                {site.hero.primaryCta.label}
+              </a>
+            )}
+          </div>
+
+          {/* The trial is the reason someone clicks, so it sits directly under
+              the button. */}
+          {download && site.downloads?.trial && (
+            <p class="trial">{site.downloads.trial}</p>
+          )}
+        </div>
+
+        {/* Grouped capability wins where it exists. A flat list of forty items
+            undersells a product this deep, because nobody reads to the end. */}
+        {product.groups && product.groups.length > 0 ? (
+          <div class="groups">
+            {product.groups.map((group) => (
+              <section class="group">
+                <h2>{group.title}</h2>
+                <ul class="features">
+                  {group.items.map((item) => <li>{item}</li>)}
+                </ul>
+              </section>
+            ))}
+          </div>
+        ) : (
+          <ul class="features">
+            {product.features.map((feature) => <li>{feature}</li>)}
+          </ul>
+        )}
+      </div>
+    </div>
+  </section>
+
+  {product.screenshots && product.screenshots.length > 0 && (
+    <section class="section mode-light">
+      <div class="container">
+        <div class="grid shots" style="--col: 380px">
+          {product.screenshots.map((shot) => (
+            <img src={shot} alt="" width="1280" height="720" loading="lazy" class="shot" />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+</Base>
+
+<style>
+  .hero-shot {
+    display: block;
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto var(--s-7);
+    background: var(--surface-tint);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-sm);
+    padding: var(--s-2);
+    object-fit: contain;
+  }
+
+  .detail {
+    display: grid;
+    gap: var(--s-7);
+    grid-template-columns: 1.15fr 1fr;
+    align-items: start;
+    max-width: 960px;
+    margin-inline: auto;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    align-items: center;
+    margin-top: var(--s-5);
+  }
+
+  /* Size and version sit inside the button rather than beside it. On a 119MB
+     installer over a Zambian mobile connection, the size is the single most
+     useful thing to know before tapping. */
+  .actions .meta {
+    display: block;
+    margin-top: 3px;
+    font-size: var(--t-meta);
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    opacity: 0.85;
+  }
+
+  /* Carries the accent so it reads as an offer, not a disclaimer. */
+  .trial {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    max-width: var(--measure);
+    margin: var(--s-3) 0 0;
+    font-size: var(--t-small);
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+
+  .trial::before {
+    content: "";
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .intro {
+    font-size: var(--t-lead);
+    line-height: 1.55;
+    margin-bottom: var(--s-5);
+  }
+
+  .price {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-5);
+  }
+  .price .amount {
+    font-family: var(--font-display);
+    font-size: var(--t-h2);
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .price .note {
+    font-size: var(--t-small);
+    color: var(--ink-muted);
+  }
+
+  .detail--stacked {
+    grid-template-columns: 1fr;
+    gap: var(--s-6);
+  }
+
+  .groups {
+    display: grid;
+    gap: var(--s-6) var(--s-7);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+
+  .group h2 {
+    font-size: var(--t-h3);
+    padding-bottom: var(--s-2);
+    margin-bottom: var(--s-3);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .features {
+    margin: 0;
+    padding-left: var(--s-3);
+  }
+  .features li {
+    margin-bottom: var(--s-2);
+  }
+  .features li::marker {
+    color: var(--accent);
+  }
+
+  .shot {
+    width: 100%;
+    background: var(--surface);
+    border-radius: var(--r-sm);
+    padding: var(--s-1);
+    object-fit: contain;
+  }
+
+  @media (max-width: 1024px) {
+    .detail {
+      grid-template-columns: 1fr;
+      gap: var(--s-5);
+    }
+  }
+</style>

@@ -1,0 +1,154 @@
+---
+import site from "../../lib/site";
+
+interface Props { mode: "light" | "inverse"; heading?: string }
+const { mode, heading } = Astro.props;
+
+const clients = site.proof?.clients ?? [];
+const testimonials = site.proof?.testimonials ?? [];
+const hasContent = clients.length > 0 || testimonials.length > 0;
+---
+
+{hasContent && (
+  <section class={`section mode-${mode}`}>
+    <div class="container">
+      {heading && <h2>{heading}</h2>}
+
+      {/* Engagements, not endorsements. Each card states only what the client
+          uses, which is checkable. A quote would need their words and their
+          permission; this needs neither. */}
+      {clients.length > 0 && (
+        <ul class="grid clients" style="--col: 260px">
+          {clients.map((client) => (
+            <li class="card client">
+              <h3>{client.name}</h3>
+              <ul class="using">
+                {client.using.map((item) => <li>{item}</li>)}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Wide columns on purpose: at 320px four quotes broke 3 + 1, leaving an
+          orphan on its own row, and quotes this long read badly in narrow
+          measures. 420px yields two columns inside the 1200px container. */}
+      {testimonials.length > 0 && (
+        <div class="grid quotes" style="--col: 420px">
+          {testimonials.map((t) => (
+            <figure class="quote">
+              <blockquote>{t.quote}</blockquote>
+              <figcaption>
+                {t.logo && (
+                  <img
+                    class="quote-logo"
+                    src={t.logo}
+                    alt={t.organisation}
+                    width="440"
+                    height="176"
+                    loading="lazy"
+                  />
+                )}
+                <span class="who">{t.organisation}</span>
+                {/* A name and title only appear when the client gave them.
+                    Without them the quote still stands on the company. */}
+                {t.author && (
+                  <span class="muted">
+                    {t.role ? `${t.author}, ${t.role}` : t.author}
+                  </span>
+                )}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+)}
+
+<style>
+  h2 {
+    margin-bottom: var(--s-6);
+  }
+
+  .clients {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .client h3 {
+    font-size: var(--t-lead);
+    margin: 0 0 var(--s-3);
+    padding-bottom: var(--s-2);
+    border-bottom: 1px solid var(--band-hairline);
+  }
+
+  .using {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-1);
+  }
+
+  .using li {
+    font-size: var(--t-small);
+    color: var(--band-ink-muted);
+  }
+
+  /* Not cards. The client cards above are already a grid of boxes, and a second
+     grid of boxes underneath turned the section into nothing but chrome. These
+     are quotes: an accent rule, the words, then the attribution. */
+  .quotes {
+    margin-top: var(--s-7);
+    padding-top: var(--s-6);
+    border-top: 1px solid var(--band-hairline);
+    align-items: stretch;
+  }
+
+  .quote {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    padding-left: var(--s-4);
+    border-left: 2px solid var(--band-accent);
+  }
+
+  .quote blockquote {
+    margin: 0;
+    font-size: var(--t-lead);
+    line-height: 1.45;
+    /* Quotes are short and ragged-right reads better here than justified,
+       which would stretch a two-line quote into gappy lines. */
+    text-align: left;
+  }
+
+  /* margin-top:auto against stretched grid items puts every attribution on the
+     same baseline, however uneven the quotes above them are. */
+  figcaption {
+    display: grid;
+    gap: 2px;
+    font-size: var(--t-small);
+    margin-top: auto;
+  }
+
+  /* Same fitted canvas as the marquee, so a circular mark and a wide one carry
+     the same weight. The tile follows the band, not the theme: an inverse band
+     is dark in both themes, and client marks are mostly dark ink, so without it
+     they disappear. Padding keeps the ink off the tile edge. */
+  .quote-logo {
+    height: 40px;
+    width: auto;
+    align-self: start;
+    margin-bottom: var(--s-2);
+    padding: 4px 8px;
+    background: var(--band-logo-tile, var(--logo-tile));
+    border-radius: var(--r-sm);
+  }
+
+  .who {
+    font-weight: 600;
+  }
+</style>

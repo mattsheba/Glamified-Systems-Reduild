@@ -1,0 +1,68 @@
+---
+import Base from "../layouts/Base.astro";
+import StructuredData from "../components/StructuredData.astro";
+import site, { sectionModes } from "../lib/site";
+
+import Hero from "../components/sections/Hero.astro";
+import ProofStrip from "../components/sections/ProofStrip.astro";
+import LogoMarquee from "../components/sections/LogoMarquee.astro";
+import Products from "../components/sections/Products.astro";
+import Services from "../components/sections/Services.astro";
+import Proof from "../components/sections/Proof.astro";
+import Process from "../components/sections/Process.astro";
+import Templates from "../components/sections/Templates.astro";
+import Faq from "../components/sections/Faq.astro";
+import Form from "../components/sections/Form.astro";
+
+const REGISTRY = {
+  hero: Hero,
+  proofStrip: ProofStrip,
+  logoMarquee: LogoMarquee,
+  products: Products,
+  services: Services,
+  proof: Proof,
+  process: Process,
+  templates: Templates,
+  faq: Faq,
+  form: Form,
+} as const;
+
+// EC-2: a configured section with nothing to show is skipped rather than
+// rendered as an empty container. Warned about at build time, not here.
+const isEmpty = (key: string) =>
+  (key === "logoMarquee" && !site.proof?.logos?.length) ||
+  (key === "faq" && !site.faq?.items?.length) ||
+  (key === "templates" && !site.templates?.length) ||
+  (key === "products" && !site.products?.length) ||
+  (key === "services" && !site.services?.length) ||
+  (key === "process" && !site.process?.length) ||
+  (key === "proof" &&
+    !site.proof?.clients?.length &&
+    !site.proof?.testimonials?.length);
+
+const modes = sectionModes();
+
+// FR-6, FR-7: config order is render order.
+const blocks = site.sections
+  .map((section, i) => ({ ...section, mode: modes[i] }))
+  .filter((section) => !isEmpty(section.key));
+---
+
+<Base>
+  {/* FAQPage markup lives on the homepage only — the same questions marked up
+      on several routes reads as duplicate structured data. */}
+  <StructuredData includeFaq />
+
+  {/* `home-titles` drives the centred, uppercase section headings in
+      tokens.css. It has to be a global rule rather than a scoped one —
+      the headings live inside the section components, where Astro's
+      style scoping cannot reach. */}
+  <div class="home-titles">
+    {
+      blocks.map((block) => {
+        const Section = REGISTRY[block.key as keyof typeof REGISTRY];
+        return <Section mode={block.mode} heading={block.heading} />;
+      })
+    }
+  </div>
+</Base>

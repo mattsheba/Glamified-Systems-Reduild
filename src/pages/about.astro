@@ -1,0 +1,204 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+import Proof from "../components/sections/Proof.astro";
+import Icon from "../components/Icon.astro";
+import site, { sectionHeading, inlineBold } from "../lib/site";
+
+const copy = site.pages?.about ?? {};
+const heading = copy.heading ?? site.brand.name;
+const body = copy.body ?? [];
+const values = copy.values ?? [];
+
+// A chapter marked `aside` renders in the right column instead of below the
+// prose, so the facts and values do not leave the column ending early.
+const chapters = copy.sections ?? [];
+const mainChapters = chapters.filter((s) => !s.aside);
+const asideChapters = chapters.filter((s) => s.aside);
+---
+
+<Base title={`${heading} | ${site.brand.name}`} description={copy.standfirst}>
+  <PageHeader heading={heading} standfirst={copy.standfirst} />
+
+  <section class="section mode-light">
+    <div class="container about">
+      <div class="prose">
+        {body.map((paragraph) => <p set:html={inlineBold(paragraph)} />)}
+
+        {mainChapters.map((section) => (
+          <section class="chapter">
+            <h2>{section.title}</h2>
+            {section.body.map((paragraph) => <p set:html={inlineBold(paragraph)} />)}
+          </section>
+        ))}
+      </div>
+
+      {/* Facts and values share the right column. Left as siblings of .prose
+          they became a third grid item and broke the two-column layout. */}
+      <div class="side">
+        {copy.facts && copy.facts.items.length > 0 && (
+          <div class="facts">
+            <p class="eyebrow">{copy.facts.label}</p>
+            <dl>
+              {copy.facts.items.map((fact) => (
+                <div class="fact">
+                  <dt>{fact.label}</dt>
+                  <dd>{fact.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        )}
+
+        {values.length > 0 && (
+          <ul class="values">
+            {values.map((value) => (
+              <li>
+                {value.icon && <Icon name={value.icon} size={30} />}
+                <h2>{value.title}</h2>
+                <p class="muted">{value.detail}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {/* Last in the column on purpose: the facts and values are the
+            at-a-glance items, and this is what fills the space below them. */}
+        {asideChapters.map((section) => (
+          <section class="chapter chapter--aside">
+            <h2>{section.title}</h2>
+            {section.body.map((paragraph) => <p set:html={inlineBold(paragraph)} />)}
+          </section>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* `proof` is not in the homepage sections list, so the section-heading
+      lookup finds nothing here. proof.heading is the fallback. */}
+  <Proof mode="light" heading={sectionHeading("proof") ?? site.proof?.heading} />
+</Base>
+
+<style>
+  .about {
+    display: grid;
+    gap: var(--s-7);
+    grid-template-columns: 1.3fr 1fr;
+    align-items: start;
+  }
+  .prose p {
+    font-size: var(--t-lead);
+    line-height: 1.55;
+  }
+
+  .chapter {
+    margin-top: var(--s-7);
+  }
+
+  .chapter h2 {
+    font-size: var(--t-h2);
+    margin-bottom: var(--s-3);
+    padding-bottom: var(--s-2);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .side {
+    display: grid;
+    gap: var(--s-6);
+    align-content: start;
+  }
+
+  /* In the narrow column this takes the accent rule the values use, so the
+     column reads as one stack rather than a chapter bolted onto the end.
+     Body size, not lead: lead type set at 473px runs to about six words a
+     line. The column gap handles the spacing, so the margin goes. */
+  .chapter--aside {
+    margin-top: 0;
+    border-top: 2px solid var(--accent);
+    padding-top: var(--s-3);
+  }
+
+  .chapter--aside h2 {
+    font-size: var(--t-h3);
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: var(--s-2);
+  }
+
+  .chapter--aside p {
+    line-height: 1.6;
+  }
+
+  .chapter--aside p + p {
+    margin-top: var(--s-3);
+  }
+
+  .facts dl {
+    margin: var(--s-3) 0 0;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .fact {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--s-3);
+    padding: var(--s-2) 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .fact dt {
+    font-size: var(--t-small);
+    color: var(--ink-muted);
+  }
+
+  .fact dd {
+    margin: 0;
+    font-size: var(--t-small);
+    font-weight: 600;
+    text-align: right;
+  }
+  .values {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-5);
+  }
+  .values li {
+    border-top: 2px solid var(--accent);
+    padding-top: var(--s-3);
+  }
+  .values :global(.icon) {
+    margin-bottom: var(--s-2);
+  }
+  .values h2 {
+    font-size: var(--t-h3);
+    margin-bottom: var(--s-2);
+  }
+  .values p {
+    margin: 0;
+    font-size: var(--t-small);
+  }
+  @media (max-width: 1024px) {
+    .about {
+      grid-template-columns: 1fr;
+    }
+
+    /* Stacked there is no empty column to fill, so the chapter goes back to
+       reading as prose: first in the side stack, straight after the chapter it
+       belongs with, rather than stranded below the facts and values. */
+    .chapter--aside {
+      order: -1;
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .chapter--aside h2 {
+      font-size: var(--t-h2);
+      padding-bottom: var(--s-2);
+      border-bottom: 1px solid var(--hairline);
+      margin-bottom: var(--s-3);
+    }
+  }
+</style>

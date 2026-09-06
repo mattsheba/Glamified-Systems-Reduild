@@ -1,0 +1,140 @@
+---
+import site, { whatsappHref } from "../../lib/site";
+
+interface Props { mode: "light" | "inverse"; heading?: string }
+const { mode, heading } = Astro.props;
+
+const faq = site.faq;
+const items = faq?.items ?? [];
+const cta = faq?.cta;
+const ctaHref = cta ? (cta.type === "whatsapp" ? whatsappHref() : cta.href!) : null;
+---
+
+{items.length > 0 && (
+  <section id="faq" class={`section mode-${mode}`}>
+    <div class="container faq">
+      <div class="faq-intro">
+        <h2>{heading ?? faq?.heading}</h2>
+        {faq?.standfirst && <p class="muted">{faq.standfirst}</p>}
+        {cta && ctaHref && (
+          <a class="btn btn--primary" href={ctaHref} rel="noopener">{cta.label}</a>
+        )}
+      </div>
+
+      {/* Native disclosure elements. The shared `name` makes them mutually
+          exclusive — a real accordion with no JavaScript. Browsers without
+          support simply allow several open at once, which is harmless. */}
+      <div class="faq-list">
+        {items.map((item) => (
+          <details name="faq">
+            <summary>
+              <span class="q">{item.q}</span>
+              <span class="marker" aria-hidden="true"></span>
+            </summary>
+            <div class="answer"><p>{item.a}</p></div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .faq {
+    display: grid;
+    gap: var(--s-7);
+    grid-template-columns: 0.85fr 1.15fr;
+    align-items: start;
+  }
+
+  .faq-intro h2 {
+    margin-bottom: var(--s-3);
+  }
+  .faq-intro p {
+    margin-bottom: var(--s-5);
+  }
+
+  .faq-list {
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  details {
+    background: var(--band-surface);
+    border: 1px solid var(--band-hairline);
+    border-radius: var(--r-sm);
+    transition: border-color 0.15s ease;
+  }
+
+  details[open] {
+    border-color: var(--band-accent);
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+    padding: var(--s-3) var(--s-4);
+    cursor: pointer;
+    list-style: none;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary:hover .q {
+    color: var(--band-accent);
+  }
+
+  /* Plus that becomes a minus, drawn rather than iconised so it inherits
+     colour and stays crisp at any zoom. */
+  .marker {
+    position: relative;
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+  }
+  .marker::before,
+  .marker::after {
+    content: "";
+    position: absolute;
+    inset: 50% 0 auto 0;
+    height: 1.5px;
+    background: var(--band-accent);
+    transition: transform 0.18s ease;
+  }
+  .marker::after {
+    transform: rotate(90deg);
+  }
+  details[open] .marker::after {
+    transform: rotate(0deg);
+  }
+
+  .answer {
+    padding: 0 var(--s-4) var(--s-4);
+  }
+  .answer p {
+    margin: 0;
+    color: var(--band-ink-muted);
+    max-width: 62ch;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marker::before,
+    .marker::after,
+    details {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .faq {
+      grid-template-columns: 1fr;
+      gap: var(--s-5);
+    }
+  }
+</style>

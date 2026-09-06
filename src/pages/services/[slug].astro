@@ -1,0 +1,272 @@
+---
+import Base from "../../layouts/Base.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import StructuredData from "../../components/StructuredData.astro";
+import site, { whatsappHref, serviceHref } from "../../lib/site";
+
+// FR-9: one page per configured service.
+export function getStaticPaths() {
+  return site.services.map((service) => ({
+    params: { slug: service.slug },
+    props: { service },
+  }));
+}
+
+const { service } = Astro.props;
+const wa = whatsappHref();
+const copy = site.pages?.services ?? {};
+const others = site.services.filter((s) => s.slug !== service.slug);
+---
+
+<Base
+  title={service.seo?.title ?? `${service.name} | ${site.brand.name}`}
+  description={service.seo?.description ?? service.summary}
+>
+  <StructuredData
+    service={service}
+    breadcrumbs={[
+      { name: "Home", path: "/" },
+      { name: copy.heading ?? "Services", path: "/services" },
+      { name: service.name, path: `/services/${service.slug}` },
+    ]}
+  />
+  <PageHeader
+    heading={service.name}
+    standfirst={service.summary}
+    eyebrow={copy.heading}
+  />
+
+  <section class="section mode-light">
+    <div class="container">
+      {/* Intro and aside share the top row, because both are short. The scope
+          list runs full width beneath: it is far taller than the aside, and
+          keeping it in a side-by-side column left most of the page empty. */}
+      <div class="detail">
+      <div class="body">
+        {service.description &&
+          service.description.split("\n\n").map((para) => <p class="intro">{para}</p>)}
+
+        <a class="btn btn--primary" href={wa} rel="noopener">
+          {site.hero.primaryCta.label}
+        </a>
+      </div>
+
+      <aside class="aside">
+        {service.forWho && copy.forWhoLabel && (
+          <div class="card who">
+            <h2>{copy.forWhoLabel}</h2>
+            <p class="muted">{service.forWho}</p>
+          </div>
+        )}
+
+        <nav class="others" aria-label="Other services">
+          {copy.otherServicesLabel && <p class="eyebrow">{copy.otherServicesLabel}</p>}
+          <ul>
+            {others.map((other) => (
+              <li><a href={serviceHref(other.slug)}>{other.name}</a></li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
+      </div>
+
+      {service.groups && service.groups.length > 0 ? (
+        <div class="groups">
+          {service.groups.map((group) => (
+            <section class="group">
+              <h2>{group.title}</h2>
+              <ul class="includes">
+                {group.items.map((item) => <li>{item}</li>)}
+              </ul>
+            </section>
+          ))}
+        </div>
+      ) : (
+        service.includes &&
+        service.includes.length > 0 && (
+          <ul class="includes flat">
+            {service.includes.map((item) => <li>{item}</li>)}
+          </ul>
+        )
+      )}
+
+      {/* Full-width strip rather than a side column. Five marks stacked two
+          abreast in an aside made the aside taller than the intro beside it,
+          which just moved the empty space from one side to the other. */}
+      {service.bodies && service.bodies.items.length > 0 && (
+        <div class="bodies">
+          <p class="eyebrow">{service.bodies.label}</p>
+          <ul>
+            {service.bodies.items.map((body) => (
+              <li>
+                <img
+                  src={body.src}
+                  alt={body.name}
+                  width="300"
+                  height="200"
+                  loading="lazy"
+                />
+              </li>
+            ))}
+          </ul>
+          {service.bodies.note && <p class="bodies-note">{service.bodies.note}</p>}
+        </div>
+      )}
+    </div>
+  </section>
+
+</Base>
+
+<style>
+  .detail {
+    display: grid;
+    gap: var(--s-7);
+    grid-template-columns: 1.4fr 1fr;
+    align-items: start;
+  }
+
+  .intro {
+    font-size: var(--t-lead);
+    line-height: 1.55;
+  }
+
+  .intro + .intro {
+    margin-top: var(--s-3);
+  }
+
+  /* Full width, in as many columns as fit. The scope list is the tallest thing
+     on the page, so giving it the whole width is what removes the dead column
+     the aside used to leave beside it. */
+  .groups {
+    margin-top: var(--s-7);
+    display: grid;
+    gap: var(--s-6) var(--s-7);
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    align-items: start;
+  }
+
+  .includes.flat {
+    margin-top: var(--s-6);
+    max-width: none;
+    columns: 2;
+    column-gap: var(--s-7);
+  }
+
+  .includes.flat li {
+    break-inside: avoid;
+  }
+
+  .group h2 {
+    font-size: var(--t-h3);
+    padding-bottom: var(--s-2);
+    margin-bottom: var(--s-3);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .group .includes {
+    margin: 0;
+  }
+
+  .includes {
+    margin: var(--s-5) 0;
+    padding-left: var(--s-3);
+    max-width: var(--measure);
+  }
+  .includes li {
+    margin-bottom: var(--s-2);
+  }
+  .includes li::marker {
+    color: var(--accent);
+  }
+
+  .aside {
+    display: grid;
+    gap: var(--s-5);
+  }
+
+  .who h2 {
+    font-size: var(--t-h3);
+    margin-bottom: var(--s-2);
+  }
+  .who p {
+    margin: 0;
+    font-size: var(--t-small);
+  }
+
+  .bodies {
+    margin-top: var(--s-7);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--hairline);
+  }
+
+  /* Flex rather than grid: the count of authorities will change, and a grid
+     leaves whatever does not divide evenly stranded at the left of the last
+     row. Wrapping flex centres the remainder instead. */
+  .bodies ul {
+    list-style: none;
+    margin: var(--s-3) 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--s-3);
+  }
+
+  .bodies li {
+    flex: 0 1 176px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--s-3);
+    /* Stays light in dark mode: these marks are dark ink and would otherwise
+       vanish into the card behind them. */
+    background: var(--band-logo-card, var(--logo-card));
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-sm);
+  }
+
+  /* Every mark was fitted to one canvas at build time, so a single height
+     gives the circular and the wide ones comparable weight. */
+  .bodies img {
+    width: 100%;
+    height: 44px;
+    object-fit: contain;
+  }
+
+  .bodies-note {
+    margin: var(--s-3) 0 0;
+    font-size: var(--t-meta);
+    line-height: 1.5;
+    color: var(--ink-muted);
+    text-align: left;
+  }
+
+  .others ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-1);
+  }
+  .others a {
+    display: block;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--hairline);
+    font-family: var(--font-display);
+    font-size: var(--t-label);
+    font-weight: 600;
+    letter-spacing: var(--tr-label);
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .others a:hover {
+    color: var(--accent);
+  }
+
+  @media (max-width: 1024px) {
+    .detail {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

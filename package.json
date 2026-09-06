@@ -1,0 +1,25 @@
+{
+  "name": "glamified-website-engine",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Config-driven marketing site engine. One codebase, many industry variants.",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "npm run verify:config && npm run verify:engine && astro check && astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "verify:config": "node scripts/verify-config.mjs",
+    "verify:engine": "node scripts/verify-engine.mjs",
+    "verify:variant": "node scripts/verify-variant.mjs",
+    "verify:downloads": "node scripts/verify-downloads.mjs"
+  },
+  "dependencies": {
+    "astro": "^5.14.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.9.2"
+  }
+}

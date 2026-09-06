@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Placeholder">
+  <rect width="1200" height="630" fill="#E8EFEA"/>
+  <rect x="1" y="1" width="1198" height="628" fill="none" stroke="#0F6E5C" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="50%" y="48%" font-family="monospace" font-size="16" fill="#0F6E5C" text-anchor="middle">PLACEHOLDER</text>
+  <text x="50%" y="62%" font-family="monospace" font-size="13" fill="#5A6B66" text-anchor="middle">OG image</text>
+</svg>

@@ -1,0 +1,76 @@
+---
+import site from "../../lib/site";
+import Icon from "../Icon.astro";
+
+interface Props { mode: "light" | "inverse"; heading?: string }
+const { mode, heading } = Astro.props;
+---
+
+<section id="process" class={`section mode-${mode}`}>
+  <div class="container">
+    {heading && <h2>{heading}</h2>}
+
+    <ol class="grid steps" style="--col: 240px">
+      {site.process.map((step) => (
+        <li class="step">
+          <div class="step-top">
+            {step.icon && <Icon name={step.icon} size={30} />}
+            <span class="step-num">{step.step}</span>
+          </div>
+          <h3>{step.title}</h3>
+          <p class="muted">{step.detail}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  h2 {
+    margin-bottom: var(--s-6);
+  }
+  .steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .step {
+    border-top: 2px solid var(--band-hairline);
+    padding-top: var(--s-3);
+  }
+  .step-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-2);
+    margin-bottom: var(--s-3);
+  }
+  .step-top :global(.icon) {
+    box-sizing: border-box;
+    width: 52px;
+    height: 52px;
+    padding: 11px;
+    border-radius: var(--r-sm);
+    background: var(--accent-wash);
+    border: 1px solid var(--band-hairline);
+  }
+  /* Outlined numeral, so the step index reads as a marker rather than
+     competing with the icon beside it. */
+  .step-num {
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    font-weight: 800;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--band-accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .step h3 {
+    font-size: var(--t-lead);
+    margin: var(--s-2) 0;
+  }
+  .step p {
+    margin: 0;
+    font-size: var(--t-small);
+  }
+</style>

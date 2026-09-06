@@ -1,0 +1,62 @@
+---
+import Base from "../layouts/Base.astro";
+import site from "../lib/site";
+import { legalDocs } from "../content/legal";
+
+// FR-11: /privacy, /terms, /refund — each parameterised by config.
+export function getStaticPaths() {
+  return legalDocs.map((doc) => ({
+    params: { legal: doc.slug },
+    props: { doc },
+  }));
+}
+
+const { doc } = Astro.props;
+const updated = new Date(site.legal.lastUpdated).toLocaleDateString("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+---
+
+<Base title={`${doc.title} | ${site.brand.name}`} description={`${doc.title} for ${site.legal.registeredName}.`}>
+  <article class="section mode-light">
+    <div class="container legal">
+      <h1 class="display">{doc.title}</h1>
+      <p class="muted updated">Last updated {updated}</p>
+
+      <div class="note">
+        <strong>Template: not yet reviewed.</strong> This document has not been
+        checked by a lawyer. Have it reviewed before relying on it.
+      </div>
+
+      {doc.sections.map((section) => (
+        <section>
+          <h2>{section.heading}</h2>
+          {section.body.map((paragraph) => <p>{paragraph}</p>)}
+        </section>
+      ))}
+    </div>
+  </article>
+</Base>
+
+<style>
+  .legal {
+    max-width: 72ch;
+  }
+  .legal h2 {
+    margin-top: var(--s-6);
+    margin-bottom: var(--s-2);
+  }
+  .updated {
+    font-size: var(--t-small);
+  }
+  /* Deliberately loud. This should be uncomfortable to ship. */
+  .note {
+    border-left: 3px solid var(--error);
+    background: color-mix(in oklab, var(--error), transparent 94%);
+    padding: var(--s-3) var(--s-4);
+    margin: var(--s-5) 0;
+    font-size: var(--t-small);
+  }
+</style>

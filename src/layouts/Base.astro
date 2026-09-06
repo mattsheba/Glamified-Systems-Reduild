@@ -1,0 +1,84 @@
+---
+import site from "../lib/site";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import "../styles/fonts.css";
+import "../styles/tokens.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+
+const pageTitle = title ?? site.seo.title;
+const pageDescription = description ?? site.seo.description;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={site.brand.favicon} />
+
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:image" content={new URL(site.seo.ogImage, Astro.site).href} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {/* Fonts are served from this origin (see src/styles/fonts.css for why).
+        Preloaded because a font referenced only from CSS is not discovered
+        until the stylesheet has been parsed, which costs a round trip the
+        browser could have spent fetching. */}
+    <link
+      rel="preload"
+      href="/fonts/archivo-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/manrope-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    {/* Runs before first paint, so a dark-theme visitor never sees a white
+        flash. It has to be inline and in the head for that: any deferred or
+        external script arrives after the browser has already painted. */}
+    <script is:inline>
+      try {
+        const stored = localStorage.getItem("theme");
+        if (stored === "dark" || stored === "light") {
+          document.documentElement.setAttribute("data-theme", stored);
+        }
+      } catch {
+        // Blocked site data. Fall through to prefers-color-scheme.
+      }
+    </script>
+
+    {/* FR-5: the one place config reaches into the token layer. */}
+    <style define:vars={{ configAccent: site.brand.accent }}>
+      :root {
+        --accent: var(--configAccent);
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

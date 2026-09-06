@@ -1,0 +1,136 @@
+---
+import site, { whatsappHref } from "../../lib/site";
+
+interface Props { mode: "light" | "inverse"; heading?: string }
+const { mode, heading } = Astro.props;
+
+const templates = site.templates ?? [];
+const wa = whatsappHref();
+---
+
+{templates.length > 0 && (
+  <section id="templates" class={`section mode-${mode}`}>
+    <div class="container">
+      {heading && <h2>{heading}</h2>}
+
+      <div class="grid templates" style="--col: 300px">
+        {templates.map((template) => (
+          <article class="card template">
+            <img
+              src={template.image}
+              alt={`${template.name} website template`}
+              width="1280"
+              height="720"
+              loading="lazy"
+            />
+
+            <div class="body">
+              <p class="industry">{template.industry}</p>
+              <h3>{template.name}</h3>
+              <p class="muted">{template.summary}</p>
+
+              {template.price && (
+                <p class="price">
+                  <span class="amount">
+                    K{template.price.amount.toLocaleString("en-ZM")}
+                  </span>
+                  {template.price.note && <span class="note">{template.price.note}</span>}
+                </p>
+              )}
+
+              <div class="actions">
+                {/* A template with no demo yet is still worth listing, so the
+                    link only appears once there is something to show. */}
+                {template.demoUrl && (
+                  <a class="btn btn--ghost" href={template.demoUrl} rel="noopener">
+                    View demo
+                  </a>
+                )}
+                <a class="btn btn--primary" href={wa} rel="noopener">
+                  {site.hero.primaryCta.label}
+                </a>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  h2 {
+    margin-bottom: var(--s-6);
+  }
+
+  .template {
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .template img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+    background: var(--surface-tint);
+    border-bottom: 1px solid var(--band-hairline);
+  }
+
+  .body {
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    flex: 1;
+  }
+
+  .industry {
+    font-family: var(--font-display);
+    font-size: var(--t-meta);
+    font-weight: 600;
+    letter-spacing: var(--tr-label);
+    text-transform: uppercase;
+    color: var(--band-accent);
+    margin: 0;
+  }
+
+  .body h3 {
+    margin: 0;
+    font-size: var(--t-lead);
+  }
+
+  .body .muted {
+    margin: 0;
+    flex: 1;
+  }
+
+  .price {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    flex-wrap: wrap;
+    margin: var(--s-2) 0 0;
+  }
+  .price .amount {
+    font-family: var(--font-display);
+    font-size: var(--t-h3);
+    font-weight: 800;
+    color: var(--band-accent);
+    line-height: 1;
+  }
+  .price .note {
+    font-size: var(--t-small);
+    color: var(--band-ink-muted);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    margin-top: var(--s-3);
+  }
+</style>

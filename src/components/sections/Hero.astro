@@ -1,0 +1,65 @@
+---
+import site, { whatsappHref } from "../../lib/site";
+
+interface Props { mode: "light" | "inverse" }
+const { mode } = Astro.props;
+
+const { headline, standfirst, primaryCta, secondaryCta } = site.hero;
+const primaryHref = primaryCta.type === "whatsapp" ? whatsappHref() : primaryCta.href!;
+---
+
+<section class={`section hero mode-${mode}`}>
+  <div class="container">
+    <p class="eyebrow">{site.brand.tagline}</p>
+    <h1>{headline}</h1>
+    <p class="standfirst">{standfirst}</p>
+
+    <div class="hero-ctas">
+      <a class="btn btn--primary" href={primaryHref} rel="noopener">{primaryCta.label}</a>
+      {secondaryCta && <a class="btn btn--ghost" href={secondaryCta.href}>{secondaryCta.label}</a>}
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: calc(var(--section-y) * 1.3);
+    text-align: center;
+  }
+
+  /* The global `p` rule caps paragraphs at --measure with no auto margin, so
+     inherited centring would centre the text inside a left-aligned box. */
+  .eyebrow {
+    max-width: none;
+    margin: 0 auto var(--s-4);
+  }
+
+  /* Uppercase is safe here: the hero headline is a sentence, never a product
+     name. The page-title component leaves it off for exactly that reason. */
+  h1 {
+    font-size: var(--t-hero);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    text-wrap: balance;
+    max-width: 16ch;
+    margin: 0 auto;
+  }
+
+  .standfirst {
+    font-size: var(--t-lead);
+    line-height: 1.5;
+    color: var(--band-ink-muted, var(--ink-muted));
+    max-width: 58ch;
+    margin: var(--s-4) auto 0;
+  }
+
+  .hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--s-3);
+    margin-top: var(--s-6);
+  }
+</style>

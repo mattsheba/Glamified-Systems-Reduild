@@ -1,0 +1,83 @@
+---
+import site from "../../lib/site";
+import { productHref } from "../../lib/site";
+
+interface Props { mode: "light" | "inverse"; heading?: string }
+const { mode, heading } = Astro.props;
+---
+
+<section id="products" class={`section mode-${mode}`}>
+  <div class="container">
+    {heading && <h2>{heading}</h2>}
+
+    <div class="grid products" style="--col: 300px">
+      {site.products.map((product) => (
+        <article class="card product">
+          <img
+            src={product.image}
+            alt={`${product.name} screenshot`}
+            width="1280"
+            height="720"
+            loading="lazy"
+          />
+          <h3>{product.name}</h3>
+          <p class="muted">{product.summary}</p>
+          <a class="product-link" href={productHref(product.slug)}>
+            Read more<span class="sr-only"> about {product.name}</span>
+          </a>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Gap belongs to the heading, not the grid — a section rendered without a
+     heading (as on /products, under a page header) then has no dead space. */
+  h2 {
+    margin-bottom: var(--s-6);
+  }
+  .product {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    padding: 0;
+    overflow: hidden;
+  }
+  /* `contain`, not `cover`: these are product screenshots, and cropping one
+     hides the thing it is there to show. The box sits close to the shots'
+     own ~1.9:1 ratio so the letterboxing is barely visible. */
+  .product img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+    background: var(--surface-tint);
+    display: block;
+    padding: var(--s-2);
+    border-bottom: 1px solid var(--band-hairline, var(--hairline));
+  }
+  .product h3,
+  .product p,
+  .product .product-link {
+    margin-inline: var(--s-4);
+  }
+  .product h3 {
+    margin-top: var(--s-4);
+  }
+  .product p {
+    flex: 1;
+  }
+  .product-link {
+    margin-bottom: var(--s-4);
+    font-family: var(--font-display);
+    font-size: var(--t-label);
+    font-weight: 600;
+    letter-spacing: var(--tr-label);
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--band-accent);
+  }
+  .product-link:hover {
+    text-decoration: underline;
+  }
+</style>

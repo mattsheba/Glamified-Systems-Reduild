@@ -1,0 +1,90 @@
+---
+import site from "../../lib/site";
+import Icon from "../Icon.astro";
+
+interface Props { mode: "light" | "inverse" }
+const { mode } = Astro.props;
+
+// Stats only. Client logos belong to the logoMarquee section.
+const stats = site.proof?.stats ?? [];
+---
+
+{stats.length > 0 && (
+  <section class={`proof-strip mode-${mode}`}>
+    <div class="container strip">
+      {stats.map((stat) => (
+        <div class="stat">
+          {stat.icon && <Icon name={stat.icon} size={26} />}
+          {/* Label above value. "Building since / 2023" reads correctly;
+              "2023 / Building since" does not. */}
+          <span class="stat-label">{stat.label}</span>
+          <span class="stat-value">{stat.value}</span>
+        </div>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .proof-strip {
+    padding-block: var(--s-6);
+  }
+
+  .strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--s-5);
+  }
+
+  .stat {
+    display: grid;
+    justify-items: center;
+    gap: var(--s-2);
+    text-align: center;
+    padding-inline: var(--s-4);
+    border-inline-start: 1px solid var(--band-hairline);
+  }
+
+  /* No rule before the first item, and none before an item that has wrapped
+     onto a new row. */
+  .stat:first-child {
+    border-inline-start: none;
+  }
+
+  .stat :global(.icon) {
+    opacity: 0.9;
+  }
+
+  .stat-label {
+    font-family: var(--font-display);
+    font-size: var(--t-meta);
+    font-weight: 600;
+    letter-spacing: var(--tr-label);
+    text-transform: uppercase;
+    color: var(--band-ink-muted);
+  }
+
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: var(--t-h2);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--band-accent);
+  }
+
+  @media (max-width: 767px) {
+    .strip {
+      grid-template-columns: 1fr;
+      gap: var(--s-4);
+    }
+    .stat {
+      border-inline-start: none;
+      padding-block: var(--s-3);
+      border-block-start: 1px solid var(--band-hairline);
+    }
+    .stat:first-child {
+      border-block-start: none;
+    }
+  }
+</style>

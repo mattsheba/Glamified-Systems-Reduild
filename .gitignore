@@ -1,0 +1,18 @@
+# build output
+dist/
+.astro/
+.variant-check/
+site.config.backup.tmp.js
+
+# dependencies
+node_modules/
+
+# environment — never commit secrets (NFR-10)
+.env
+.env.*
+!.env.example
+
+# os / editor
+.DS_Store
+Thumbs.db
+*.log

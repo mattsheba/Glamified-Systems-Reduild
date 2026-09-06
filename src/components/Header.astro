@@ -1,0 +1,397 @@
+---
+import site, { whatsappHref, navTree } from "../lib/site";
+import ThemeToggle from "./ThemeToggle.astro";
+
+// FR-13: the WhatsApp CTA lives in the header so it is reachable from every
+// page without scrolling, on every viewport.
+const wa = whatsappHref();
+const nav = navTree();
+const path = Astro.url.pathname;
+
+const isCurrent = (href: string) =>
+  href === "/" ? path === "/" : path === href || path.startsWith(`${href}/`);
+---
+
+<header class="site-header mode-light" data-header>
+  <div class="container header-inner">
+    {/* The monogram plus the name as live text. The full lockup is stacked, so
+        at header size its wordmark would be unreadable — the mark carries the
+        identity and the text stays crisp and selectable. */}
+    <a class="brand" href="/">
+      <img
+        src={site.brand.mark ?? site.brand.logo}
+        alt=""
+        width="168"
+        height="200"
+      />
+      <span class="brand-name">{site.brand.name}</span>
+    </a>
+
+    {/* Desktop navigation. Dropdowns open on hover and on :focus-within, so
+        they work for keyboard users with no JavaScript at all (NFR-2, NFR-9). */}
+    <nav class="nav" aria-label="Primary">
+      <ul class="nav-list">
+        {nav.map((item) => (
+          <li class={item.children.length ? "has-children" : ""}>
+            <a href={item.href} aria-current={isCurrent(item.href) ? "page" : undefined}>
+              {item.label}
+              {item.children.length > 0 && (
+                <svg class="chev" viewBox="0 0 10 6" aria-hidden="true" focusable="false">
+                  <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" />
+                </svg>
+              )}
+            </a>
+
+            {item.children.length > 0 && (
+              <ul class="submenu">
+                {item.children.map((child) => (
+                  <li>
+                    <a href={child.href} aria-current={isCurrent(child.href) ? "page" : undefined}>
+                      {child.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <ThemeToggle />
+
+    <a class="btn btn--primary header-cta" href={wa} rel="noopener">
+      {site.hero.primaryCta.label}
+    </a>
+
+    {/* Mobile menu. A <details> disclosure rather than a scripted drawer —
+        same reason: no JavaScript, and it is keyboard-operable for free. */}
+    <details class="mobile-nav">
+      <summary aria-label="Menu">
+        <svg viewBox="0 0 20 14" aria-hidden="true" focusable="false">
+          <path d="M0 1h20M0 7h20M0 13h20" stroke="currentColor" stroke-width="2" fill="none" />
+        </svg>
+      </summary>
+      <nav class="mobile-panel" aria-label="Primary, mobile">
+        <ul>
+          {nav.map((item) => (
+            <li>
+              <a class="mobile-top" href={item.href}>{item.label}</a>
+              {item.children.length > 0 && (
+                <ul>
+                  {item.children.map((child) => (
+                    <li><a href={child.href}>{child.label}</a></li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </details>
+  </div>
+</header>
+
+<script is:inline>
+  // Progressive enhancement. With JavaScript off the header is still sticky,
+  // it simply does not compact, which costs the visitor nothing (NFR-9).
+  //
+  // A plain scroll position check, deliberately. The IntersectionObserver
+  // recipes for this both failed here: a zero-height sentinel is unreliable
+  // (browsers disagree on whether a zero-area target intersects), and observing
+  // the header itself cannot work when the header is the first element on the
+  // page, because it sits at y=0 whether or not it is stuck. A passive listener behind
+  // a requestAnimationFrame guard does at most one class toggle per frame.
+  (() => {
+    const header = document.querySelector("[data-header]");
+    if (!header) return;
+
+    let queued = false;
+    const sync = () => {
+      queued = false;
+      header.classList.toggle("is-stuck", window.scrollY > 4);
+    };
+
+    addEventListener(
+      "scroll",
+      () => {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(sync);
+      },
+      { passive: true }
+    );
+
+    sync();
+  })();
+</script>
+
+<style>
+  /* White on a near-white page left the header with no edge at all until you
+     scrolled. It now carries an accent rule along the top, a faint dot texture
+     in the same colour, and a permanent hairline underneath, so it reads as a
+     surface rather than as empty space.
+
+     The dots are deliberately near-invisible: at 10% they register as texture,
+     and anything stronger competes with the logo and the navigation sitting
+     on top of them. */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-top: 3px solid var(--accent);
+    border-bottom: 1px solid var(--hairline);
+    background-color: var(--surface);
+    background-image: radial-gradient(
+      color-mix(in oklab, var(--accent), transparent 90%) 1px,
+      transparent 1px
+    );
+    background-size: 14px 14px;
+    transition: box-shadow 0.2s ease;
+  }
+
+  /* Scrolled state: the header tightens, the logo shrinks, and a soft shadow
+     separates it from the content moving underneath. */
+  .site-header.is-stuck {
+    box-shadow: var(--shadow-sm);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--s-4);
+    min-height: 72px;
+    transition: min-height 0.2s ease;
+  }
+
+  .site-header.is-stuck .header-inner {
+    min-height: 58px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    flex: 0 0 auto;
+    text-decoration: none;
+  }
+
+  /* The supplied mark has a solid white ground. In light mode that is
+     invisible against the header; in dark it becomes a tile, so round it so
+     it reads as deliberate rather than as a rendering fault. */
+  .brand img {
+    height: 36px;
+    width: auto;
+    border-radius: var(--r-sm);
+    transition: height 0.2s ease;
+  }
+
+  .brand-name {
+    font-family: var(--font-display);
+    font-size: var(--t-small);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 480px) {
+    .brand-name {
+      display: none;
+    }
+  }
+
+  .site-header.is-stuck .brand img {
+    height: 28px;
+  }
+
+  .site-header.is-stuck .nav a {
+    padding-block: 19px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-header,
+    .header-inner,
+    .brand img {
+      transition: none;
+    }
+  }
+
+  .nav {
+    margin-inline-start: auto;
+  }
+
+  .nav-list {
+    display: flex;
+    gap: var(--s-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-list > li {
+    position: relative;
+  }
+
+  .nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-display);
+    font-size: var(--t-label);
+    font-weight: 600;
+    letter-spacing: var(--tr-label);
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink);
+    padding-block: 26px;
+  }
+
+  .nav a:hover,
+  .nav a[aria-current] {
+    color: var(--accent);
+  }
+
+  .chev {
+    width: 9px;
+    height: 6px;
+    transition: transform 0.15s ease;
+  }
+
+  .has-children:hover .chev,
+  .has-children:focus-within .chev {
+    transform: rotate(180deg);
+  }
+
+  /* ---- dropdown ---- */
+
+  .submenu {
+    position: absolute;
+    top: 100%;
+    left: -14px;
+    min-width: 232px;
+    margin: 0;
+    padding: var(--s-2) 0;
+    list-style: none;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-sm);
+    box-shadow: var(--shadow-sm);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s;
+  }
+
+  .has-children:hover > .submenu,
+  .has-children:focus-within > .submenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .submenu a {
+    display: block;
+    padding: 9px 16px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: var(--t-small);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .submenu a:hover,
+  .submenu a[aria-current] {
+    background: var(--accent-wash);
+    color: var(--accent);
+  }
+
+  /* ---- mobile ---- */
+
+  .mobile-nav {
+    display: none;
+    position: relative;
+  }
+
+  .mobile-nav summary {
+    list-style: none;
+    cursor: pointer;
+    padding: var(--s-2);
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+  }
+
+  .mobile-nav summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .mobile-nav summary svg {
+    width: 20px;
+    height: 14px;
+  }
+
+  .mobile-panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    min-width: 232px;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-sm);
+    box-shadow: var(--shadow-sm);
+    padding: var(--s-3);
+  }
+
+  .mobile-panel ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .mobile-panel ul ul {
+    margin: var(--s-1) 0 var(--s-3) var(--s-3);
+    border-left: 1px solid var(--hairline);
+  }
+
+  .mobile-panel a {
+    display: block;
+    padding: 7px 0 7px var(--s-2);
+    font-size: var(--t-small);
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  .mobile-panel .mobile-top {
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--tr-label);
+    font-size: var(--t-label);
+    padding-top: var(--s-2);
+  }
+
+  .mobile-panel a:hover {
+    color: var(--accent);
+  }
+
+  /* Below 767 the links fold into the disclosure, but the CTA never does —
+     it is the primary conversion path (FR-13). */
+  @media (max-width: 767px) {
+    .nav {
+      display: none;
+    }
+    .mobile-nav {
+      display: block;
+    }
+    .header-inner {
+      gap: var(--s-2);
+      justify-content: space-between;
+    }
+    .header-cta {
+      margin-inline-start: auto;
+      padding: 10px 16px;
+    }
+  }
+</style>

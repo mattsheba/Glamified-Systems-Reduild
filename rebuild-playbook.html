@@ -1,0 +1,585 @@
+<title>Glamified Rebuild Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<style>
+  :root {
+    --ground:   #F7F8F6;
+    --surface:  #FFFFFF;
+    --sunken:   #ECEFEA;
+    --ink:      #16211E;
+    --ink-soft: #5C6B66;
+    --line:     #D6DCD6;
+    --accent:   #0F6E5C;
+    --accent-w: #0F6E5C14;
+    --signal:   #B4531F;
+    --signal-w: #B4531F12;
+    --focus:    #0F6E5C;
+
+    --display: "Fraunces", Georgia, "Times New Roman", serif;
+    --body: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Consolas, monospace;
+
+    --measure: 66ch;
+    --pad: clamp(1.15rem, 4vw, 2.5rem);
+  }
+
+  :root:not([data-theme="light"]) {
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:   #0E1513;
+      --surface:  #16211E;
+      --sunken:   #1D2C28;
+      --ink:      #E8EDE9;
+      --ink-soft: #93A39D;
+      --line:     #2A3A35;
+      --accent:   #3FBFA1;
+      --accent-w: #3FBFA11F;
+      --signal:   #E08A52;
+      --signal-w: #E08A5216;
+      --focus:    #3FBFA1;
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:   #0E1513;
+    --surface:  #16211E;
+    --sunken:   #1D2C28;
+    --ink:      #E8EDE9;
+    --ink-soft: #93A39D;
+    --line:     #2A3A35;
+    --accent:   #3FBFA1;
+    --accent-w: #3FBFA11F;
+    --signal:   #E08A52;
+    --signal-w: #E08A5216;
+    --focus:    #3FBFA1;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16.5px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 62rem;
+    margin: 0 auto;
+    padding: clamp(2rem, 6vw, 4.5rem) var(--pad) 5rem;
+  }
+
+  /* ---------- masthead ---------- */
+
+  .masthead { border-bottom: 2px solid var(--ink); padding-bottom: 1.6rem; margin-bottom: 2.6rem; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 0.9rem;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-size: clamp(2.1rem, 6.5vw, 3.4rem);
+    line-height: 1.04;
+    letter-spacing: -0.021em;
+    text-wrap: balance;
+    margin: 0 0 0.85rem;
+  }
+
+  .standfirst {
+    max-width: var(--measure);
+    font-size: 1.06rem;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  /* ---------- prose ---------- */
+
+  p, ul, ol { max-width: var(--measure); }
+  p { margin: 0 0 1.05rem; }
+  ul, ol { margin: 0 0 1.15rem; padding-left: 1.15rem; }
+  li { margin-bottom: 0.42rem; }
+  li::marker { color: var(--accent); }
+
+  strong { font-weight: 600; }
+  em { font-style: italic; color: var(--ink); }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.855em;
+    background: var(--sunken);
+    padding: 0.1em 0.36em;
+    border-radius: 3px;
+  }
+
+  /* ---------- phases ---------- */
+
+  .phase {
+    display: grid;
+    grid-template-columns: 3.4rem 1fr;
+    gap: 0 1.5rem;
+    padding-top: 2.9rem;
+    margin-top: 2.9rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .phase-num {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.75rem;
+    line-height: 1;
+    color: var(--accent);
+    padding-top: 0.15rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .phase-body { min-width: 0; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(1.42rem, 3.4vw, 1.85rem);
+    line-height: 1.16;
+    letter-spacing: -0.014em;
+    text-wrap: balance;
+    margin: 0 0 0.3rem;
+  }
+
+  .phase-goal {
+    font-family: var(--mono);
+    font-size: 0.735rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 1.15rem;
+  }
+
+  h3 {
+    font-family: var(--body);
+    font-weight: 600;
+    font-size: 0.96rem;
+    letter-spacing: 0.005em;
+    margin: 1.7rem 0 0.55rem;
+  }
+
+  /* ---------- the ledger ---------- */
+
+  .ledger {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin: 1.5rem 0 0.9rem;
+  }
+
+  .ledger-col { background: var(--surface); padding: 1.2rem 1.25rem 1.35rem; }
+
+  .ledger-head {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    margin: 0 0 0.85rem;
+    padding-bottom: 0.55rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ledger-col.take .ledger-head { color: var(--accent); }
+  .ledger-col.leave .ledger-head { color: var(--signal); }
+
+  .ledger ul { margin: 0; padding-left: 1rem; max-width: none; font-size: 0.925rem; }
+  .ledger li { margin-bottom: 0.5rem; }
+  .ledger .leave li::marker { color: var(--signal); }
+
+  @media (max-width: 620px) {
+    .ledger { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- callout ---------- */
+
+  .note {
+    border-left: 3px solid var(--signal);
+    background: var(--signal-w);
+    padding: 0.95rem 1.15rem;
+    margin: 1.4rem 0;
+    max-width: var(--measure);
+    font-size: 0.95rem;
+  }
+  .note p:last-child { margin-bottom: 0; }
+  .note .note-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--signal);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .aside {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-w);
+    padding: 0.95rem 1.15rem;
+    margin: 1.4rem 0;
+    max-width: var(--measure);
+    font-size: 0.95rem;
+  }
+  .aside p:last-child { margin-bottom: 0; }
+  .aside .note-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  /* ---------- command blocks ---------- */
+
+  .cmd {
+    background: var(--sunken);
+    border: 1px solid var(--line);
+    padding: 0.9rem 1.05rem;
+    margin: 1.05rem 0 1.2rem;
+    overflow-x: auto;
+  }
+  .cmd pre {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    white-space: pre;
+  }
+  .cmd .c { color: var(--ink-soft); }
+  .cmd .k { color: var(--accent); }
+
+  /* ---------- spec table ---------- */
+
+  .tablewrap { overflow-x: auto; margin: 1.3rem 0; }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 30rem;
+    font-size: 0.925rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.62rem 0.9rem 0.62rem 0;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  th {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 500;
+    border-bottom-color: var(--ink);
+  }
+  td:first-child { font-weight: 600; white-space: nowrap; padding-right: 1.4rem; }
+  td .mono { font-family: var(--mono); font-size: 0.86em; color: var(--ink-soft); }
+
+  /* ---------- checklist ---------- */
+
+  .check { list-style: none; padding-left: 0; margin: 1.2rem 0; }
+  .check li {
+    display: grid;
+    grid-template-columns: 1.4rem 1fr;
+    gap: 0.6rem;
+    align-items: start;
+    padding: 0.5rem 0;
+    border-bottom: 1px dotted var(--line);
+    font-size: 0.945rem;
+  }
+  .check li::before {
+    content: "";
+    width: 0.95rem;
+    height: 0.95rem;
+    margin-top: 0.28rem;
+    border: 1.5px solid var(--accent);
+    border-radius: 2px;
+  }
+
+  /* ---------- footer ---------- */
+
+  .colophon {
+    margin-top: 3.4rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--ink);
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+    max-width: var(--measure);
+  }
+  .colophon p { font-size: inherit; }
+
+  @media (max-width: 560px) {
+    .phase { grid-template-columns: 1fr; gap: 0; }
+    .phase-num { font-size: 1.15rem; margin-bottom: 0.5rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Glamified Systems · Build Process</p>
+    <h1>Glamified Rebuild Playbook</h1>
+    <p class="standfirst">Turning a tech site you admire into glamifiedsystems.com — and then into the reusable engine behind the industry template catalogue. Six phases, run in order.</p>
+  </header>
+
+  <p>You picked "a live company site I admire" and "match whatever the source uses." Take the first at face value and adjust the second, for one practical reason before any legal one: <strong>a modern production site ships nothing worth copying.</strong> What you'd pull down is minified bundles, hashed class names like <code>.css-1x7kzq</code>, compiled Tailwind with every unused utility stripped, and a framework hydration payload that expects a build pipeline you don't have. Rebranding that is harder than building clean, and you'd own a codebase you can't modify a year from now.</p>
+
+  <p>So the method is: <strong>read the stack, extract the design decisions, rebuild in that same stack.</strong> You still get their layout and feel. You get a codebase you can actually run twenty industries through.</p>
+
+  <section class="phase">
+    <div class="phase-num">01</div>
+    <div class="phase-body">
+      <h2>Draw the line before you start</h2>
+      <p class="phase-goal">Goal · Know what's yours to take</p>
+
+      <p>This matters more for you than for most people asking this question, because these builds get resold. A site you customise for a lodge in Livingstone at K3,500 is a commercial product, and the tier that ships source files puts the code in someone else's hands.</p>
+
+      <div class="ledger">
+        <div class="ledger-col take">
+          <p class="ledger-head">Yours to take</p>
+          <ul>
+            <li>Section sequence and page structure</li>
+            <li>Grid, column counts, spacing rhythm</li>
+            <li>Type scale <em>ratio</em> and hierarchy logic</li>
+            <li>Navigation and IA patterns</li>
+            <li>Interaction patterns — sticky headers, reveal-on-scroll, accordion FAQs</li>
+            <li>How they solve a problem you also have</li>
+          </ul>
+        </div>
+        <div class="ledger-col leave">
+          <p class="ledger-head">Not yours</p>
+          <ul>
+            <li>Their source code, verbatim or lightly edited</li>
+            <li>Every image, illustration, icon set and video</li>
+            <li>All body copy, headlines and taglines</li>
+            <li>Logo, wordmark, brand name</li>
+            <li>Their exact brand palette, where it <em>is</em> the brand</li>
+            <li>Licensed fonts served from their CDN</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="note">
+        <span class="note-label">Where people get caught</span>
+        <p>Not the layout — the assets. A hero photograph or an icon set carried across is the thing that generates a takedown, because it's provable in seconds by reverse image search. Strip every asset at extraction time, not at review time.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="phase">
+    <div class="phase-num">02</div>
+    <div class="phase-body">
+      <h2>Read the stack and the design system</h2>
+      <p class="phase-goal">Goal · Facts on paper, before any code</p>
+
+      <p>Don't reach for a scraping plugin here. <code>design-mirror</code> is <strong>not installed</strong> — that was an assumption in an earlier draft of this playbook, and it cost a turn to discover. You don't need it either. What you want is the <em>rendered</em> design system, and only a real browser can tell you that: Elementor, Webflow and Framer sites declare almost nothing useful in their stylesheets, so the system lives in what the page finally paints. Drive Chrome and read computed styles.</p>
+
+      <div class="cmd"><pre><span class="c"># In Claude Code, pointed at your empty project</span>
+<span class="k">claude</span> "open https://the-site-you-like.com in Chrome and read the
+  design system off the rendered page — computed styles aggregated
+  by frequency: type scale, spacing histogram, colour roles weighted
+  by painted area, container max-width, section padding, breakpoints.
+  Write design-tokens.md. No assets, no copy."</pre></div>
+
+      <p><strong>Frequency is the whole trick.</strong> A production page carries hundreds of one-off values; the scale is whatever <em>repeats</em>. Counting nodes per font-size is what separates a real step in the ramp from a widget somebody nudged once — and it is the only way to tell a design system from an accident on a site that has no token layer.</p>
+
+      <div class="note">
+        <span class="note-label">Read two sites, not one</span>
+        <p>Pick a second reference closer to your own size and market, and extract both. The site you admire is usually built for a scale you are not at — the first run of this phase found an 80px hero and fifteen sections on the aspirational reference, against a 45px hero on a local peer doing the same job. Without the second reading, nothing tells you which one is the anomaly, and you inherit an altitude your content cannot fill.</p>
+      </div>
+
+      <p>Then confirm the stack yourself rather than trusting a guess. What the response headers and HTML source tell you:</p>
+
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr><th>Signal</th><th>Means</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Next.js</td><td><span class="mono">/_next/static/</span> paths, <span class="mono">__NEXT_DATA__</span> script, <span class="mono">x-powered-by</span></td></tr>
+            <tr><td>Astro</td><td><span class="mono">astro-</span> prefixed classes, almost no client JS</td></tr>
+            <tr><td>Tailwind</td><td>Long utility strings in markup — <span class="mono">flex items-center gap-4</span></td></tr>
+            <tr><td>WordPress</td><td><span class="mono">/wp-content/</span>, <span class="mono">/wp-json/</span> reachable</td></tr>
+            <tr><td>Webflow</td><td><span class="mono">.w-container</span>, <span class="mono">data-wf-page</span></td></tr>
+            <tr><td>Framer</td><td><span class="mono">framerusercontent.com</span> asset URLs</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="aside">
+        <span class="note-label">Reality check</span>
+        <p>If it's Webflow or Framer, there's no stack to match — those are hosted builders that emit machine-generated markup. Rebuild it in Astro or Next and you'll get a faster, cheaper, more maintainable site than the original. Same for a heavily-plugged WordPress site.</p>
+      </div>
+
+      <h3>What you should have written down before Phase 3</h3>
+      <ul>
+        <li>Type scale — the actual steps, the ratio between them, and <em>where you cap it</em>. The cap is a decision, not a measurement.</li>
+        <li>Spacing scale — measure the base rather than assuming 4 or 8; it is not always either. Then decide separately whether to inherit theirs or normalise to yours.</li>
+        <li>Color <em>roles</em> — ground, surface, ink, muted, one accent, semantic states. Roles, not their hex values.</li>
+        <li>Container max-width and gutter</li>
+        <li>Section inventory in order: hero → proof → services → … — and the count you are actually going to build</li>
+        <li>Breakpoints, and what collapses at each</li>
+        <li>Any single component worth lifting wholesale — a form, a pricing table, a nav pattern</li>
+      </ul>
+
+      <p>Write it as <strong>decisions with sources attached</strong>, not as a list of observations. "Cap the ramp at 56 — reference A used 80, reference B used 45, 80 needs page depth we don't have" is a spec Phase 3 can build against. A table of everything both sites do is just a second thing to read.</p>
+    </div>
+  </section>
+
+  <section class="phase">
+    <div class="phase-num">03</div>
+    <div class="phase-body">
+      <h2>Write the spec before the code</h2>
+      <p class="phase-goal">Goal · A contract the generated code answers to</p>
+
+      <p>This is the phase most people skip, and it's the one that decides whether you have a website or an engine at the end. You just installed <code>spec-driven-workflow</code> for exactly this — it produces a spec artifact that tests get derived from, so generated code stays traceable to a requirement instead of drifting.</p>
+
+      <div class="cmd"><pre><span class="k">claude</span> "use spec-driven-workflow. Write the spec for the
+  Glamified Systems site from the design system in
+  design-tokens.md. Sections, breakpoints, content model,
+  acceptance criteria per section."</pre></div>
+
+      <p>Force one thing into that spec now, while it costs nothing: <strong>every piece of text and every image path comes from a config file, never from the markup.</strong> That single constraint is the difference between a site and the Glamified Website Engine. Get it wrong here and industry number four is a copy-paste job again.</p>
+
+      <div class="cmd"><pre><span class="c">// site.config.js — the whole engine idea, in one file</span>
+export default {
+  brand: { name: <span class="k">"Glamified Systems"</span>, tagline: <span class="k">"..."</span>, accent: <span class="k">"#0F6E5C"</span> },
+  contact: {
+    phone: <span class="k">"+260 977 669 883"</span>,
+    whatsapp: <span class="k">"+260977669883"</span>,
+    city: <span class="k">"Lusaka, Zambia"</span>,
+    hours: <span class="k">"Mon–Fri, 08:00–17:00 CAT"</span>
+  },
+  sections: [<span class="k">"hero"</span>, <span class="k">"products"</span>, <span class="k">"services"</span>, <span class="k">"proof"</span>, <span class="k">"contact"</span>],
+  products: [ <span class="c">/* GlamifiedHR, Fleet, Sales */</span> ],
+  services: [ <span class="c">/* web + software, IT support, consultancy, ... */</span> ]
+}</pre></div>
+    </div>
+  </section>
+
+  <section class="phase">
+    <div class="phase-num">04</div>
+    <div class="phase-body">
+      <h2>Build the shell</h2>
+      <p class="phase-goal">Goal · Real structure, placeholder content</p>
+
+      <p>Build from the spec, in the stack you identified, with your own <code>frontend-design</code> and <code>uiux</code> skills carrying the execution. Structure first — every section in place, responsive, keyboard-navigable — with obviously fake content in the slots. Fake content that looks fake is a feature here: it stops you shipping <em>Lorem ipsum</em> to a client, which happens more often than anyone admits.</p>
+
+      <p>Then run the two checks that are cheap now and expensive later:</p>
+
+      <div class="cmd"><pre><span class="k">claude</span> "run a11y-audit on this project"
+<span class="c"># WCAG 2.2 — contrast, focus order, labels, landmarks.
+# Fix before content, or you fix it in 40 places after.</span>
+
+<span class="k">claude</span> "run env-secrets-manager on this project"
+<span class="c"># Catches an API key committed on day one, before it
+# reaches a public GitHub repo.</span></pre></div>
+
+      <div class="aside">
+        <span class="note-label">For the catalogue</span>
+        <p>An accessible base template is a selling point you can name in the premium tier, and it's genuinely rare in the Zambian market. It costs you one afternoon once, then ships free with every industry variant.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="phase">
+    <div class="phase-num">05</div>
+    <div class="phase-body">
+      <h2>Swap in Glamified's own substance</h2>
+      <p class="phase-goal">Goal · The site becomes yours, not a reskin</p>
+
+      <p>This is where a rebuild stops looking like the site it came from. Layout can rhyme with theirs; the substance has to be entirely yours — and yours is genuinely different, because you're selling both products and services to a market they don't serve.</p>
+
+      <p>Your memory of the last positioning pass says the new homepage leads with products, not services. That decision changes the hero, so honour it here:</p>
+
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr><th>Slot</th><th>Glamified's real content</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Hero</td><td>The product suite — GlamifiedHR, Glamified Fleet, Glamified Sales</td></tr>
+            <tr><td>Services</td><td>Web &amp; software development, IT support, business consultancy, payroll outsourcing, graphic design</td></tr>
+            <tr><td>Proof</td><td>Named Zambian deployments, screenshots of real dashboards, client logos you have permission to use</td></tr>
+            <tr><td>Contact</td><td>Lusaka · +260 977 669 883 · WhatsApp · Mon–Fri 08:00–17:00 CAT</td></tr>
+            <tr><td>Legal</td><td>Privacy policy, terms, refund policy — flagged as missing in your last site audit</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Two things worth building in while you're in here, both from your <code>zambia-local</code> skill: a WhatsApp deep link rather than a contact form as the primary CTA, since that's how enquiries actually arrive; and a hard performance budget, because a hero video that's fine on fibre is a bounced visitor on mobile data.</p>
+
+      <div class="note">
+        <span class="note-label">Last check before Phase 6</span>
+        <p>Open your build and the original side by side. If a stranger could name the source site from looking at yours, you've matched too closely — usually it's a distinctive hero illustration or a signature color doing it. Change that one thing.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="phase">
+    <div class="phase-num">06</div>
+    <div class="phase-body">
+      <h2>Ship it, then fork it into the engine</h2>
+      <p class="phase-goal">Goal · One site live, twenty ready</p>
+
+      <p>Deploy to Netlify from GitHub as you normally would — and use <code>ci-cd-pipeline-builder</code> to generate the pipeline once, since every industry variant will reuse it.</p>
+
+      <div class="cmd"><pre><span class="k">claude</span> "use ci-cd-pipeline-builder — detect the stack and
+  generate a Netlify deploy pipeline with build + a11y check"</pre></div>
+
+      <p>Then the fork that makes this a product rather than a job:</p>
+
+      <ul class="check">
+        <li>Glamified Systems site live on its own domain</li>
+        <li>Repo tagged <code>v1-base</code> — the untouched engine base</li>
+        <li><code>site.config.js</code> holds 100% of brand, copy and contact — nothing hardcoded in markup</li>
+        <li>One industry proven end-to-end by config alone (pick lodges or construction — highest demand, clearest content model)</li>
+        <li>Deploy preview per industry on a subdomain, per your catalogue plan</li>
+        <li>Legal pages written once, parameterised by client name</li>
+      </ul>
+
+      <p>When that checklist is clean, a new industry demo is a config file and a set of images. That's the K1,500 tier turning a profit instead of eating a weekend.</p>
+    </div>
+  </section>
+
+  <div class="colophon">
+    <p><strong>The short version:</strong> read their stack, extract their design decisions, rebuild clean in the same stack, put every word in a config file. You get the site you admired and an engine underneath it — and nothing in the repo that belongs to anyone else.</p>
+  </div>
+
+</div>
+

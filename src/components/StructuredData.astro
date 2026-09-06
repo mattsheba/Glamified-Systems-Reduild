@@ -1,0 +1,122 @@
+---
+/**
+ * JSON-LD structured data.
+ *
+ * Tells Google what this business is, where it operates, and what each product
+ * is — which is how a listing becomes a rich result rather than a plain blue
+ * link. Everything here is derived from site.config.js, so it cannot drift away
+ * from what the page actually says.
+ *
+ * Deliberately absent: aggregateRating and review. Those produce star ratings
+ * in search results and must be backed by real, verifiable reviews. Inventing
+ * them is a manual-action risk, not a shortcut.
+ */
+
+import site, { downloadHref } from "../lib/site";
+import type { Product, Service } from "../types";
+
+interface Props {
+  /** Product page: emits SoftwareApplication. */
+  product?: Product;
+  /** Service page: emits Service. */
+  service?: Service;
+  /** Emit FAQPage from config.faq (homepage only, to avoid duplicate FAQ markup). */
+  includeFaq?: boolean;
+  /** Trail for BreadcrumbList, root first. */
+  breadcrumbs?: Array<{ name: string; path: string }>;
+}
+
+const { product, service, includeFaq, breadcrumbs } = Astro.props;
+
+const origin = site.seo.domain.replace(/\/$/, "");
+const abs = (path: string) => `${origin}${path.startsWith("/") ? path : `/${path}`}`;
+
+const organisation = {
+  "@type": "Organization",
+  "@id": `${origin}/#organisation`,
+  name: site.legal.registeredName,
+  alternateName: site.brand.name,
+  url: origin,
+  logo: abs(site.brand.logo),
+  email: site.contact.email,
+  telephone: site.contact.phone,
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: site.contact.city.split(",")[0]?.trim(),
+    addressCountry: "ZM",
+  },
+  areaServed: { "@type": "Country", name: site.legal.jurisdiction },
+  description: site.seo.description,
+};
+
+const graph: Record<string, unknown>[] = [organisation];
+
+if (product) {
+  graph.push({
+    "@type": "SoftwareApplication",
+    name: product.name,
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Windows",
+    url: abs(`/products/${product.slug}`),
+    description: product.summary,
+    image: abs(product.image),
+    publisher: { "@id": `${origin}/#organisation` },
+    ...(product.price && {
+      offers: {
+        "@type": "Offer",
+        price: product.price.amount,
+        priceCurrency: product.price.currency,
+        availability: "https://schema.org/InStock",
+        seller: { "@id": `${origin}/#organisation` },
+      },
+    }),
+    ...(product.features?.length && { featureList: product.features }),
+    /* Only emitted once there is a real host to link to. Advertising a
+       downloadUrl that 404s is worse than omitting the field. */
+    ...(downloadHref(product) && {
+      downloadUrl: downloadHref(product),
+      softwareVersion: product.download?.version,
+      fileSize: product.download?.size,
+    }),
+  });
+}
+
+if (service) {
+  graph.push({
+    "@type": "Service",
+    name: service.name,
+    serviceType: service.name,
+    url: abs(`/services/${service.slug}`),
+    description: service.description ?? service.summary,
+    provider: { "@id": `${origin}/#organisation` },
+    areaServed: { "@type": "Country", name: site.legal.jurisdiction },
+  });
+}
+
+if (includeFaq && site.faq?.items?.length) {
+  graph.push({
+    "@type": "FAQPage",
+    mainEntity: site.faq.items.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: { "@type": "Answer", text: item.a },
+    })),
+  });
+}
+
+if (breadcrumbs?.length) {
+  graph.push({
+    "@type": "BreadcrumbList",
+    itemListElement: breadcrumbs.map((crumb, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: crumb.name,
+      item: abs(crumb.path),
+    })),
+  });
+}
+
+const payload = JSON.stringify({ "@context": "https://schema.org", "@graph": graph });
+---
+
+<script type="application/ld+json" is:inline set:html={payload} />

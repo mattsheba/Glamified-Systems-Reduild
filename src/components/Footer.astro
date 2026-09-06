@@ -1,0 +1,98 @@
+---
+import site from "../lib/site";
+import { whatsappHref } from "../lib/site";
+
+const wa = whatsappHref();
+const year = new Date().getFullYear();
+---
+
+<footer class="mode-inverse site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        {/* The supplied logo has a solid white ground, so on an inverse band it
+            sits on a light chip rather than being recoloured — altering a brand
+            mark is the client's call, not ours. */}
+        <span class="logo-chip">
+          <img src={site.brand.logo} alt={site.brand.name} width="640" height="470" />
+        </span>
+        <p class="muted">{site.brand.tagline}</p>
+        <a class="btn btn--primary" href={wa} rel="noopener">
+          {site.hero.primaryCta.label}
+        </a>
+      </div>
+
+      <div>
+        <p class="eyebrow">Contact</p>
+        <ul class="plain">
+          <li><a href={`tel:${site.contact.phone.replace(/\s/g, "")}`}>{site.contact.phone}</a></li>
+          <li><a href={`mailto:${site.contact.email}`}>{site.contact.email}</a></li>
+          <li class="muted">{site.contact.city}</li>
+          <li class="muted">{site.contact.hours}</li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="eyebrow">Legal</p>
+        <ul class="plain">
+          <li><a href="/privacy">Privacy policy</a></li>
+          <li><a href="/terms">Terms of service</a></li>
+          <li><a href="/refund">Refund policy</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="colophon muted">
+      &copy; {year} {site.legal.registeredName}. {site.contact.city}.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding-block: var(--section-y) var(--s-5);
+  }
+
+  .footer-grid {
+    display: grid;
+    gap: var(--s-6);
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .logo-chip {
+    display: inline-block;
+    background: #fff;
+    border-radius: var(--r-sm);
+    padding: var(--s-3);
+    margin-bottom: var(--s-3);
+  }
+  .logo-chip img {
+    display: block;
+    height: 74px;
+    width: auto;
+  }
+
+  .plain {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  .plain a {
+    color: var(--band-ink);
+    text-decoration: none;
+  }
+
+  .plain a:hover {
+    color: var(--band-accent);
+  }
+
+  .colophon {
+    margin: var(--s-6) 0 0;
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--band-hairline);
+    font-size: var(--t-meta);
+  }
+</style>

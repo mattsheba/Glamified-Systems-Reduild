@@ -1,0 +1,32 @@
+# Netlify cache headers.
+#
+# Astro emits no hashed asset filenames here, because the site ships no external
+# JS and its CSS is inlined. That means these paths are stable, and a long cache
+# on a stable filename only works if changing the file also changes its name.
+#
+#   To replace a font or an image that is already live, upload it under a NEW
+#   filename and update site.config.js. Overwriting in place will leave repeat
+#   visitors on the old copy until their cache expires.
+#
+# HTML is deliberately not cached. The pages are small (about 11KB over the
+# wire) and content changes must appear immediately, so revalidation on every
+# request is the right trade.
+
+/fonts/*
+  # Fonts never change without a rename. A year is the usual ceiling, and
+  # immutable tells the browser not to even revalidate.
+  Cache-Control: public, max-age=31536000, immutable
+
+/images/*
+  # Thirty days rather than a year: screenshots and client logos do get
+  # replaced, and they are not renamed as reliably as fonts are.
+  Cache-Control: public, max-age=2592000
+
+/favicon.svg
+  Cache-Control: public, max-age=2592000
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/
+  Cache-Control: public, max-age=0, must-revalidate

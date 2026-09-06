@@ -1,0 +1,124 @@
+---
+import Icon from "./Icon.astro";
+
+/**
+ * Light / auto / dark, as three explicit buttons rather than one that cycles.
+ *
+ * A cycling button hides its own state: you cannot tell what pressing it will
+ * do without pressing it. Three buttons say which one is active and let someone
+ * pick directly, which also gives screen readers something sensible to announce
+ * through aria-pressed.
+ *
+ * "auto" stores nothing and lets prefers-color-scheme decide, so a device that
+ * switches at sunset carries the site with it.
+ */
+
+const OPTIONS = [
+  { value: "light", icon: "sun", label: "Light theme" },
+  { value: "auto", icon: "auto", label: "Match device theme" },
+  { value: "dark", icon: "moon", label: "Dark theme" },
+];
+---
+
+<div class="theme" role="group" aria-label="Colour theme">
+  {OPTIONS.map((option) => (
+    <button
+      type="button"
+      class="theme-btn"
+      data-theme-set={option.value}
+      aria-label={option.label}
+      aria-pressed="false"
+    >
+      <Icon name={option.icon} size={16} />
+    </button>
+  ))}
+</div>
+
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    const buttons = document.querySelectorAll("[data-theme-set]");
+    if (!buttons.length) return;
+
+    const read = () => {
+      try {
+        return localStorage.getItem("theme") || "auto";
+      } catch {
+        // Private browsing and blocked site data both throw here. Falling back
+        // to auto keeps the site usable rather than breaking the header.
+        return "auto";
+      }
+    };
+
+    const apply = (choice) => {
+      if (choice === "auto") root.removeAttribute("data-theme");
+      else root.setAttribute("data-theme", choice);
+
+      buttons.forEach((button) => {
+        const active = button.getAttribute("data-theme-set") === choice;
+        button.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const choice = button.getAttribute("data-theme-set");
+        try {
+          if (choice === "auto") localStorage.removeItem("theme");
+          else localStorage.setItem("theme", choice);
+        } catch {
+          // Choice still applies for this page view even if it cannot persist.
+        }
+        apply(choice);
+      });
+    });
+
+    apply(read());
+  })();
+</script>
+
+<style>
+  .theme {
+    display: inline-flex;
+    flex: 0 0 auto;
+    padding: 2px;
+    gap: 2px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-pill);
+    background: var(--surface);
+  }
+
+  .theme-btn {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: transparent;
+    color: var(--ink-muted);
+    cursor: pointer;
+  }
+
+  .theme-btn:hover {
+    color: var(--accent);
+  }
+
+  .theme-btn[aria-pressed="true"] {
+    background: var(--accent);
+    color: var(--surface);
+  }
+
+  /* The icon paints with currentColor, so it has to inherit the button's
+     colour rather than the accent it defaults to. */
+  .theme-btn :global(.icon) {
+    color: inherit;
+  }
+
+  @media (max-width: 767px) {
+    .theme {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,473 @@
+/*
+ * Design tokens — the visual contract from design-tokens.md.
+ *
+ * Two rules this file exists to enforce:
+ *   FR-19  colour tokens are light/dark pairs, and --ink === --ground-inverse
+ *   FR-21  display type scales with clamp(); no font-size inside a media query
+ *
+ * --accent is injected from site.config.js at build time (FR-5).
+ */
+
+:root {
+  /* ---- grounds ----
+     Nearly white. The earlier #f6f7f9 was light enough to look grey once
+     muted text sat on it, which read as washed out rather than soft. */
+  --ground: #fafbfc;
+  --surface: #ffffff;
+  --surface-tint: #eef2f6;
+
+  /* ---- ink ----
+     Body text is pure black, by decision. --ink and --ground-inverse were
+     originally the same navy so the light and dark bands read as one system
+     (FR-19), but that coupling cost readability on the light side and
+     readability wins. The dark bands keep the logo navy; only the words
+     changed. --ink-muted is near-black too: dark enough to read cleanly,
+     light enough to stay a second level. */
+  --ink: #000000;
+  --ground-inverse: #1a2230;
+  --ink-inverse: #ffffff;
+  --ink-muted: #3d3d3d;
+  --ink-muted-inverse: #d0d7e0;
+
+  /* ---- lines ---- */
+  --hairline: #e1e5ea;
+  --hairline-inverse: rgba(255, 255, 255, 0.15);
+
+  /* Third-party logos are mostly dark ink on transparent. On a dark ground
+     they would disappear, so in dark mode they get a light tile behind them
+     rather than being recoloured, which would distort somebody else's brand. */
+  --logo-tile: transparent;
+  --logo-card: var(--surface);
+
+  /* ---- accent ----
+     --accent is set from config. It is tuned for light grounds; on an inverse
+     band it is too dark to pass contrast, so --accent-inverse lightens it
+     rather than shipping a failure. Measured: #0F6E5C is 6.2:1 on --ground
+     but only 2.7:1 on --ground-inverse. */
+  --accent: #006c90;
+  --accent-inverse: color-mix(in oklab, var(--accent), white 45%);
+  --accent-wash: color-mix(in oklab, var(--accent), transparent 92%);
+
+  /* ---- semantic ---- */
+  --success: #1a7f4f;
+  --error: #b3261e;
+  --focus: var(--accent);
+
+  /* ---- type ---- */
+  --font-display: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Ramp caps at 56px (FR-22). Ratio 1.25 through the text steps. */
+  --t-display: clamp(2rem, 1.1rem + 4.4vw, 3.5rem);      /* 32 → 56 */
+  /* Page titles run larger than the in-page ramp: they carry two or three
+     words on their own, centred, with nothing competing for attention. */
+  --t-page-title: clamp(2.25rem, 1.1rem + 5.6vw, 4rem);  /* 36 → 64 */
+  /* The homepage hero, larger again — it is the one place on the site with
+     nothing above it to share the screen with. */
+  --t-hero: clamp(2.5rem, 1.1rem + 7vw, 4.5rem);         /* 40 → 72 */
+  --t-h1: clamp(1.75rem, 1.15rem + 3vw, 2.75rem);        /* 28 → 44 */
+  --t-h2: clamp(1.375rem, 1.05rem + 1.6vw, 2rem);        /* 22 → 32 */
+  --t-h3: clamp(1.25rem, 1.15rem + 0.5vw, 1.5625rem);    /* 20 → 25 */
+  --t-lead: 1.25rem;    /* 20 */
+  --t-body: 1rem;       /* 16 */
+  --t-small: 0.875rem;  /* 14 */
+  --t-label: 0.8125rem; /* 13 */
+  --t-meta: 0.75rem;    /* 12 */
+
+  /* Line-height and tracking invert with size — the rule taken from Phase 02. */
+  --lh-display: 1.05;
+  --lh-heading: 1.15;
+  --lh-body: 1.5;
+  --tr-display: -0.02em;
+  --tr-heading: -0.01em;
+  --tr-label: 0.08em;
+
+  /* ---- spacing: base 8, with a 4 half-step ---- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 16px;
+  --s-4: 24px;
+  --s-5: 32px;
+  --s-6: 48px;
+  --s-7: 64px;
+  --s-8: 80px;
+  --s-9: 120px;
+
+  /* Section rhythm 80 → 56 → 40, fluid rather than stepped. */
+  --section-y: clamp(40px, 5vw, 80px);
+  --section-y-tight: clamp(24px, 3vw, 48px);
+  --section-y-strip: 16px;
+
+  /* ---- layout ---- */
+  --container: 1200px;
+  --gutter: 24px;
+  --measure: 68ch;
+
+  /* ---- radius ---- */
+  --r-sm: 8px;
+  --r-md: 16px;
+  --r-pill: 999px;
+
+  /* ---- elevation: one blur value, as extracted ---- */
+  --shadow-sm: rgba(0, 0, 0, 0.06) 0 0 10px;
+  --shadow: rgba(0, 0, 0, 0.28) 0 0 10px;
+  --shadow-glow: rgba(255, 255, 255, 0.19) 0 5px 10px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Dark theme
+ *
+ * Only the root tokens are redefined. The band modes below read those
+ * tokens, so light and inverse bands keep alternating in dark without a
+ * second set of rules.
+ *
+ * Declared twice on purpose: once behind prefers-color-scheme for the
+ * "auto" setting, and once on [data-theme="dark"] for an explicit choice.
+ * The auto rule is guarded with :not([data-theme="light"]) so that picking
+ * light on a dark-set device actually wins.
+ * ------------------------------------------------------------------ */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #101720;
+    --surface: #18202b;
+    --surface-tint: #1d2734;
+    --ink: #f2f5f8;
+    --ground-inverse: #080c12;
+    --ink-inverse: #f2f5f8;
+    --ink-muted: #aab6c4;
+    --ink-muted-inverse: #aab6c4;
+    --hairline: #26303d;
+    --hairline-inverse: rgba(255, 255, 255, 0.12);
+    --accent: #4fb3d9;
+    --accent-inverse: var(--accent);
+    --shadow-sm: rgba(0, 0, 0, 0.4) 0 0 10px;
+    --shadow: rgba(0, 0, 0, 0.6) 0 0 14px;
+    --logo-tile: #ffffff;
+    --logo-card: #ffffff;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #101720;
+  --surface: #18202b;
+  --surface-tint: #1d2734;
+  --ink: #f2f5f8;
+  --ground-inverse: #080c12;
+  --ink-inverse: #f2f5f8;
+  --ink-muted: #aab6c4;
+  --ink-muted-inverse: #aab6c4;
+  --hairline: #26303d;
+  --hairline-inverse: rgba(255, 255, 255, 0.12);
+  --accent: #4fb3d9;
+  --accent-inverse: var(--accent);
+  --shadow-sm: rgba(0, 0, 0, 0.4) 0 0 10px;
+  --shadow: rgba(0, 0, 0, 0.6) 0 0 14px;
+  --logo-tile: #ffffff;
+  --logo-card: #ffffff;
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------ *
+ * Band modes (FR-20). A section sets its own ground and ink, and every
+ * component inside reads the same three variables regardless of mode.
+ * ------------------------------------------------------------------ */
+
+.mode-light {
+  --band-ground: var(--ground);
+  --band-surface: var(--surface);
+  --band-ink: var(--ink);
+  --band-ink-muted: var(--ink-muted);
+  --band-hairline: var(--hairline);
+  --band-accent: var(--accent);
+  --band-logo-tile: var(--logo-tile);
+  --band-logo-card: var(--logo-card);
+  background: var(--band-ground);
+  color: var(--band-ink);
+}
+
+.mode-inverse {
+  --band-ground: var(--ground-inverse);
+  --band-surface: color-mix(in oklab, var(--ground-inverse), white 6%);
+  --band-ink: var(--ink-inverse);
+  --band-ink-muted: var(--ink-muted-inverse);
+  --band-hairline: var(--hairline-inverse);
+  --band-accent: var(--accent-inverse);
+  --band-logo-tile: #ffffff;
+  --band-logo-card: #ffffff;
+  background: var(--band-ground);
+  color: var(--band-ink);
+}
+
+/* ------------------------------------------------------------------ *
+ * Base
+ * ------------------------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  margin: 0;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--t-h1);
+  font-weight: 800;
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
+}
+
+h2 {
+  font-size: var(--t-h2);
+  font-weight: 700;
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-heading);
+}
+
+h3 {
+  font-size: var(--t-h3);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+p {
+  margin: 0 0 var(--s-3);
+  max-width: var(--measure);
+}
+
+a {
+  color: var(--band-accent, var(--accent));
+  text-underline-offset: 2px;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Visible focus on everything interactive (NFR-7). */
+:focus-visible {
+  outline: 2px solid var(--band-accent, var(--focus));
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Long-form prose
+ *
+ * Justified, with hyphenation switched on. The hyphenation is not optional:
+ * justified text without it opens rivers of white space down the column,
+ * which is worse than ragged-right. `hyphens: auto` needs the lang attribute,
+ * which the layout sets on <html>.
+ *
+ * Deliberately not applied to centred text (justification and centring fight
+ * each other) or to short card summaries, where justifying two lines just
+ * looks broken.
+ * ------------------------------------------------------------------ */
+
+.prose p,
+.chapter--aside p,
+.intro,
+.answer p,
+.legal p,
+.legal li {
+  text-align: justify;
+  /* Hyphenation deliberately off. It is the usual way to keep justified text
+     from opening gaps, but it breaks words across lines ("manag-ement"), which
+     reads as a printing error on screen. text-wrap: pretty gives the browser
+     licence to rebalance the last lines instead. */
+  hyphens: none;
+  -webkit-hyphens: none;
+  text-wrap: pretty;
+}
+
+/* ------------------------------------------------------------------ *
+ * Homepage section headings
+ *
+ * Centred, uppercase and a full step larger than the in-page h2. Global
+ * rather than scoped because the headings are rendered inside the section
+ * components, which Astro's per-component scoping cannot reach into.
+ *
+ * The FAQ is excluded on purpose: its heading anchors a two-column layout
+ * on the left, and centring it would break that composition.
+ * ------------------------------------------------------------------ */
+
+.home-titles > section:not(#faq) h2 {
+  font-size: var(--t-display);
+  line-height: 1.06;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  text-align: center;
+  text-wrap: balance;
+  max-width: 20ch;
+  margin-inline: auto;
+}
+
+/* ------------------------------------------------------------------ *
+ * Primitives
+ * ------------------------------------------------------------------ */
+
+.container {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  padding-block: var(--section-y);
+}
+
+.section--strip {
+  padding-block: var(--section-y-strip);
+}
+
+.eyebrow {
+  font-family: var(--font-display);
+  font-size: var(--t-label);
+  font-weight: 600;
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--band-accent, var(--accent));
+  margin: 0 0 var(--s-2);
+}
+
+.display {
+  font-family: var(--font-display);
+  font-size: var(--t-display);
+  font-weight: 800;
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
+  text-wrap: balance;
+  margin: 0 0 var(--s-3);
+}
+
+.lead {
+  font-size: var(--t-lead);
+  line-height: 1.4;
+  color: var(--band-ink-muted, var(--ink-muted));
+}
+
+.muted {
+  color: var(--band-ink-muted, var(--ink-muted));
+}
+
+/* auto-fit grids, never a 12-column system (FR-23). */
+.grid {
+  display: grid;
+  gap: var(--s-4);
+  grid-template-columns: repeat(auto-fit, minmax(var(--col, 280px), 1fr));
+}
+
+.card {
+  background: var(--band-surface, var(--surface));
+  border: 1px solid var(--band-hairline, var(--hairline));
+  border-radius: var(--r-sm);
+  padding: var(--s-4);
+}
+
+.mode-inverse .card {
+  box-shadow: var(--shadow-glow);
+}
+
+/* ---- buttons ---- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  font-family: var(--font-display);
+  font-size: var(--t-label);
+  font-weight: 600;
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 13px 24px;
+  border-radius: var(--r-pill);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.btn:hover {
+  opacity: 0.88;
+}
+
+.btn--primary {
+  background: var(--band-accent, var(--accent));
+  color: var(--ground);
+  border-color: var(--band-accent, var(--accent));
+}
+
+.mode-inverse .btn--primary {
+  color: var(--ground-inverse);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--band-ink, var(--ink));
+  border-color: var(--band-hairline, var(--hairline));
+}
+
+/* Screen-reader-only, for skip links and visually hidden legends. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--s-2);
+  top: -60px;
+  z-index: 100;
+  background: var(--accent);
+  color: #fff;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-sm);
+  transition: top 0.15s ease;
+}
+
+.skip-link:focus {
+  top: var(--s-2);
+}
+
+/* EC-10 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

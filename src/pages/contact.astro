@@ -1,0 +1,14 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+import Form from "../components/sections/Form.astro";
+import site from "../lib/site";
+
+const copy = site.pages?.contact ?? {};
+const heading = copy.heading ?? site.brand.name;
+---
+
+<Base title={`${heading} | ${site.brand.name}`} description={copy.standfirst}>
+  <PageHeader heading={heading} standfirst={copy.standfirst} />
+  <Form mode="light" heading={site.form.heading} />
+</Base>

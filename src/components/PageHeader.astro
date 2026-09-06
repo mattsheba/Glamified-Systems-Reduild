@@ -1,0 +1,60 @@
+---
+/**
+ * The page title block.
+ *
+ * Centred, large, and deliberately short — the heading carries two or three
+ * words on its own line with nothing beside it. The standfirst is capped at a
+ * narrow measure so it stays two or three lines rather than becoming a
+ * paragraph; centred text is hard to read once it runs long.
+ */
+
+interface Props {
+  heading: string;
+  standfirst?: string;
+  eyebrow?: string;
+}
+
+const { heading, standfirst, eyebrow } = Astro.props;
+---
+
+<section class="section page-head mode-light">
+  <div class="container">
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h1>{heading}</h1>
+    {standfirst && <p class="standfirst">{standfirst}</p>}
+  </div>
+</section>
+
+<style>
+  .page-head {
+    padding-block: calc(var(--section-y) * 1.1) var(--section-y);
+    text-align: center;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .eyebrow {
+    margin-bottom: var(--s-3);
+  }
+
+  /* No uppercase here, deliberately. The reference site uppercases its page
+     titles, but our product names are camel-case compounds — GlamifiedFleet
+     becomes GLAMIFIEDFLEET, one unreadable run of letters. The uppercase
+     eyebrow above keeps the same rhythm without mangling a brand name. */
+  h1 {
+    font-size: var(--t-page-title);
+    font-weight: 800;
+    line-height: 1.06;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+    max-width: 18ch;
+    margin-inline: auto;
+  }
+
+  .standfirst {
+    font-size: var(--t-lead);
+    line-height: 1.5;
+    color: var(--ink-muted);
+    max-width: 56ch;
+    margin: var(--s-4) auto 0;
+  }
+</style>

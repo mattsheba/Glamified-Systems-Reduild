@@ -1,0 +1,18 @@
+# Netlify redirects.
+#
+# The live site ranks on these URLs. A 301 passes that ranking to the new
+# address; without it the old page 404s and the ranking is lost, which is the
+# most common way a rebuild silently costs traffic.
+#
+# Keep every path the old site published, even ones that look obsolete.
+
+/glamifiedhr              /products/glamified-hr       301
+/glamifiedsales           /products/glamified-sales    301
+/glamifiedfleet           /products/glamified-fleet    301
+
+# Common variants people and old links use.
+/glamified-hr             /products/glamified-hr       301
+/glamified-sales          /products/glamified-sales    301
+/glamified-fleet          /products/glamified-fleet    301
+/hr                       /products/glamified-hr       301
+/payroll                  /products/glamified-hr       301

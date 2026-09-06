@@ -1,0 +1,138 @@
+---
+import site from "../../lib/site";
+
+interface Props { mode: "light" | "inverse"; heading?: string }
+const { mode, heading } = Astro.props;
+
+const logos = site.proof?.logos ?? [];
+
+// The track is rendered twice and translated by exactly -50%, which is what
+// makes the loop seamless. The second copy is aria-hidden so a screen reader
+// does not read every client name twice.
+const passes = [false, true];
+---
+
+{logos.length > 0 && (
+  <section class={`section--strip marquee-section mode-${mode}`}>
+    {heading && <p class="eyebrow container">{heading}</p>}
+
+    <div class="marquee">
+      <div class="marquee-track">
+        {passes.map((isDuplicate) => (
+          <ul class="marquee-group" aria-hidden={isDuplicate ? "true" : undefined}>
+            {logos.map((logo) => (
+              <li>
+                {/* Only the first pass is announced; the duplicate track is
+                    aria-hidden, so alt text here does not read twice. */}
+                {/* Eager, not lazy. A marquee translates its track, so a
+                    lazily-loaded logo does not start fetching until it has
+                    already scrolled into view, and pops in visibly. The whole
+                    set is well under 100KB and sits below the fold, so it
+                    costs nothing to load it up front. */}
+                <img
+                  src={logo.src}
+                  alt={isDuplicate ? "" : logo.name}
+                  width="440"
+                  height="176"
+                  decoding="async"
+                />
+              </li>
+            ))}
+          </ul>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .marquee-section {
+    overflow: hidden;
+  }
+
+  .eyebrow {
+    display: block;
+    max-width: none;
+    margin: 0 auto var(--s-3);
+    text-align: center;
+    color: var(--band-ink-muted);
+  }
+
+  .marquee {
+    /* Fade the strip into the band at both edges so logos enter and leave
+       rather than being clipped mid-word. */
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 8%,
+      black 92%,
+      transparent
+    );
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-scroll 45s linear infinite;
+  }
+
+  .marquee-group {
+    display: flex;
+    align-items: center;
+    gap: var(--s-7);
+    list-style: none;
+    margin: 0;
+    padding: 0 calc(var(--s-7) / 2);
+  }
+
+  /* Every logo was fitted to the same canvas at build time, so a single
+     height gives them all an identical footprint despite their source files
+     ranging from 411x214 to 5250x5250. */
+  .marquee-group img {
+    height: 68px;
+    width: auto;
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+    /* Transparent in light, white in dark. Client marks are mostly dark ink,
+       so on a dark ground they need something to sit on. */
+    background: var(--band-logo-tile, var(--logo-tile));
+    border-radius: var(--r-sm);
+  }
+
+  .marquee-group img:hover {
+    opacity: 1;
+  }
+
+  /* Pausing on hover lets someone actually read a logo they recognised. */
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes marquee-scroll {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* EC-10: no motion. The strip becomes a static, wrapping row and the
+     duplicate set is dropped so nothing is shown twice. */
+  @media (prefers-reduced-motion: reduce) {
+    .marquee {
+      mask-image: none;
+    }
+    .marquee-track {
+      animation: none;
+      width: 100%;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .marquee-group[aria-hidden="true"] {
+      display: none;
+    }
+    .marquee-group {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--s-5);
+    }
+  }
+</style>
