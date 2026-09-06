@@ -30,6 +30,7 @@ const passes = [false, true];
                     set is well under 100KB and sits below the fold, so it
                     costs nothing to load it up front. */}
                 <img
+                  class:list={[logo.tile === "none" && "bare"]}
                   src={logo.src}
                   alt={isDuplicate ? "" : logo.name}
                   width="440"
@@ -97,6 +98,12 @@ const passes = [false, true];
        so on a dark ground they need something to sit on. */
     background: var(--band-logo-tile, var(--logo-tile));
     border-radius: var(--r-sm);
+  }
+
+  /* Carries its own ground, so no tile behind it. Without this the tile shows
+     as light bars either side of the mark on a dark band. */
+  .marquee-group img.bare {
+    background: none;
   }
 
   .marquee-group img:hover {

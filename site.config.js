@@ -747,6 +747,12 @@ export default {
       { src: "/images/logos/ampindi-ventures.webp", name: "Ampindi Ventures" },
       { src: "/images/logos/crescent-crest-supplies.webp", name: "Crescent Crest Supplies" },
       { src: "/images/logos/ikan-konsult.webp", name: "IKAN Konsult" },
+      {
+        src: "/images/logos/rare-events.webp",
+        name: "Rare Events",
+        // Gold on black: supplies its own ground, so it takes no tile.
+        tile: "none",
+      },
     ],
     /**
      * Label reads first, value second: "Building since / 2023". Value-first

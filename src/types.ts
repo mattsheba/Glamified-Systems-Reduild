@@ -305,7 +305,12 @@ export interface SiteConfig {
      * `name` becomes the alt text, so the strip is not a row of anonymous
      * images to anyone using a screen reader.
      */
-    logos?: Array<{ src: string; name: string }>;
+    logos?: Array<{
+      src: string;
+      name: string;
+      /** "none" for a mark that carries its own ground. See Testimonial.logoTile. */
+      tile?: "none";
+    }>;
     /**
      * Label reads first, value second: "Building since / 2023". Value-first
      * only works when the label is a noun describing the number, which is not
