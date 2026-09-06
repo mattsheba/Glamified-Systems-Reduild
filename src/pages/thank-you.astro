@@ -1,0 +1,57 @@
+---
+import Base from "../layouts/Base.astro";
+import site, { whatsappHref } from "../lib/site";
+
+/**
+ * Where a form submission lands when JavaScript is off.
+ *
+ * With JavaScript on, the enquiry posts in the background and the success
+ * message appears inline, so nobody reaches this page. Without it, the browser
+ * does a normal POST and Netlify redirects here. Without this page that
+ * redirect would land on Netlify's own generic success screen, which carries
+ * none of the site's navigation.
+ *
+ * Excluded from the sitemap and from indexing: it is a destination, not a page
+ * anyone should arrive at from a search result.
+ */
+const copy = site.pages?.thankYou;
+const wa = whatsappHref();
+---
+
+<Base
+  title={`${copy?.heading ?? "Thank you"} | ${site.brand.name}`}
+  description={copy?.standfirst}
+  noindex
+>
+  <section class="section mode-light">
+    <div class="container thanks">
+      <h1 class="display">{copy?.heading}</h1>
+      {copy?.standfirst && <p class="lead">{copy.standfirst}</p>}
+
+      <div class="actions">
+        <a class="btn btn--primary" href={wa} rel="noopener">
+          {site.hero.primaryCta.label}
+        </a>
+        <a class="btn btn--ghost" href="/">{site.brand.name}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .thanks {
+    max-width: var(--measure);
+  }
+
+  .lead {
+    font-size: var(--t-lead);
+    line-height: 1.5;
+    margin-bottom: var(--s-6);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+  }
+</style>

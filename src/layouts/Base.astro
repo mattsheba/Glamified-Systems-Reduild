@@ -9,9 +9,12 @@ import "../styles/tokens.css";
 interface Props {
   title?: string;
   description?: string;
+  /** Keeps a page out of search results. For destinations like /thank-you,
+   *  which make no sense as an entry point from a search. */
+  noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, noindex } = Astro.props;
 
 const pageTitle = title ?? site.seo.title;
 const pageDescription = description ?? site.seo.description;
@@ -26,6 +29,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
     <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="icon" href={site.brand.favicon} />
 
     <meta property="og:title" content={pageTitle} />

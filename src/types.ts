@@ -259,6 +259,8 @@ export interface SiteConfig {
     services?: ServicesCopy;
     about?: AboutCopy;
     contact?: PageCopy;
+    /** Where a no-JS form submission lands. */
+    thankYou?: PageCopy;
     /** 404 page. A variant may want its own wording. */
     notFound?: PageCopy;
   };

@@ -1,0 +1,15 @@
+# Netlify build settings, committed so a deploy does not depend on dashboard
+# state that nobody can see in the repository.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Astro 5 needs 18+; pinning avoids a surprise when Netlify moves its default.
+  NODE_VERSION = "20"
+
+# Headers and redirects are NOT configured here on purpose. They live in
+# public/_headers and public/_redirects, which Astro copies into dist/ and
+# Netlify reads from there. Keeping them in those files means Cloudflare Pages
+# reads the same two files unchanged if the site ever moves.

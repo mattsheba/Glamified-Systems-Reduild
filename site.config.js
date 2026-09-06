@@ -151,6 +151,11 @@ export default {
         },
       ],
     },
+    thankYou: {
+      heading: "Thank you, we have your enquiry",
+      standfirst:
+        "We reply within one working day. If it is urgent, WhatsApp reaches us faster than email.",
+    },
     notFound: {
       heading: "That page does not exist",
       standfirst:
@@ -898,7 +903,15 @@ export default {
   },
 
   form: {
-    endpoint: "/api/enquiry",
+    /*
+     * Netlify Forms. The build bot finds the form in the deployed HTML and
+     * stores submissions itself, so there is no function to write or maintain.
+     *
+     * `endpoint` is not an API: it is where a visitor with JavaScript off lands
+     * after the browser posts the form. With JavaScript on, the script posts in
+     * the background and shows the success message inline instead.
+     */
+    endpoint: "/thank-you",
     heading: "Tell us about your project",
     standfirst:
       "For anything bigger than a quick question. Prefer WhatsApp for a fast answer.",

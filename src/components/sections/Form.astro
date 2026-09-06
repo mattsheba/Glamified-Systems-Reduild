@@ -14,9 +14,33 @@ const wa = whatsappHref();
     {heading && <h2>{heading}</h2>}
     {f.standfirst && <p class="lead">{f.standfirst}</p>}
 
-    {/* NFR-9: a real form with action/method, so it still submits with JS off.
-        The inline script below upgrades it to a fetch when JS is available. */}
-    <form class="enquiry" method="post" action={f.endpoint} novalidate>
+    {/*
+      NFR-9: a real form with action/method, so it still submits with JS off.
+      The inline script below upgrades it to a background post when JS is there.
+
+      Netlify Forms needs four things, all of them here: a `name`, the
+      `data-netlify` flag so the build bot registers the form, a hidden
+      `form-name` field so a scripted post is attributed to the right form, and
+      a honeypot it can use to drop bots. `action` is where a no-JS submit
+      lands afterwards.
+    */}
+    <form
+      class="enquiry"
+      name="enquiry"
+      method="post"
+      action={f.endpoint}
+      data-netlify="true"
+      data-netlify-honeypot="bot-field"
+      novalidate
+    >
+      <input type="hidden" name="form-name" value="enquiry" />
+
+      {/* Not a real field. Hidden from sight, from screen readers and from the
+          tab order, so only an automated submitter fills it in. */}
+      <div class="bot-field" aria-hidden="true">
+        <input type="text" name="bot-field" tabindex="-1" autocomplete="off" />
+      </div>
+
       <div class="cols">
         <div class="col">
           <div class="row">
@@ -128,15 +152,25 @@ const wa = whatsappHref();
       status.textContent = "Sending…";
       status.className = "form-status";
 
-      const data = new FormData(form);
-      const payload = Object.fromEntries(data.entries());
-      payload.services = data.getAll("services");
+      /*
+       * Netlify Forms accepts a urlencoded body, not JSON, and it identifies
+       * the form by the `form-name` field rather than by the URL. The hidden
+       * input in the markup supplies that, so FormData already carries it.
+       *
+       * URLSearchParams keeps repeated keys, which matters: the "what are you
+       * looking for" checkboxes all post under `services`, and a plain object
+       * would keep only the last one ticked.
+       */
+      const body = new URLSearchParams(new FormData(form));
 
       try {
-        const response = await fetch(form.action, {
+        // Posted to the current page, not to form.action. The action is where a
+        // no-JS submit lands; Netlify accepts the background post on any path
+        // it serves and routes by form-name.
+        const response = await fetch(location.pathname, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body,
         });
         if (!response.ok) throw new Error(String(response.status));
         status.textContent = successMessage;
@@ -271,6 +305,10 @@ const wa = whatsappHref();
 
   .submit {
     justify-self: start;
+  }
+
+  .bot-field {
+    display: none;
   }
 
   .form-status {

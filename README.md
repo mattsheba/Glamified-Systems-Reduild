@@ -150,7 +150,8 @@ These are real and tracked, not oversights:
 - **Legal pages are unreviewed templates.** They carry a visible warning banner.
   Have a lawyer check them before any client site goes live.
 - **`/api/enquiry` does not exist yet.** The form posts to it and degrades
-  correctly on failure, but a Netlify Function still needs writing.
+  handled by Netlify Forms: the build bot registers the form from the
+  deployed HTML, so there is no function to write or maintain.
 - **Accent on dark bands is derived, not chosen.** `#0F6E5C` measures 2.64:1 on
   the inverse ground, which fails WCAG, so `--accent-inverse` lightens it via
   `color-mix`. Worth a designer's eye before launch.

@@ -39,7 +39,30 @@ const routesFrom = (dir, base = "") =>
     return entry.name === "index.html" ? [base || "/"] : [];
   });
 
-const built = routesFrom(dist).sort();
+const allRoutes = routesFrom(dist).sort();
+
+/*
+ * A page that tells crawlers noindex must not also be advertised in the
+ * sitemap: the two contradict each other, and a crawler is being asked to
+ * index something it is simultaneously told to ignore.
+ *
+ * Read from the built HTML rather than kept as a list here, so the rule stays
+ * true on its own. Mark a page noindex and it drops out of both; remove the
+ * mark and it becomes required in the sitemap again.
+ */
+const fileFor = (route) =>
+  route === "/" ? join(dist, "index.html") : join(dist, route, "index.html");
+
+const isNoindex = (route) => {
+  const file = fileFor(route);
+  if (!existsSync(file)) return false;
+  return /<meta[^>]*name=["']robots["'][^>]*noindex/i.test(
+    readFileSync(file, "utf8")
+  );
+};
+
+const noindexed = allRoutes.filter(isNoindex);
+const built = allRoutes.filter((route) => !noindexed.includes(route));
 
 /* ---------- what the sitemap claims ---------- */
 
@@ -62,9 +85,16 @@ const phantom = listed.filter((r) => !built.includes(r));
 missing.forEach((r) =>
   errors.push(`built but missing from sitemap: ${r}`)
 );
-phantom.forEach((r) =>
-  errors.push(`in sitemap but no such page was built: ${r}`)
-);
+phantom.forEach((r) => {
+  if (noindexed.includes(r)) {
+    errors.push(
+      `${r} is marked noindex but is listed in the sitemap. It is either a page ` +
+        `for search engines or it is not.`
+    );
+  } else {
+    errors.push(`in sitemap but no such page was built: ${r}`);
+  }
+});
 
 /* ---------- sitemap validity ---------- */
 
@@ -120,5 +150,8 @@ if (errors.length) {
 }
 
 console.log(
-  `  sitemap OK — ${listed.length} URLs, matching all ${built.length} built pages\n`
+  `  sitemap OK — ${listed.length} URLs, matching all ${built.length} indexable pages` +
+    (noindexed.length
+      ? `, ${noindexed.length} noindex page(s) correctly excluded\n`
+      : "\n")
 );
