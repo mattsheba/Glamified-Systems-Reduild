@@ -76,10 +76,11 @@ export function serviceHref(slug: string): string {
 export function navTree(): Array<{
   label: string;
   href: string;
-  children: Array<{ label: string; href: string }>;
+  children: Array<{ label: string; href: string; group?: string }>;
 }> {
   return site.nav.map((item) => {
-    let children = item.children ?? [];
+    let children: Array<{ label: string; href: string; group?: string }> =
+      item.children ?? [];
 
     if (item.childrenFrom === "products") {
       children = site.products.map((product) => ({
@@ -87,9 +88,14 @@ export function navTree(): Array<{
         href: productHref(product.slug),
       }));
     } else if (item.childrenFrom === "services") {
+      // `group` is carried through so the menu can divide the technology work
+      // from the business services exactly as the services page does. A menu
+      // that groups differently from the page it links to is its own small
+      // confusion.
       children = site.services.map((service) => ({
         label: service.name,
         href: serviceHref(service.slug),
+        group: service.group,
       }));
     }
 

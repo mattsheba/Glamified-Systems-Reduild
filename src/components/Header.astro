@@ -43,12 +43,20 @@ const isCurrent = (href: string) =>
 
             {item.children.length > 0 && (
               <ul class="submenu">
-                {item.children.map((child) => (
-                  <li>
-                    <a href={child.href} aria-current={isCurrent(child.href) ? "page" : undefined}>
-                      {child.label}
-                    </a>
-                  </li>
+                {item.children.map((child, i) => (
+                  <>
+                    {/* A divider only where the group actually changes, so a
+                        menu whose items carry no group renders exactly as it
+                        did before. */}
+                    {child.group && child.group !== item.children[i - 1]?.group && (
+                      <li class="submenu-group" aria-hidden="true">{child.group}</li>
+                    )}
+                    <li>
+                      <a href={child.href} aria-current={isCurrent(child.href) ? "page" : undefined}>
+                        {child.label}
+                      </a>
+                    </li>
+                  </>
                 ))}
               </ul>
             )}
@@ -74,8 +82,13 @@ const isCurrent = (href: string) =>
               <a class="mobile-top" href={item.href}>{item.label}</a>
               {item.children.length > 0 && (
                 <ul>
-                  {item.children.map((child) => (
-                    <li><a href={child.href}>{child.label}</a></li>
+                  {item.children.map((child, i) => (
+                    <>
+                      {child.group && child.group !== item.children[i - 1]?.group && (
+                        <li class="submenu-group" aria-hidden="true">{child.group}</li>
+                      )}
+                      <li><a href={child.href}>{child.label}</a></li>
+                    </>
                   ))}
                 </ul>
               )}
@@ -300,6 +313,32 @@ const isCurrent = (href: string) =>
     font-size: var(--t-small);
     font-weight: 600;
     white-space: nowrap;
+  }
+
+  /*
+   * aria-hidden because the group is a visual aid only: the link text already
+   * says what each item is, and a screen reader announcing "Technology" as a
+   * list item between links would be noise rather than structure.
+   */
+  .submenu-group,
+  .mobile-panel .submenu-group {
+    padding: var(--s-2) 16px 4px;
+    font-family: var(--font-display);
+    font-size: var(--t-meta);
+    font-weight: 700;
+    letter-spacing: var(--tr-label);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .submenu li.submenu-group:not(:first-child),
+  .mobile-panel li.submenu-group:not(:first-child) {
+    margin-top: var(--s-2);
+    border-top: 1px solid var(--hairline);
+  }
+
+  .mobile-panel .submenu-group {
+    padding-inline: var(--s-2);
   }
 
   .submenu a:hover,
