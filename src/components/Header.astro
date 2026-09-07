@@ -1,10 +1,9 @@
 ---
-import site, { whatsappHref, navTree } from "../lib/site";
+import site, { navTree } from "../lib/site";
 import ThemeToggle from "./ThemeToggle.astro";
 
-// FR-13: the WhatsApp CTA lives in the header so it is reachable from every
-// page without scrolling, on every viewport.
-const wa = whatsappHref();
+// FR-13 is now served by the floating WhatsApp button, which is reachable from
+// anywhere on the page rather than only from the top of it.
 const nav = navTree();
 const path = Astro.url.pathname;
 
@@ -59,10 +58,6 @@ const isCurrent = (href: string) =>
     </nav>
 
     <ThemeToggle />
-
-    <a class="btn btn--primary header-cta" href={wa} rel="noopener">
-      {site.hero.primaryCta.label}
-    </a>
 
     {/* Mobile menu. A <details> disclosure rather than a scripted drawer —
         same reason: no JavaScript, and it is keyboard-operable for free. */}
@@ -197,9 +192,14 @@ const isCurrent = (href: string) =>
     white-space: nowrap;
   }
 
-  @media (max-width: 480px) {
+  /* Shown at every width. It used to be hidden below 480px to make room for
+     the WhatsApp button that sat here; that button is now the floating one, so
+     the name fits. A logo with no name is a worse header than a small name. */
+  @media (max-width: 380px) {
     .brand-name {
-      display: none;
+      /* Only the very narrowest phones need the shorter form. */
+      font-size: var(--t-meta);
+      letter-spacing: 0.01em;
     }
   }
 
@@ -401,24 +401,15 @@ const isCurrent = (href: string) =>
       gap: var(--s-2);
       justify-content: space-between;
     }
-    .header-cta {
+    /* The menu button takes the far edge now that the CTA has gone. */
+    .mobile-nav {
       margin-inline-start: auto;
-      padding: 10px 16px;
     }
   }
 
-  /* Brand, theme control, CTA and menu all have to fit 320px. */
   @media (max-width: 400px) {
     .header-inner {
       gap: 6px;
-    }
-    .header-cta {
-      /* nowrap and a step down in size, because the label comes from config
-         and wrapped onto two lines here, which made the whole header taller
-         on exactly the screens with the least room to spare. */
-      padding: 10px 12px;
-      font-size: 0.75rem;
-      white-space: nowrap;
     }
   }
 </style>

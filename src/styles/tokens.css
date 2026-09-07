@@ -62,9 +62,11 @@
   /* Page titles run larger than the in-page ramp: they carry two or three
      words on their own, centred, with nothing competing for attention. */
   --t-page-title: clamp(2.25rem, 1.1rem + 5.6vw, 4rem);  /* 36 → 64 */
-  /* The homepage hero, larger again — it is the one place on the site with
-     nothing above it to share the screen with. */
-  --t-hero: clamp(2.5rem, 1.1rem + 7vw, 4.5rem);         /* 40 → 72 */
+  /* The homepage hero. Was 40 → 72, which cost 294px of headline on a laptop
+     and pushed everything below it off the first screen. The headline is also
+     a longer sentence now. 32 → 52 keeps it commanding without the hero
+     swallowing the fold. */
+  --t-hero: clamp(2rem, 1.1rem + 4.2vw, 3.25rem);        /* 32 → 52 */
   --t-h1: clamp(1.75rem, 1.15rem + 3vw, 2.75rem);        /* 28 → 44 */
   --t-h2: clamp(1.375rem, 1.05rem + 1.6vw, 2rem);        /* 22 → 32 */
   --t-h3: clamp(1.25rem, 1.15rem + 0.5vw, 1.5625rem);    /* 20 → 25 */

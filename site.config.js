@@ -216,11 +216,27 @@ export default {
   },
 
   hero: {
-    headline: "Software your business actually runs on",
+    headline: "Software for the work your business actually does",
+    /*
+     * The sectors line. Set as its own field rather than folded into the
+     * standfirst because it reads as a list, not a sentence, and it is styled
+     * as one. It is also the fastest way for a visitor to find themselves on
+     * the page: most people are scanning for their own word.
+     */
+    capabilities: [
+      "Payroll",
+      "HR",
+      "Loans",
+      "Fleet",
+      "Invoicing",
+      "Property",
+      "School",
+    ],
     standfirst:
-      "Payroll, invoicing and fleet costs, built for Zambian statutory rules and built to keep working when the internet doesn't.",
+      "Business systems built for Zambian businesses, with offline-first operations and local statutory requirements in mind.",
     primaryCta: { label: "Chat on WhatsApp", type: "whatsapp" },
     secondaryCta: { label: "See the products", href: "/products" },
+    image: "/images/brand/hero-systems.webp",
   },
 
   products: [

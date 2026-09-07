@@ -269,6 +269,8 @@ export interface SiteConfig {
 
   hero: {
     headline: string;
+    /** Sectors, set as a list under the headline. */
+    capabilities?: string[];
     standfirst: string;
     primaryCta: { label: string; type: "whatsapp" | "link"; href?: string };
     secondaryCta?: { label: string; href: string };
