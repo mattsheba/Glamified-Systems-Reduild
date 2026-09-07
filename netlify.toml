@@ -31,3 +31,9 @@
   from = "/api/lenco-webhook"
   to = "/.netlify/functions/lenco-webhook"
   status = 200
+
+# Notifies Bing, DuckDuckGo and Yandex the moment a production deploy is live,
+# instead of waiting for their next crawl. Local plugin, so it needs no install
+# and cannot break when a third-party package changes.
+[[plugins]]
+  package = "/plugins/indexnow"
