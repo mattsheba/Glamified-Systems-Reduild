@@ -247,44 +247,6 @@ export default {
     ],
   },
 
-  dataSafety: {
-    heading: "Offline does not mean unprotected",
-    standfirst:
-      "Your records live on your own computer, which is the point. Here is what keeps them safe there.",
-    points: [
-      {
-        title: "Backup and restore is built in",
-        detail:
-          "Settings, then Backup and Restore. Click Back up now, choose a folder, and you have a backup. Restoring is the same file going back the other way.",
-      },
-      {
-        title: "One file, so it goes anywhere",
-        detail:
-          "A backup is a single file. Put it on a memory stick, or in Google Drive, OneDrive or Dropbox exactly as you would any other document. Nothing new to learn and nothing new to pay for.",
-      },
-      {
-        title: "The software tells you when you are overdue",
-        detail:
-          "If a backup has not been taken for a while a warning appears at the top of the screen, so a forgotten backup does not stay forgotten.",
-      },
-      {
-        title: "Moving to a new computer is a backup and a restore",
-        detail:
-          "Take a backup on the old machine, install on the new one, restore the file. Hardware failure is a bad day rather than a lost year.",
-      },
-      {
-        title: "Your data is never locked to a licence",
-        detail:
-          "Backups keep working even after a licence has expired. Your records are yours, and a lapsed key never holds them hostage.",
-      },
-      {
-        title: "We can set the routine up with you",
-        detail:
-          "Deployment includes showing your staff how and when to back up. For payroll we suggest a backup at every run and a copy kept off the machine.",
-      },
-    ],
-  },
-
   downloads: {
     baseUrl: "https://downloads.glamifiedsystems.com",
     label: "Download for Windows",
@@ -407,7 +369,8 @@ export default {
           items: [
             "Desktop application, works with no internet connection",
             "User accounts with roles, so payroll is not open to everyone",
-            "Data stored on your own machine, backed up on your own terms",
+            "Data stored on your own machine",
+            "Backup and restore, to this machine, an external drive or a cloud drive",
             "Licence editions, with a clear warning before a term runs out",
           ],
         },
@@ -503,6 +466,13 @@ export default {
             "VAT treatment per line",
           ],
         },
+        {
+          title: "Running it",
+          items: [
+            "Desktop application, works with no internet connection",
+            "Backup and restore, to this machine, an external drive or a cloud drive",
+          ],
+        },
       ],
     },
 
@@ -587,7 +557,7 @@ export default {
           items: [
             "Desktop application, works with no internet connection",
             "Audit log of what changed and who changed it",
-            "Backup and restore",
+            "Backup and restore, to this machine, an external drive or a cloud drive",
           ],
         },
       ],

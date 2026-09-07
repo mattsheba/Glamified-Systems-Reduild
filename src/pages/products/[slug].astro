@@ -179,27 +179,6 @@ const crumbs = [
     </div>
   </section>
 
-  {/* Only where the product is actually a desktop application we ship, which
-      is the only case where "your data is on your machine" applies. */}
-  {product.download && site.dataSafety && (
-    <section class="section mode-inverse">
-      <div class="container safety">
-        <h2>{site.dataSafety.heading}</h2>
-        {site.dataSafety.standfirst && (
-          <p class="lead">{site.dataSafety.standfirst}</p>
-        )}
-        <ul class="grid safety-points" style="--col: 300px">
-          {site.dataSafety.points.map((point) => (
-            <li>
-              <h3>{point.title}</h3>
-              <p>{point.detail}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  )}
-
   {product.screenshots && product.screenshots.length > 0 && (
     <section class="section mode-light">
       <div class="container">
@@ -293,45 +272,6 @@ const crumbs = [
     align-items: start;
     max-width: 960px;
     margin-inline: auto;
-  }
-
-  .safety h2 {
-    font-size: var(--t-h2);
-    max-width: 20ch;
-  }
-
-  .safety .lead {
-    font-size: var(--t-lead);
-    line-height: 1.5;
-    color: var(--band-ink-muted);
-    max-width: var(--measure);
-    margin: var(--s-3) 0 var(--s-6);
-  }
-
-  .safety-points {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .safety-points li {
-    /* An accent rule rather than a card: this section already sits on an
-       inverse band, and boxing it as well makes it heavier than the
-       capability lists above it. */
-    padding-top: var(--s-3);
-    border-top: 2px solid var(--band-accent);
-  }
-
-  .safety-points h3 {
-    font-size: var(--t-h3);
-    margin: 0 0 var(--s-2);
-  }
-
-  .safety-points p {
-    margin: 0;
-    font-size: var(--t-small);
-    line-height: 1.55;
-    color: var(--band-ink-muted);
   }
 
   .includes-box {

@@ -316,16 +316,6 @@ export interface SiteConfig {
   /** What a product licence fee buys, listed beside the price. */
   licenceIncludes?: { label: string; items: string[] };
 
-  /**
-   * Backup and data-safety story, shown on every product page. Answers the
-   * question that offline-first positioning necessarily raises.
-   */
-  dataSafety?: {
-    heading: string;
-    standfirst?: string;
-    points: Array<{ title: string; detail: string }>;
-  };
-
   /** Online payment. See site.config.js for why prices are not repeated here. */
   payments?: {
     /** Nothing renders and the functions refuse to run while this is false. */
