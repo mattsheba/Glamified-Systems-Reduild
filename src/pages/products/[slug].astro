@@ -42,13 +42,23 @@ const crumbs = [
 
   <section class="section mode-light">
     <div class="container">
-      <img
-        class="hero-shot"
-        src={product.image}
-        alt={`${product.name} screenshot`}
-        width="1280"
-        height="720"
-      />
+      {/* Captioned because the dashboards are populated with invented
+          companies and figures. At 960px those are legible, and a table headed
+          "who owes you most" listing named businesses against amounts reads as
+          a real customer's ledger put on the web — the worst thing to imply
+          about software whose whole pitch is that your records stay yours. */}
+      <figure class="shot-figure">
+        <img
+          class="hero-shot"
+          src={product.image}
+          alt={`${product.name} screenshot`}
+          width="1280"
+          height="720"
+        />
+        {site.screenshotNote && (
+          <figcaption class="shot-note">{site.screenshotNote}</figcaption>
+        )}
+      </figure>
 
       {/* A grouped product stacks: intro across the top, capabilities in a
           two-column grid beneath. Seven groups squeezed into a side column
@@ -253,16 +263,29 @@ const crumbs = [
 </Base>
 
 <style>
+  /* The figure carries the width and the spacing so the caption sits inside
+     the same 960px column as the shot and the intro copy below it. */
+  .shot-figure {
+    max-width: 960px;
+    margin: 0 auto var(--s-7);
+  }
+
   .hero-shot {
     display: block;
     width: 100%;
-    max-width: 960px;
-    margin: 0 auto var(--s-7);
+    margin: 0;
     background: var(--surface-tint);
     border: 1px solid var(--hairline);
     border-radius: var(--r-sm);
     padding: var(--s-2);
     object-fit: contain;
+  }
+
+  .shot-note {
+    margin: var(--s-2) 0 0;
+    font-size: var(--t-meta);
+    color: var(--ink-muted);
+    text-align: center;
   }
 
   .detail {
@@ -462,7 +485,7 @@ const crumbs = [
     .detail--stacked {
       gap: var(--s-5);
     }
-    .hero-shot {
+    .shot-figure {
       margin-bottom: var(--s-5);
     }
   }

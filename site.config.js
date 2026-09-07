@@ -247,6 +247,12 @@ export default {
     ],
   },
 
+  // Captions the screenshot on every product page. The dashboards are filled
+  // with invented companies and figures, and at full width those read clearly
+  // enough that a visitor could take them for a real customer's records.
+  screenshotNote:
+    "Screenshots show sample data for illustration only. The companies and figures in them are not real customer records.",
+
   downloads: {
     baseUrl: "https://downloads.glamifiedsystems.com",
     label: "Download for Windows",

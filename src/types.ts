@@ -316,6 +316,13 @@ export interface SiteConfig {
   /** What a product licence fee buys, listed beside the price. */
   licenceIncludes?: { label: string; items: string[] };
 
+  /**
+   * Caption under the screenshot on a product page, saying the data in it is
+   * invented. Optional, but omitting it on a variant whose screenshots show
+   * named parties and money is a decision, not a default.
+   */
+  screenshotNote?: string;
+
   /** Online payment. See site.config.js for why prices are not repeated here. */
   payments?: {
     /** Nothing renders and the functions refuse to run while this is false. */
