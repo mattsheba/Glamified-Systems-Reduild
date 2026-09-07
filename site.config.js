@@ -282,11 +282,22 @@ export default {
       "Business systems built for Zambian businesses, with offline-first operations and local statutory requirements in mind.",
     primaryCta: { label: "Browse our software", type: "link", href: "/products" },
     secondaryCta: { label: "Chat on WhatsApp", type: "whatsapp" },
-    // Versioned filename, deliberately. Files under public/ keep the name they
-    // are given, and the CDN in front of the site caches them for 30 days, so
-    // replacing an image in place leaves the old one served from the edge long
-    // after the deploy — no browser refresh can reach past that. A new name is
-    // a new cache key. Bump the suffix whenever this photo is replaced.
+    /*
+     * Versioned filename, deliberately.
+     *
+     * Files under public/ are copied out under the name they are given, so they
+     * carry no content hash, and the CDN caches them for 30 days. Replacing one
+     * in place leaves the previous version served from the edge long after the
+     * deploy, and no browser refresh reaches past that. A new name is a new
+     * cache key, which is what actually busts it.
+     *
+     * To replace this photo: write it to a new filename (-v3, and so on) and
+     * point this at it. Leave the previous file in the folder for a few days
+     * rather than deleting it — HTML is served must-revalidate, but a browser
+     * that already has the page open still holds markup naming the old file,
+     * and deleting it turns that into a 404 and a visibly broken hero. Keeping
+     * it means stale markup falls back to the old photo instead of to nothing.
+     */
     image: "/images/brand/hero-desk-v2.webp",
   },
 
