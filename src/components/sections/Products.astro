@@ -13,9 +13,15 @@ const { mode, heading } = Astro.props;
     <div class="grid products" style="--col: 300px">
       {site.products.map((product) => (
         <article class="card product">
+          {/* The logo carries the card where one exists; the screenshot is the
+              fallback so a variant that ships only screenshots still works.
+              Either way the name is in the h3 below, so the mark is decorative
+              and takes an empty alt rather than repeating it to a screen
+              reader. */}
           <img
-            src={product.image}
-            alt={`${product.name} screenshot`}
+            class:list={[product.logo && "is-logo"]}
+            src={product.logo ?? product.image}
+            alt={product.logo ? "" : `${product.name} screenshot`}
             width="1280"
             height="720"
             loading="lazy"
@@ -44,9 +50,10 @@ const { mode, heading } = Astro.props;
     padding: 0;
     overflow: hidden;
   }
-  /* `contain`, not `cover`: these are product screenshots, and cropping one
-     hides the thing it is there to show. The box sits close to the shots'
-     own ~1.9:1 ratio so the letterboxing is barely visible. */
+  /* `contain`, not `cover`: cropping a screenshot hides the thing it is there
+     to show, and cropping a logo is worse still. The marks are already centred
+     on a 16:9 canvas at a normalised area, so for those `contain` is a no-op
+     and the three cards line up without further work here. */
   .product img {
     width: 100%;
     aspect-ratio: 16 / 9;
@@ -55,6 +62,20 @@ const { mode, heading } = Astro.props;
     display: block;
     padding: var(--s-2);
     border-bottom: 1px solid var(--band-hairline, var(--hairline));
+  }
+
+  /* All three marks are dark ink — navy, near-black, dark green — on
+     transparency, so the tile has to stay light in both themes or they vanish.
+     --logo-ground is the site's own tint rather than white: a white panel this
+     size glares against a dark page. Recolouring the marks instead would mean
+     altering the brand, which is not ours to do. A screenshot brings its own
+     ground and needs none of this. */
+  .product img.is-logo {
+    background: var(--logo-ground);
+    /* Smaller than it looks: the marks are centred on their own canvas with
+       margin already baked in, so a large padding here doubles it and leaves
+       them stranded in the middle of the tile. */
+    padding: var(--s-3);
   }
   .product h3,
   .product p,

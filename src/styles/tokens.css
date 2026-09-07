@@ -39,6 +39,13 @@
   --logo-tile: transparent;
   --logo-card: var(--surface);
 
+  /* Our own product marks, which are dark ink like the client ones and so also
+     need a light ground in both themes — but sitting in a large card tile
+     rather than a small chip, where white reads as a glare panel against a
+     dark page. This is --surface-tint's light value, held constant: the token
+     itself flips to #1d2734 in dark mode and would swallow the marks. */
+  --logo-ground: #eef2f6;
+
   /* ---- accent ----
      --accent is set from config. It is tuned for light grounds; on an inverse
      band it is too dark to pass contrast, so --accent-inverse lightens it

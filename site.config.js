@@ -337,6 +337,7 @@ export default {
       description:
         "GlamifiedHR runs the whole employment cycle: staff records, leave and attendance, monthly payroll with statutory deductions calculated against current Zambia Revenue Authority rules, and separations with terminal benefits worked out under the Employment Code Act. Statutory returns come out the other end, including the upload files the NAPSA and NHIMA portals expect.\n\nIt runs as a desktop application on your own machine. Your payroll data never leaves the building, and a bad line does not stop you paying people.",
       image: "/images/products/glamified-hr.webp",
+      logo: "/images/products/glamified-hr-logo.webp",
       download: {
         // Must match the object key in the R2 bucket exactly, including the
         // extension. The bucket holds the .zip, not the bare .exe.
@@ -429,6 +430,7 @@ export default {
       description:
         "GlamifiedSales replaces the quotation book and the separate invoice pad. A quotation becomes an invoice in one step, a receipt stays linked to the invoice it settles, and what a customer still owes is a number you can look up rather than work out.\n\nIt runs on your own machine and keeps working without a connection, which matters when a customer is standing in front of you.",
       image: "/images/products/glamified-sales.webp",
+      logo: "/images/products/glamified-sales-logo.webp",
       download: {
         file: "GlamifiedSales-Setup-1.3.0.zip",
         version: "1.3.0",
@@ -520,6 +522,7 @@ export default {
       description:
         "GlamifiedFleet answers a question most fleets cannot: what does this vehicle cost to run. Fuel fills, trips, job cards, service schedules and licence renewals all attach to the vehicle, so the running cost is a figure you can read rather than an estimate.\n\nIt runs on your own machine, offline, which matters for a fleet office that is not always near a good line.",
       image: "/images/products/glamified-fleet.webp",
+      logo: "/images/products/glamified-fleet-logo.webp",
       download: {
         file: "GlamifiedFleet-Setup-1.2.0.zip",
         version: "1.2.0",

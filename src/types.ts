@@ -60,6 +60,20 @@ export interface Product {
    */
   groups?: Array<{ title: string; items: string[] }>;
   image: string;
+  /**
+   * Product logo, shown on the listing cards in place of `image`.
+   *
+   * The card slot renders about 366px wide on desktop and 311px on mobile.
+   * A 1280px screenshot scaled into that is at 24-29%, which puts its UI text
+   * at two or three pixels: it reads as texture, not as evidence. The mark is
+   * legible at that size and tells the three products apart at a glance.
+   *
+   * The screenshot is not lost — `image` still runs full width on the product
+   * page, where it renders up to 960px and can actually be read.
+   *
+   * Optional: a variant with no logos falls back to `image` on the cards.
+   */
+  logo?: string;
   screenshots?: string[];
   /**
    * Installer for this product. The host lives once in `downloads.baseUrl`, so
