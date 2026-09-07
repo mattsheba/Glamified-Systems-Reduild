@@ -122,8 +122,17 @@ const hasContent = clients.length > 0 || testimonials.length > 0;
 
   .quote blockquote {
     margin: 0;
-    font-size: var(--t-lead);
-    line-height: 1.45;
+    /* Body size, not lead. At --t-lead these set 20px against the 16px running
+       text everywhere else, which made four quotes shout over the section they
+       are meant to support. The accent rule already marks them as quotes, so
+       the type does not have to. */
+    font-size: var(--t-body);
+    line-height: 1.55;
+    /* The column is wide enough to hold ~70 characters at this size, past a
+       comfortable measure. Capping the line length rather than narrowing the
+       column keeps two columns for four quotes — three columns would break
+       3 + 1 and leave an orphan on its own row. */
+    max-width: 56ch;
     /* Quotes are short and ragged-right reads better here than justified,
        which would stretch a two-line quote into gappy lines. */
     text-align: left;
@@ -143,7 +152,9 @@ const hasContent = clients.length > 0 || testimonials.length > 0;
      is dark in both themes, and client marks are mostly dark ink, so without it
      they disappear. Padding keeps the ink off the tile edge. */
   .quote-logo {
-    height: 40px;
+    /* Scaled back with the quote text: at 40px against 16px type the client
+       marks read as the loudest thing in the section. */
+    height: 30px;
     width: auto;
     align-self: start;
     margin-bottom: var(--s-2);
