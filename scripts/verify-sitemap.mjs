@@ -39,7 +39,18 @@ const routesFrom = (dir, base = "") =>
     return entry.name === "index.html" ? [base || "/"] : [];
   });
 
-const allRoutes = routesFrom(dist).sort();
+/*
+ * Every route is compared in its canonical form, with the trailing slash.
+ * routesFrom builds "/products" from the directory name, and the sitemap used
+ * to emit "/products" too, so the two halves agreed with each other and both
+ * disagreed with the page — which serves 200 only at "/products/" and 301s the
+ * slashless form. Agreement between two things that are wrong the same way is
+ * exactly what this script exists to catch, so it compares the form the site
+ * actually serves.
+ */
+const withSlash = (route) => (route.endsWith("/") ? route : `${route}/`);
+
+const allRoutes = routesFrom(dist).map(withSlash).sort();
 
 /*
  * A page that tells crawlers noindex must not also be advertised in the
@@ -76,6 +87,32 @@ const xml = readFileSync(sitemapPath, "utf8");
 const origin = site.seo.domain.replace(/\/$/, "");
 const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
 const listed = locs.map((l) => l.replace(origin, "") || "/").sort();
+
+/*
+ * The check that makes the redirect bug impossible rather than merely fixed.
+ * A <loc> must be byte-identical to the canonical the page itself declares:
+ * if the two ever disagree the sitemap is advertising a URL the site does not
+ * consider real, whichever of the two is wrong.
+ */
+const canonicalOf = (route) => {
+  const file = fileFor(route);
+  if (!existsSync(file)) return null;
+  const found = readFileSync(file, "utf8").match(
+    /<link rel="canonical" href="([^"]+)"/
+  );
+  return found ? found[1] : null;
+};
+
+listed.forEach((route) => {
+  const declared = canonicalOf(route);
+  if (declared === null) return; // the phantom check below already reports this
+  if (declared !== `${origin}${route}`) {
+    errors.push(
+      `sitemap lists ${origin}${route} but that page's canonical is ${declared}. ` +
+        `A crawler follows the canonical, so the sitemap entry is a redirect.`
+    );
+  }
+});
 
 /* ---------- the comparison that matters ---------- */
 
