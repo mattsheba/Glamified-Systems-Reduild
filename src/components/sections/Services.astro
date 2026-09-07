@@ -62,13 +62,35 @@ const grouped = groups.some((g) => g.name);
 </section>
 
 <style>
-  .service-group + .service-group {
-    margin-top: var(--s-6);
+  /*
+   * A divider, not a caption. At 13px in muted grey this read as a stray label
+   * and was missed entirely: the whole point is to show that the technology
+   * work and the business services are two different halves of the company, so
+   * it has to be visible enough to divide them.
+   *
+   * The rule runs from the label to the edge, which is what makes it read as a
+   * section break rather than a first list item.
+   */
+  .group-label {
+    /* The global .eyebrow caps at --measure, which stopped the rule halfway
+       across for no reason anyone chose. A divider should reach the edge. */
+    max-width: none;
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    margin-bottom: var(--s-4);
+    color: var(--band-accent);
   }
 
-  .group-label {
-    margin-bottom: var(--s-3);
-    color: var(--band-ink-muted);
+  .group-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--band-hairline);
+  }
+
+  .service-group + .service-group {
+    margin-top: var(--s-7);
   }
 
   h2 {

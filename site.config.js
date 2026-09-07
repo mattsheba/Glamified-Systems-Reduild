@@ -648,7 +648,7 @@ export default {
         description:
           "IT support for Zambian businesses: computers, printers, networks, Windows, email and business software. Hardware repair, backups and data recovery, remote or on site.",
       },
-      summary: "Computers, printers, networks and software, whoever supplied them.",
+      summary: "Computers, printers, networks and business software, kept working.",
       description:
         "Most IT problems are not the kind people expect. A machine that will not start. A printer that has stopped talking to the network. Email that has quietly stopped syncing. A file that mattered, on a drive that failed.\n\nWe support the whole setup, not only our own software, and not only the parts we sold you.",
       forWho:
