@@ -4,28 +4,73 @@ import Icon from "../Icon.astro";
 
 interface Props { mode: "light" | "inverse"; heading?: string }
 const { mode, heading } = Astro.props;
+
+/*
+ * Grouped where services declare a group, flat where they do not, so a variant
+ * with ungrouped services renders exactly as before.
+ *
+ * Order follows the order services appear in config rather than an alphabetical
+ * sort: the first group in the file is the one the company leads with.
+ */
+const groups: Array<{ name: string; items: typeof site.services }> = [];
+for (const service of site.services) {
+  const key = service.group ?? "";
+  const found = groups.find((g) => g.name === key);
+  if (found) found.items.push(service);
+  else groups.push({ name: key, items: [service] });
+}
+const grouped = groups.some((g) => g.name);
 ---
 
 <section id="services" class={`section mode-${mode}`}>
   <div class="container">
     {heading && <h2>{heading}</h2>}
 
-    <ul class="grid services" style="--col: 260px">
-      {site.services.map((service) => (
-        <li class="card service">
-          {service.icon && <Icon name={service.icon} size={30} />}
-          <h3>
-            {/* Whole card is the target, via the stretched pseudo-element below. */}
-            <a href={serviceHref(service.slug)}>{service.name}</a>
-          </h3>
-          <p class="muted">{service.summary}</p>
-        </li>
-      ))}
-    </ul>
+    {grouped ? (
+      groups.map((group) => (
+        <div class="service-group">
+          {group.name && <p class="eyebrow group-label">{group.name}</p>}
+          <ul class="grid services" style="--col: 260px">
+            {group.items.map((service) => (
+              <li class="card service">
+              {service.icon && <Icon name={service.icon} size={30} />}
+              <h3>
+                {/* Whole card is the target, via the stretched pseudo-element below. */}
+                <a href={serviceHref(service.slug)}>{service.name}</a>
+              </h3>
+              <p class="muted">{service.summary}</p>
+            </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    ) : (
+      <ul class="grid services" style="--col: 260px">
+        {site.services.map((service) => (
+          <li class="card service">
+              {service.icon && <Icon name={service.icon} size={30} />}
+              <h3>
+                {/* Whole card is the target, via the stretched pseudo-element below. */}
+                <a href={serviceHref(service.slug)}>{service.name}</a>
+              </h3>
+              <p class="muted">{service.summary}</p>
+            </li>
+        ))}
+      </ul>
+    )}
   </div>
 </section>
 
 <style>
+  .service-group + .service-group {
+    margin-top: var(--s-6);
+  }
+
+  .group-label {
+    margin-bottom: var(--s-3);
+    color: var(--band-ink-muted);
+  }
+
   h2 {
     margin-bottom: var(--s-6);
   }

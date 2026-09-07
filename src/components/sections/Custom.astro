@@ -1,0 +1,80 @@
+---
+import site from "../../lib/site";
+
+interface Props { mode: "light" | "inverse"; heading?: string }
+const { mode, heading } = Astro.props;
+
+/**
+ * The bridge between the three products and the custom development service.
+ *
+ * The homepage otherwise reads as a catalogue of three things, which
+ * undersells the business: most of the work is systems that do not exist yet.
+ * A visitor whose trade is not HR, invoicing or fleet currently has nothing on
+ * the homepage telling them they are still in the right place.
+ *
+ * The examples are the industries named in the About copy, so this cannot
+ * claim experience the rest of the site does not.
+ */
+const custom = site.custom;
+---
+
+{custom && (
+  <section class={`section mode-${mode}`}>
+    <div class="container custom">
+      {heading && <h2>{heading}</h2>}
+      <p class="lead">{custom.standfirst}</p>
+
+      {custom.examples && custom.examples.length > 0 && (
+        <ul class="examples">
+          {custom.examples.map((example) => <li>{example}</li>)}
+        </ul>
+      )}
+
+      {custom.cta && (
+        <a class="btn btn--primary" href={custom.cta.href}>{custom.cta.label}</a>
+      )}
+    </div>
+  </section>
+)}
+
+<style>
+  .custom {
+    text-align: center;
+  }
+
+  .lead {
+    font-size: var(--t-lead);
+    line-height: 1.5;
+    color: var(--band-ink-muted);
+    max-width: 62ch;
+    margin: var(--s-3) auto 0;
+  }
+
+  /*
+   * Set as words rather than cards. These are examples of what could be built,
+   * not products that exist, and giving them cards would make them look like
+   * things you can buy today.
+   */
+  .examples {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--s-2) var(--s-3);
+    list-style: none;
+    margin: var(--s-5) auto;
+    padding: 0;
+    max-width: 60ch;
+  }
+
+  .examples li {
+    padding: 7px 14px;
+    font-family: var(--font-display);
+    font-size: var(--t-label);
+    font-weight: 600;
+    letter-spacing: var(--tr-label);
+    text-transform: uppercase;
+    color: var(--band-ink);
+    border: 1px solid var(--band-hairline);
+    border-radius: var(--r-btn);
+  }
+</style>

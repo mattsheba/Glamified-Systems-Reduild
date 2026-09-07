@@ -177,8 +177,9 @@ export const terms: LegalDoc = {
     {
       heading: "Your data and your backups",
       body: [
-        "Our desktop products store your data on your own machine. That means we cannot recover it for you if the machine is lost, stolen or damaged.",
-        "Keeping working backups is your responsibility. We will advise on how, and can set backups up as part of an engagement, but we are not liable for data lost where no backup existed.",
+        "Our desktop products store your data on your own machine, so we hold no copy of it and cannot retrieve it for you if that machine is lost, stolen or damaged.",
+        "Each product includes backup and restore. A backup is a single file you can keep on a memory stick or in any cloud folder you already use, and the software warns you when one is overdue. Taking those backups, and keeping a copy somewhere other than the machine itself, remains yours to do.",
+        "We are not liable for data lost where no backup existed.",
       ],
     },
     {

@@ -15,6 +15,7 @@ export type SectionKey =
   | "products"
   | "services"
   | "proof"
+  | "custom"
   | "process"
   | "templates"
   | "faq"
@@ -84,6 +85,8 @@ export interface Product {
 export interface Service {
   slug: string;
   name: string;
+  /** Groups the services list, e.g. "Technology" / "Business services". */
+  group?: string;
   summary: string;
   seo?: PageSeo;
   /** Long-form copy for the service detail page. */
@@ -129,6 +132,8 @@ export interface NavItem {
 export interface Testimonial {
   quote: string;
   organisation: string;
+  /** What this client uses us for, shown under the company name. */
+  using?: string;
   /** Optional. A quote can stand on the company name alone. */
   author?: string;
   role?: string;
@@ -287,6 +292,26 @@ export interface SiteConfig {
    * the WhatsApp call to action, because a button that 404s is worse than no
    * button.
    */
+  /** Bridge from the products to custom development. */
+  custom?: {
+    standfirst: string;
+    examples?: string[];
+    cta?: { label: string; href: string };
+  };
+
+  /** What a product licence fee buys, listed beside the price. */
+  licenceIncludes?: { label: string; items: string[] };
+
+  /**
+   * Backup and data-safety story, shown on every product page. Answers the
+   * question that offline-first positioning necessarily raises.
+   */
+  dataSafety?: {
+    heading: string;
+    standfirst?: string;
+    points: Array<{ title: string; detail: string }>;
+  };
+
   /** Online payment. See site.config.js for why prices are not repeated here. */
   payments?: {
     /** Nothing renders and the functions refuse to run while this is false. */

@@ -1,5 +1,5 @@
 ---
-import site from "../lib/site";
+import site, { productHref, serviceHref } from "../lib/site";
 import { legalDocs } from "../content/legal";
 
 const year = new Date().getFullYear();
@@ -9,6 +9,12 @@ const year = new Date().getFullYear();
 // no longer exists.
 const legal = legalDocs.map((doc) => ({ href: `/${doc.slug}`, label: doc.title }));
 const quickLinks = site.nav.map((item) => ({ href: item.href, label: item.label }));
+
+// Every product and service, by name. A footer that lists only section pages
+// makes a visitor go back up a level to find anything, and gives a crawler one
+// link where it could have eight.
+const products = site.products.map((p) => ({ href: productHref(p.slug), label: p.name }));
+const services = site.services.map((s) => ({ href: serviceHref(s.slug), label: s.name }));
 ---
 
 <footer class="mode-inverse site-footer">
@@ -31,6 +37,24 @@ const quickLinks = site.nav.map((item) => ({ href: item.href, label: item.label 
           <li><a href={`mailto:${site.contact.email}`}>{site.contact.email}</a></li>
           <li class="muted">{site.contact.city}</li>
           <li class="muted">{site.contact.hours}</li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="eyebrow">{site.pages?.products?.heading}</p>
+        <ul class="plain">
+          {products.map((link) => (
+            <li><a href={link.href}>{link.label}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <p class="eyebrow">{site.pages?.services?.heading}</p>
+        <ul class="plain">
+          {services.map((link) => (
+            <li><a href={link.href}>{link.label}</a></li>
+          ))}
         </ul>
       </div>
 

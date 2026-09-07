@@ -55,7 +55,8 @@ export default {
     { key: "products", heading: "Three systems, in production" },
     { key: "services", heading: "And the work around them" },
     { key: "proof", heading: "What our clients say" },
-    { key: "process", heading: "How an engagement runs" },
+    { key: "custom", heading: "Don't see your business here?" },
+    { key: "process", heading: "How we build" },
     // Pinned light: the footer is an inverse band, and an inverse FAQ above it
     // ran the two together with no visible boundary.
     { key: "faq", mode: "light" },
@@ -195,6 +196,95 @@ export default {
     methods: ["airtel", "mtn", "card"],
   },
 
+  /*
+   * Shown on every product page, under the capability lists.
+   *
+   * "Your data stays on your machine" is the strongest thing these products
+   * say, and it immediately raises the question it does not answer: what
+   * happens when that machine dies. Leaving that unanswered is what loses a
+   * payroll sale, so it gets a section rather than a line in the FAQ.
+   *
+   * Everything here is drawn from the products' own user guides. Do not add a
+   * claim the software does not actually make.
+   */
+  /*
+   * What the licence fee buys, shown beside the price.
+   *
+   * Every line here is something the site already commits to elsewhere: the
+   * migration and training come from the FAQ, the guide from the download
+   * block. Nothing has been added to make the offer look fuller than it is.
+   * CONFIRM before adding anything to this list.
+   */
+  /*
+   * Sits between the products and the process. Without it the homepage says
+   * "we sell three things" and stops, when the larger part of the business is
+   * building systems that do not exist yet.
+   */
+  custom: {
+    standfirst:
+      "These are the systems we have already turned into products. If your operation works differently, we build around your workflow rather than bending the work to fit software bought off a shelf.",
+    examples: [
+      "Loan management",
+      "Property management",
+      "Hospitality",
+      "Asset registers",
+      "Procurement",
+      "Approvals",
+    ],
+    cta: { label: "How we build custom systems", href: "/services/web-software-development" },
+  },
+
+  licenceIncludes: {
+    label: "What the licence includes",
+    items: [
+      "The software, licensed to your business",
+      "Installation on your machine",
+      "Migration of your existing records from spreadsheets",
+      "Staff training and a handover document",
+      "Updates when statutory rates change",
+      "The user guide",
+      "Support afterwards, from the people who built it",
+    ],
+  },
+
+  dataSafety: {
+    heading: "Offline does not mean unprotected",
+    standfirst:
+      "Your records live on your own computer, which is the point. Here is what keeps them safe there.",
+    points: [
+      {
+        title: "Backup and restore is built in",
+        detail:
+          "Settings, then Backup and Restore. Click Back up now, choose a folder, and you have a backup. Restoring is the same file going back the other way.",
+      },
+      {
+        title: "One file, so it goes anywhere",
+        detail:
+          "A backup is a single file. Put it on a memory stick, or in Google Drive, OneDrive or Dropbox exactly as you would any other document. Nothing new to learn and nothing new to pay for.",
+      },
+      {
+        title: "The software tells you when you are overdue",
+        detail:
+          "If a backup has not been taken for a while a warning appears at the top of the screen, so a forgotten backup does not stay forgotten.",
+      },
+      {
+        title: "Moving to a new computer is a backup and a restore",
+        detail:
+          "Take a backup on the old machine, install on the new one, restore the file. Hardware failure is a bad day rather than a lost year.",
+      },
+      {
+        title: "Your data is never locked to a licence",
+        detail:
+          "Backups keep working even after a licence has expired. Your records are yours, and a lapsed key never holds them hostage.",
+      },
+      {
+        title: "We can set the routine up with you",
+        detail:
+          "Deployment includes showing your staff how and when to back up. For payroll we suggest a backup at every run and a copy kept off the machine.",
+      },
+    ],
+  },
+
   downloads: {
     baseUrl: "https://downloads.glamifiedsystems.com",
     label: "Download for Windows",
@@ -241,7 +331,7 @@ export default {
         // The live site ranks on this URL — keep it working (see public/_redirects).
         previousPath: "/glamifiedhr",
       },
-      price: { amount: 15000, currency: "ZMW", note: "One-off. Own it forever." },
+      price: { amount: 15000, currency: "ZMW", note: "One-time licence. No subscription." },
       summary:
         "HR and payroll for Zambian businesses, with NAPSA, PAYE and NHIMA calculated for you.",
       description:
@@ -333,7 +423,7 @@ export default {
           "Business document software for Zambian companies. Quotations, invoices, receipts and delivery notes, with ZRA Smart Invoice support. Works offline.",
         previousPath: "/glamifiedsales",
       },
-      price: { amount: 1800, currency: "ZMW", note: "One-off. Own it forever." },
+      price: { amount: 1800, currency: "ZMW", note: "One-time licence. No subscription." },
       summary:
         "Quotations, invoices, receipts and delivery notes, linked to each other and to the customer.",
       description:
@@ -424,7 +514,7 @@ export default {
           "Fleet management software for Zambian businesses. Track fuel, trips, servicing, licences and the true running cost per vehicle. Runs offline on your own machine.",
         previousPath: "/glamifiedfleet",
       },
-      price: { amount: 6000, currency: "ZMW", note: "One-off. Own it forever." },
+      price: { amount: 6000, currency: "ZMW", note: "One-time licence. No subscription." },
       summary:
         "Fuel, trips, servicing and licences, added up into a real cost per vehicle.",
       description:
@@ -504,6 +594,7 @@ export default {
   services: [
     {
       slug: "web-software-development",
+      group: "Technology",
       name: "Web & software development",
       icon: "code",
       seo: {
@@ -549,6 +640,7 @@ export default {
 
     {
       slug: "it-support",
+      group: "Technology",
       name: "IT support",
       icon: "support",
       seo: {
@@ -602,6 +694,7 @@ export default {
 
     {
       slug: "business-consultancy",
+      group: "Business services",
       name: "Business registration & consultancy",
       icon: "clipboard",
       seo: {
@@ -676,6 +769,7 @@ export default {
 
     {
       slug: "payroll-outsourcing",
+      group: "Business services",
       name: "Payroll outsourcing",
       icon: "receipt",
       seo: {
@@ -722,6 +816,7 @@ export default {
 
     {
       slug: "graphic-design",
+      group: "Business services",
       name: "Graphic design",
       icon: "pen",
       seo: {
@@ -817,24 +912,28 @@ export default {
         quote:
           "We were writing quotations in one book and invoices on a separate pad, then reconciling the two at month end. Now a quotation becomes an invoice in one step and the receipt stays linked to it. Chasing payment is the part that changed most for us.",
         organisation: "Crescent Crest Supplies",
+        using: "GlamifiedSales",
         logo: "/images/logos/crescent-crest-supplies.webp",
       },
       {
         quote:
           "They handled our PACRA registration and got the TPIN and statutory registrations in order without us having to chase anyone. We always knew what stage it was at.",
         organisation: "Amani Prestigious Ventures",
+        using: "Business registration",
         logo: "/images/logos/amani-prestigious-ventures.webp",
       },
       {
         quote:
           "They set up our registrations and then did our branding, so everything matched from the start. Having one company handle both saved us going back and forth between suppliers.",
         organisation: "Ampindi Ventures",
+        using: "Registration and design",
         logo: "/images/logos/ampindi-ventures.webp",
       },
       {
         quote:
           "They registered the company for us and have handled the monthly filings ever since. We hear from them before a deadline rather than after it, and that is the part we did not expect to matter as much as it does.",
         organisation: "Rare Events",
+        using: "Registration and monthly compliance",
         logo: "/images/logos/rare-events.webp",
         // Gold and white on black, so it carries its own ground and must not
         // sit on the light tile the other marks need.
@@ -885,7 +984,7 @@ export default {
     items: [
       {
         q: "Is this a subscription, or do we buy the software once?",
-        a: "You buy it once and it is yours. There is no monthly fee, and no licence that stops working at the end of a term.",
+        a: "You pay once. There is no monthly fee, and no licence that stops working at the end of a term: the version you buy keeps running for as long as you want to use it. Strictly it is a perpetual licence rather than a transfer of the software itself, which is the normal arrangement for packaged software and is set out in the terms.",
       },
       {
         q: "Can we try it before we buy?",
@@ -906,6 +1005,10 @@ export default {
       {
         q: "What happens after the system is installed?",
         a: "Deployment includes staff training and a handover document, so your people can run the system without us. After that we are available for support, remotely anywhere in Zambia and on site in Lusaka.",
+      },
+      {
+        q: "Our data is on our own machine. What if that computer dies?",
+        a: "Every product includes Backup and Restore in its settings. A backup is one file, so it goes on a memory stick or into Google Drive, OneDrive or Dropbox like any other document, and the software shows a warning when a backup is overdue. Restoring onto a replacement machine is the same file going back the other way. Backups keep working even after a licence has expired, so your records are never held hostage by a lapsed key.",
       },
       {
         q: "Do you support software you didn't build?",
@@ -962,7 +1065,12 @@ export default {
       "Payroll outsourcing",
       "Graphic design",
     ],
-    // PLACEHOLDER bands — confirm against real tiers (spec A-2).
+    /*
+     * No longer rendered. Asking for a budget on a first contact is a barrier:
+     * people do not know it before the problem is scoped, and a wrong guess
+     * either loses the enquiry or anchors it. Kept because the type requires it
+     * and a variant selling fixed packages may want it back.
+     */
     budgetBands: [
       { label: "Under K1,500", value: "under-1500" },
       { label: "K1,500 – K3,500", value: "1500-3500" },

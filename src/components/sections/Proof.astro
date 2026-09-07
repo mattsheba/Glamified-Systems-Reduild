@@ -50,6 +50,10 @@ const hasContent = clients.length > 0 || testimonials.length > 0;
                   />
                 )}
                 <span class="who">{t.organisation}</span>
+                {/* Which service produced the quote. Without it the reader has
+                    to guess whether a testimonial is about software or a
+                    filing, and the two say very different things. */}
+                {t.using && <span class="using">{t.using}</span>}
                 {/* A name and title only appear when the client gave them.
                     Without them the quote still stands on the company. */}
                 {t.author && (
@@ -156,5 +160,9 @@ const hasContent = clients.length > 0 || testimonials.length > 0;
 
   .who {
     font-weight: 600;
+  }
+
+  .using {
+    color: var(--band-ink-muted);
   }
 </style>
