@@ -465,10 +465,22 @@ const crumbs = [
     transform: translateY(-1px);
   }
 
+  /* Runs the full width of .detail rather than the global 68ch measure, so the
+     right edge meets the screenshot sitting directly above it. The gap was
+     130px, and justification made it read worse rather than better: squaring
+     the copy off into a hard edge only drew attention to the fact that the
+     edge did not line up with the image's.
+
+     On the stacked layout that takes the measure to roughly 79ch, a little
+     past the site default — acceptable for three-line paragraphs, and the
+     alignment buys more than the extra characters cost. The two-column layout
+     is unaffected: its body column is narrower than 68ch already, so the cap
+     was never what constrained it. */
   .intro {
     font-size: var(--t-lead);
     line-height: 1.55;
     margin-bottom: var(--s-5);
+    max-width: none;
   }
 
   .price {
