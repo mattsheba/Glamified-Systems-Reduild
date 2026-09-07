@@ -85,7 +85,7 @@ const primaryHref = hrefFor(primaryCta);
     /* Visible enough to read as screenshots of real software, faint enough that
        it never competes with the headline. At 0.16 it was invisible, which is
        the same as not having it. */
-    opacity: 0.34;
+    opacity: 0.62;
     filter: saturate(0.9);
   }
 
@@ -102,9 +102,9 @@ const primaryHref = hrefFor(primaryCta);
        already started to fade. Clearing happens left and right instead, which
        is where the screenshots read best anyway. */
     background: radial-gradient(
-      68% 100% at 50% 50%,
-      var(--band-ground, var(--ground)) 40%,
-      color-mix(in oklab, var(--band-ground, var(--ground)), transparent 60%) 100%
+      70% 100% at 50% 50%,
+      color-mix(in oklab, var(--band-ground, var(--ground)), transparent 12%) 35%,
+      color-mix(in oklab, var(--band-ground, var(--ground)), transparent 70%) 100%
     );
   }
 
@@ -176,6 +176,17 @@ const primaryHref = hrefFor(primaryCta);
     color: var(--band-ink-muted, var(--ink-muted));
     max-width: 54ch;
     margin: var(--s-3) auto 0;
+  }
+
+  /*
+   * The outline button is transparent with a near-white border everywhere else
+   * on the site, which is fine over a plain band. Over the photograph it stopped
+   * reading as a button at all: the border vanished against the laptop and the
+   * label sat directly on image detail. Only here does it need a ground.
+   */
+  .hero--image .btn--ghost {
+    background: var(--band-surface, var(--surface));
+    border-color: var(--band-hairline, var(--hairline));
   }
 
   .hero-ctas {
