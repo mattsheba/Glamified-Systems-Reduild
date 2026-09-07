@@ -118,21 +118,6 @@ export default {
           ],
         },
       ],
-      /**
-       * Company details. A buyer about to hand you their payroll or their PACRA
-       * filings will look for proof you are a real registered entity, and this
-       * is the page they look on. Fill the placeholders before launch.
-       */
-      facts: {
-        label: "Company details",
-        items: [
-          { label: "Registered name", value: "Glamified Systems Limited" },
-          { label: "Based in", value: "Lusaka, Zambia" },
-          { label: "TPIN", value: "2001937380" },
-          { label: "PACRA registration", value: "PLACEHOLDER" },
-          { label: "Trading since", value: "2023" },
-        ],
-      },
       values: [
         {
           title: "Offline first",
@@ -239,7 +224,7 @@ export default {
       "Business systems built for Zambian businesses, with offline-first operations and local statutory requirements in mind.",
     primaryCta: { label: "Browse our software", type: "link", href: "/products" },
     secondaryCta: { label: "Chat on WhatsApp", type: "whatsapp" },
-    image: "/images/brand/hero-systems.webp",
+    image: "/images/brand/hero-desk.webp",
   },
 
   products: [
@@ -997,7 +982,6 @@ export default {
     registeredOffice: "Lusaka, Zambia",
     // CONFIRM: read off a GlamifiedSales invoice screenshot, not given to us.
     // It appears on all three legal pages and the About page. Verify or remove.
-    tpin: "2001937380",
     // The statute the privacy policy is written against.
     dataProtectionAct: "the Data Protection Act No. 3 of 2021",
     lastUpdated: "2026-09-06",
