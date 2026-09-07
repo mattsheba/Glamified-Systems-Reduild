@@ -26,6 +26,9 @@ export default {
     phone: "+260 977 669 883",
     phoneAlt: "+260 770 029 595",
     whatsapp: "260977669883",
+    // Used by every WhatsApp button on the site: the floating one, the product
+    // and service pages, and the hero's secondary action.
+    ctaLabel: "Chat on WhatsApp",
     whatsappMessage:
       "Hello Glamified Systems. I'd like to talk about a project.",
     email: "info.glamifiedsystems@gmail.com",
@@ -234,8 +237,8 @@ export default {
     ],
     standfirst:
       "Business systems built for Zambian businesses, with offline-first operations and local statutory requirements in mind.",
-    primaryCta: { label: "Chat on WhatsApp", type: "whatsapp" },
-    secondaryCta: { label: "See the products", href: "/products" },
+    primaryCta: { label: "Browse our software", type: "link", href: "/products" },
+    secondaryCta: { label: "Chat on WhatsApp", type: "whatsapp" },
     image: "/images/brand/hero-systems.webp",
   },
 

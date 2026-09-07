@@ -111,6 +111,8 @@
 
   /* ---- radius ---- */
   --r-sm: 8px;
+  /* Buttons. Deliberately modest: see the note on .btn. */
+  --r-btn: 5px;
   --r-md: 16px;
   --r-pill: 999px;
 
@@ -432,11 +434,23 @@ img {
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
   text-decoration: none;
-  padding: 13px 24px;
-  border-radius: var(--r-pill);
+  /* Tighter than the 13px/24px they were: at that size two side by side read
+     as the heaviest thing on the page. */
+  padding: 11px 18px;
+  /* Not a pill. A fully rounded button is a stock look; a small radius reads
+     as a considered control rather than a default one. */
+  border-radius: var(--r-btn);
   border: 2px solid transparent;
   cursor: pointer;
   transition: opacity 0.15s ease;
+}
+
+/* The smaller padding leaves the box at about 42px. Floored at 44 on touch so
+   the target does not shrink along with the visual weight. */
+@media (pointer: coarse) {
+  .btn {
+    min-height: 44px;
+  }
 }
 
 .btn:hover {

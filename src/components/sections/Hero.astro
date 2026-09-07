@@ -5,7 +5,11 @@ interface Props { mode: "light" | "inverse" }
 const { mode } = Astro.props;
 
 const { headline, capabilities, standfirst, primaryCta, secondaryCta, image } = site.hero;
-const primaryHref = primaryCta.type === "whatsapp" ? whatsappHref() : primaryCta.href!;
+// Either slot can be the WhatsApp action now that the hero leads with the
+// products, so both resolve their href the same way.
+const hrefFor = (cta: { type?: string; href?: string }) =>
+  cta.type === "whatsapp" ? whatsappHref() : cta.href;
+const primaryHref = hrefFor(primaryCta);
 ---
 
 <section class:list={["section", "hero", `mode-${mode}`, image && "hero--image"]}>
@@ -35,7 +39,11 @@ const primaryHref = primaryCta.type === "whatsapp" ? whatsappHref() : primaryCta
 
     <div class="hero-ctas">
       <a class="btn btn--primary" href={primaryHref} rel="noopener">{primaryCta.label}</a>
-      {secondaryCta && <a class="btn btn--ghost" href={secondaryCta.href}>{secondaryCta.label}</a>}
+      {secondaryCta && (
+        <a class="btn btn--ghost" href={hrefFor(secondaryCta)} rel="noopener">
+          {secondaryCta.label}
+        </a>
+      )}
     </div>
   </div>
 </section>

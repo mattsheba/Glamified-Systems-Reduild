@@ -232,6 +232,8 @@ export interface SiteConfig {
     /** Second line, shown on the legal pages so either number reaches you. */
     phoneAlt?: string;
     whatsapp: string;
+    /** Label for every WhatsApp button on the site. */
+    ctaLabel: string;
     whatsappMessage: string;
     email: string;
     city: string;
@@ -273,7 +275,7 @@ export interface SiteConfig {
     capabilities?: string[];
     standfirst: string;
     primaryCta: { label: string; type: "whatsapp" | "link"; href?: string };
-    secondaryCta?: { label: string; href: string };
+    secondaryCta?: { label: string; type?: "whatsapp" | "link"; href?: string };
     image?: string;
   };
 

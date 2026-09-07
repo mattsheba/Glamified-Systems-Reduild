@@ -75,18 +75,33 @@ const stats = site.proof?.stats ?? [];
     color: var(--band-accent);
   }
 
+  /*
+   * Stacked, this strip was running to roughly 400px for three short facts:
+   * a 48px band pad, 24px between each stat and 16px inside each one, around
+   * type that is only about 40px tall. The words keep their size; the space
+   * around them does not need to be that generous when the rule already
+   * separates one stat from the next.
+   */
   @media (max-width: 767px) {
+    .proof-strip {
+      padding-block: var(--s-5);
+    }
     .strip {
       grid-template-columns: 1fr;
-      gap: var(--s-4);
+      gap: var(--s-2);
     }
     .stat {
       border-inline-start: none;
-      padding-block: var(--s-3);
+      gap: var(--s-1);
+      padding-block: var(--s-2);
       border-block-start: 1px solid var(--band-hairline);
     }
     .stat:first-child {
       border-block-start: none;
+      padding-block-start: 0;
+    }
+    .stat:last-child {
+      padding-block-end: 0;
     }
   }
 </style>
