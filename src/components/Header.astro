@@ -331,10 +331,33 @@ const isCurrent = (href: string) =>
     color: var(--ink-muted);
   }
 
+  /*
+   * The rule is drawn by a pseudo-element inset to the same 16px as the labels
+   * and the links, rather than as a border on the li. The li runs the full
+   * width of the card, so a border on it bled to both edges and was the only
+   * thing in the dropdown touching them.
+   */
   .submenu li.submenu-group:not(:first-child),
   .mobile-panel li.submenu-group:not(:first-child) {
+    position: relative;
     margin-top: var(--s-2);
-    border-top: 1px solid var(--hairline);
+  }
+
+  .submenu li.submenu-group:not(:first-child)::before,
+  .mobile-panel li.submenu-group:not(:first-child)::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 16px;
+    right: 16px;
+    height: 1px;
+    background: var(--hairline);
+  }
+
+  /* Matches the narrower gutter the mobile panel uses throughout. */
+  .mobile-panel li.submenu-group:not(:first-child)::before {
+    left: var(--s-2);
+    right: var(--s-2);
   }
 
   .mobile-panel .submenu-group {
