@@ -188,8 +188,12 @@ const isCurrent = (href: string) =>
   /* The supplied mark has a solid white ground. In light mode that is
      invisible against the header; in dark it becomes a tile, so round it so
      it reads as deliberate rather than as a rendering fault. */
+  /* Height grows with the viewport above about 1366. At a flat 36px the mark
+     was the same size on a 2560 display as on a laptop, which is what made it
+     read as tiny there. The floor keeps phones and laptops exactly as they
+     were. */
   .brand img {
-    height: 36px;
+    height: clamp(36px, 16px + 1.45vw, 44px);
     width: auto;
     border-radius: var(--r-sm);
     transition: height 0.2s ease;
@@ -197,7 +201,8 @@ const isCurrent = (href: string) =>
 
   .brand-name {
     font-family: var(--font-display);
-    font-size: var(--t-small);
+    /* Tracks the mark beside it rather than sitting at a flat 14px. */
+    font-size: clamp(14px, 9px + 0.37vw, 16px);
     font-weight: 700;
     letter-spacing: 0.02em;
     text-transform: uppercase;

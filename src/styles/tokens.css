@@ -81,8 +81,16 @@
      a 320px screen fits about 30 characters a line, and justifying that short a
      line opens visible rivers between words. ~17px lifts it to about 40, which
      sets cleanly. Unchanged at 1024px and above. */
-  --t-lead: clamp(1.0625rem, 0.95rem + 0.55vw, 1.25rem);  /* 17 → 20 */
-  --t-body: 1rem;       /* 16 */
+  --t-lead: clamp(1.0625rem, 1rem + 0.3125vw, 1.375rem);  /* 17 → 22 at 1920 */
+  /*
+   * Fluid rather than flat 16. Every clamp in this scale reaches its ceiling
+   * by about 950px, and the container stops growing at its own cap, so a
+   * 2560px display was being served the same layout as a 1000px one with the
+   * surplus spent entirely on empty margin — the text read as small because
+   * everything around it had stopped scaling. The ceiling is deliberately
+   * modest: 17px, reached at 1920.
+   */
+  --t-body: clamp(1rem, 0.9875rem + 0.0625vw, 1.0625rem); /* 16 → 17 at 1920 */
   --t-small: 0.875rem;  /* 14 */
   --t-label: 0.8125rem; /* 13 */
   --t-meta: 0.75rem;    /* 12 */
@@ -111,9 +119,18 @@
   --section-y-tight: clamp(24px, 3vw, 48px);
   --section-y-strip: 16px;
 
-  /* ---- layout ---- */
-  --container: 1200px;
-  --gutter: 24px;
+  /* ---- layout ----
+     1200 left the content on under two thirds of a 1920 screen and under half
+     of a 2560 one, with 360px and 680px of dead margin a side. 1440 keeps the
+     grids and card rows using the width that is there; running text is still
+     held to --measure, so the extra room goes to layout, not to line length. */
+  --container: 1440px;
+  /* Fluid, because the cap alone no longer holds the content off the edges.
+     At 1200 a 1366 laptop got 83px of margin for free; at 1440 the viewport
+     becomes the limit there and a flat 24px gutter left the content almost
+     touching the window. This restores the breathing room without giving the
+     dead margin back on larger screens. */
+  --gutter: clamp(24px, 3.5vw, 64px);
   --measure: 68ch;
 
   /* ---- radius ---- */

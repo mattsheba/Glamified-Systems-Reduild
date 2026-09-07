@@ -282,7 +282,12 @@ export default {
       "Business systems built for Zambian businesses, with offline-first operations and local statutory requirements in mind.",
     primaryCta: { label: "Browse our software", type: "link", href: "/products" },
     secondaryCta: { label: "Chat on WhatsApp", type: "whatsapp" },
-    image: "/images/brand/hero-desk.webp",
+    // Versioned filename, deliberately. Files under public/ keep the name they
+    // are given, and the CDN in front of the site caches them for 30 days, so
+    // replacing an image in place leaves the old one served from the edge long
+    // after the deploy — no browser refresh can reach past that. A new name is
+    // a new cache key. Bump the suffix whenever this photo is replaced.
+    image: "/images/brand/hero-desk-v2.webp",
   },
 
   products: [
