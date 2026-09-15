@@ -417,15 +417,12 @@ export default {
       image: "/images/products/glamified-sales.webp",
       logo: "/images/products/glamified-sales-logo.webp",
       download: {
-        file: "GlamifiedSales-Setup-1.3.0.zip",
-        version: "1.3.0",
+        file: "GlamifiedSales-Setup-1.4.2.zip",
+        version: "1.4.2",
         size: "94 MB",
         platform: "Windows 10 and 11",
       },
-      // Uncomment once the file is in the bucket, then run:
-      //   npm run verify:downloads
-      // It returns 404 today, and a guide link that 404s is worse than none.
-      // guide: { file: "GlamifiedSales-User-Guide-1.3.0.pdf" },
+      guide: { file: "GlamifiedSales-User-Guide-1.4.2.pdf" },
       features: [
         "Quotations that convert to invoices in one step",
         "Receipts and part-payments linked to the invoice",
