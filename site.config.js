@@ -325,12 +325,12 @@ export default {
       download: {
         // Must match the object key in the R2 bucket exactly, including the
         // extension. The bucket holds the .zip, not the bare .exe.
-        file: "GlamifiedHR-Setup-1.0.0.zip",
-        version: "1.0.0",
+        file: "GlamifiedHR-Setup-1.1.0.zip",
+        version: "1.1.0",
         size: "119 MB",
         platform: "Windows 10 and 11",
       },
-      guide: { file: "GlamifiedHR-User-Guide-1.0.0.pdf" },
+      guide: { file: "GlamifiedHR-User-Guide-1.1.0.pdf" },
       features: [
         "PAYE, NAPSA and NHIMA to current ZRA rules",
         "Leave, attendance and separations",
