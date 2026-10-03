@@ -339,12 +339,16 @@ export default {
       download: {
         // Must match the object key in the R2 bucket exactly, including the
         // extension. The bucket holds the .zip, not the bare .exe.
-        file: "GlamifiedHR-Setup-1.1.0.zip",
-        version: "1.1.0",
+        file: "GlamifiedHR-Setup-1.2.0.zip",
+        version: "1.2.0",
         size: "119 MB",
         platform: "Windows 10 and 11",
       },
-      guide: { file: "GlamifiedHR-User-Guide-1.1.0.pdf" },
+      // Off until the 1.2.0 guide is rebuilt and uploaded. The PDF named
+      // 1.2.0 predates the 1.2.0 changes, and the 1.1.0 guide describes leave
+      // in calendar days, which this version no longer counts. No link beats a
+      // 404 or a guide that contradicts the software.
+      // guide: { file: "GlamifiedHR-User-Guide-1.2.0.pdf" },
       features: [
         "PAYE, NAPSA and NHIMA to current ZRA rules",
         "Leave, attendance and separations",
