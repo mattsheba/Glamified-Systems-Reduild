@@ -344,11 +344,7 @@ export default {
         size: "119 MB",
         platform: "Windows 10 and 11",
       },
-      // Off until the 1.2.0 guide is rebuilt and uploaded. The PDF named
-      // 1.2.0 predates the 1.2.0 changes, and the 1.1.0 guide describes leave
-      // in calendar days, which this version no longer counts. No link beats a
-      // 404 or a guide that contradicts the software.
-      // guide: { file: "GlamifiedHR-User-Guide-1.2.0.pdf" },
+      guide: { file: "GlamifiedHR-User-Guide-1.2.0.pdf" },
       features: [
         "PAYE, NAPSA and NHIMA to current ZRA rules",
         "Leave, attendance and separations",
