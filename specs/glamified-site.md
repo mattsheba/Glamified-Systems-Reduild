@@ -412,6 +412,7 @@ interface SiteConfig {
     accent: string;            // hex, e.g. "#0F6E5C"
     logo: string;              // path under public/
     favicon: string;
+    description?: string;      // Organization description in JSON-LD; falls back to seo.description
   };
 
   contact: {

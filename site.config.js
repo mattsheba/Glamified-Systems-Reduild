@@ -20,6 +20,15 @@ export default {
     logo: "/images/brand/logo.webp",
     mark: "/images/brand/mark.webp",
     favicon: "/favicon.svg",
+    /*
+     * What the company is, in one place. Search engines and AI tools read this
+     * from the Organization structured data, and the About and Services pages
+     * say the same thing in their own words. Software first, services second:
+     * an audit found the site describing two different businesses, and this
+     * is the sentence that settles which one.
+     */
+    description:
+      "Glamified Systems is a software company in Lusaka, Zambia. It makes business software for Zambian organisations: GlamifiedHR for payroll, GlamifiedSales for invoicing and GlamifiedFleet for fleet costs, and builds custom systems to order. Around the software it also provides IT support, business registration, payroll outsourcing and graphic design.",
   },
 
   contact: {
@@ -79,22 +88,27 @@ export default {
       seo: {
         title: "Software, IT Support & Payroll Services in Lusaka, Zambia",
         description:
-          "Software development, IT support, business consultancy, payroll outsourcing and graphic design for organisations in Lusaka and across Zambia.",
+          "Services from Glamified Systems, a Lusaka software company: custom software, IT support, business registration, payroll outsourcing and graphic design.",
       },
       standfirst:
-        "The work around the software, and the work that has nothing to do with it.",
+        "We are a software company first. Around the software we offer custom development, IT support, and the registration, payroll and design work a growing business needs.",
       forWhoLabel: "Who this is for",
       otherServicesLabel: "Other services",
     },
     about: {
       heading: "About Glamified Systems",
+      seo: {
+        title: "About Glamified Systems | Software Company in Lusaka, Zambia",
+        description:
+          "Glamified Systems is a Lusaka software company: payroll, invoicing and fleet software for Zambian businesses, custom systems, and the services around them.",
+      },
       standfirst:
-        "Technology built around the way Zambian businesses actually work.",
+        "A Lusaka software company, building business systems around the way Zambian organisations actually work.",
       body: [
-        "Glamified Systems is a Zambian technology and business solutions company based in Lusaka. We develop practical digital systems, websites and business solutions that help organisations manage their operations more efficiently, make better decisions and grow with confidence.",
+        "Glamified Systems is a Zambian software company based in Lusaka. We develop practical business systems and websites that help organisations manage their operations more efficiently, make better decisions and grow with confidence.",
         "Our approach is simple: **understand the business first, then build the technology around it.**",
         "We develop customised business systems for different industries and operational needs, including **HR and payroll, fleet management, sales and invoicing, loan management, property management, hospitality, asset management, procurement, approvals and other business processes.** We also design and develop professional websites that help businesses establish a stronger digital presence.",
-        "Alongside technology, we provide selected business support services including **PACRA, ZRA, ZPPA, ZDA and NAPSA-related services, business registrations, filings, graphic design, digital marketing and other professional services.** This allows our clients to access both the technology and practical business support they need from one trusted partner.",
+        "Software is the core of the business. Around it, we provide selected support services including **PACRA, ZRA, ZPPA, ZDA and NAPSA-related services, business registrations, filings, graphic design, digital marketing and other professional services.** This allows our clients to get the software and the practical business support around it from one trusted partner.",
       ],
       sections: [
         {

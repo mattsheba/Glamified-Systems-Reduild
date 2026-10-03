@@ -46,7 +46,7 @@ const organisation = {
     addressCountry: "ZM",
   },
   areaServed: { "@type": "Country", name: site.legal.jurisdiction },
-  description: site.seo.description,
+  description: site.brand.description ?? site.seo.description,
 };
 
 const graph: Record<string, unknown>[] = [organisation];

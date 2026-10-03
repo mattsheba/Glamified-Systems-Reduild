@@ -244,6 +244,12 @@ export interface SiteConfig {
      *  too small to read. Falls back to `logo` when absent. */
     mark?: string;
     favicon: string;
+    /**
+     * What the business is, in a sentence or two. Emitted as the Organization
+     * description in structured data, which is what search engines and AI
+     * tools take as the company's own summary. Falls back to `seo.description`.
+     */
+    description?: string;
   };
 
   contact: {
