@@ -55,7 +55,7 @@ through NFR-4 carry hard numbers rather than aspirations.
 
 ### Structure
 
-- FR-6: The homepage MUST render these sections in this order: hero, proof strip, products, services, process, contact. It is a summary — detail belongs on the standalone routes in FR-26.
+- FR-6: The homepage MUST render these sections in this order: hero, proof strip, products, services, process, contact. It is a summary — detail belongs on the standalone routes in FR-26. **Superseded for this site by FR-39 (single-product mode), where the homepage is the product page and carries the detail itself.**
 - FR-7: Section order and inclusion MUST be driven by `config.sections[]`. Omitting a key MUST omit that section without layout breakage.
 - FR-8: Each product in `config.products[]` MUST render a detail page at `/products/[slug]`.
 - FR-9: Each service in `config.services[]` MUST render as a card on the services page and in the homepage services section.
@@ -71,9 +71,20 @@ through NFR-4 carry hard numbers rather than aspirations.
 - FR-36: Icons MUST be inline stroke-based SVG drawn with `currentColor`, selected by an `icon` key in config. Emoji MUST NOT be used. An unrecognised key MUST render nothing rather than a broken glyph.
 - FR-10: Primary navigation MUST derive from `config.nav[]` and MUST NOT be hardcoded. Navigation entries MUST point at real routes, not on-page anchors.
 - FR-26: The site MUST render standalone routes at `/products`, `/services`, `/about` and `/contact`, with their copy drawn from `config.pages`. Every field under `config.pages` MUST be optional, so a variant that omits one still builds.
-- FR-27: The qualifying form MUST live on `/contact` rather than on the homepage, so the homepage stays a summary.
+- FR-27: The qualifying form MUST live on `/contact` rather than on the homepage, so the homepage stays a summary. **Relaxed under FR-39:** where the homepage is the product page it is no longer a summary, so the form MAY also render there. It MUST still render on `/contact`.
 - FR-28: A section component reused across routes MUST take its heading from config, never from a literal in the page template.
 - FR-11: Legal pages MUST render at `/privacy`, `/terms` and `/refund`, with client name, contact details and jurisdiction interpolated from config.
+
+### Single-product mode (added November 2026)
+
+A site selling one product must not spend its ranking on three URLs describing it. These requirements hold while `config.productOnHome` is set.
+
+- FR-39: When `config.productOnHome` is set, the homepage MUST render the product in full — the same component the detail route renders — and `productHref()` MUST return `/`. The build MUST fail when `products[]` is empty or holds more than one product, because the second would be published nowhere.
+- FR-40: In that mode the sitemap MUST omit `/products` and `/products/[slug]`, the detail route MUST render `noindex`, and `public/_redirects` MUST force-301 both paths to `/`. The routes themselves MUST still build, because the engine serves multi-product variants.
+- FR-41: Structured data for the product MUST declare the URL the product is actually published at. A `SoftwareApplication` MUST NOT name a URL that redirects.
+- FR-42: A product MAY declare `walkthrough[]` — one entry per application screen, each with an image, a title and a caption. The build MUST fail when an entry is missing any of the three, or names an image that is not on disk.
+- FR-43: The walkthrough MUST render in full at `/features` and MAY be truncated on the homepage via `sections[].limit`, with a link to the full tour. Every image below the first MUST be lazy (FR-25), so twenty screenshots cannot breach NFR-4.
+- FR-44: Walkthrough captions MUST describe something visible in their own image. A caption making a claim the screenshot does not show is a defect, because this is the page a buyer checks against the trial.
 
 ### Conversion
 
@@ -570,5 +581,7 @@ Decided rather than confirmed. Each is cheap to change now and expensive after P
 | A-2 | Budget bands are placeholders, derived from the K1,500 and K3,500 tiers named in the playbook. | Config edit only. |
 | A-3 | Testimonial content is still placeholder. Product copy is now real, taken from each product's own documentation. | No structural impact. |
 | A-4 | The form posts to a Netlify Function; the exact endpoint is still to be chosen. | Changes the FR-17 implementation, not its contract. |
-| A-5 | ~~Three products~~ — **confirmed.** GlamifiedHR, GlamifiedSales, GlamifiedFleet. Other systems in the parent folder (Fees, Hospitality, GS-Loans, Educellency) are deliberately not on the site. | Config edit only. |
+| A-5 | ~~Three products~~ — **superseded, November 2026.** The site sells **GlamifiedHR only**. Payroll enquiries had dried up after the rebrand, so GlamifiedSales, GlamifiedFleet, IT support, business registration and graphic design were removed and the homepage became the GlamifiedHR page (FR-39). Payroll outsourcing and custom systems remain as the two services. Everything removed is in the git history. | Config edit plus clearing `productOnHome`. |
+| A-7 | **Licence terms are stated as one-time/perpetual on the site, but GlamifiedHR issues term certificates** — the edition table in the application gives paid editions 365 days with a 30-day grace, and the key in use at the time of writing ran 1,824 days. The site's wording was softened to "you pay once rather than a monthly fee"; `/terms` still says "perpetual right to use that version". | Confirm which is true and correct `/terms`, or change the editions. |
+| A-8 | **The site shows one price (K15,000) but the application has three paid editions** — starter (50 employees), professional (100) and enterprise (unlimited). The FAQ answers headcount by inviting the enquiry rather than publishing a tier table. | Add tiers to `products[].price` if the editions are what is actually sold. |
 | A-6 | Contact email is `info.glamifiedsystems@gmail.com`, taken from the GlamifiedHR user instructions. **The phone number conflicts:** the playbook says +260 977 669 883, the GlamifiedHR instructions say +260 77 002 9596. The playbook number is in config. | Config edit only — but confirm which is right. |

@@ -6,13 +6,29 @@
 #
 # Keep every path the old site published, even ones that look obsolete.
 
-/glamifiedhr              /products/glamified-hr       301
-/glamifiedsales           /products/glamified-sales    301
-/glamifiedfleet           /products/glamified-fleet    301
+# ---------------------------------------------------------------------------
+# GlamifiedHR is now the homepage (see `productOnHome` in site.config.js).
+#
+# The "!" is a force flag: without it Netlify serves a file that exists at the
+# path in preference to the rule, and /products/ and /products/glamified-hr/
+# are still built — the engine builds them for multi-product variants. Forcing
+# the redirect is what makes them unreachable, so the product has exactly one
+# URL. Remove these two lines the day a second product goes back on the site.
+# ---------------------------------------------------------------------------
+/products                 /                            301!
+/products/*               /                            301!
 
-# Common variants people and old links use.
-/glamified-hr             /products/glamified-hr       301
-/glamified-sales          /products/glamified-sales    301
-/glamified-fleet          /products/glamified-fleet    301
-/hr                       /products/glamified-hr       301
-/payroll                  /products/glamified-hr       301
+# The old product URLs. HR goes to its page, which is now the homepage.
+/glamifiedhr              /                            301
+/glamified-hr             /                            301
+/hr                       /                            301
+/payroll                  /                            301
+
+# GlamifiedSales and GlamifiedFleet are no longer sold from this site. They go
+# to the homepage rather than 404ing: a visitor who followed one of these is
+# looking for Glamified Systems, and the homepage is where that conversation
+# can still happen.
+/glamifiedsales           /                            301
+/glamified-sales          /                            301
+/glamifiedfleet           /                            301
+/glamified-fleet          /                            301

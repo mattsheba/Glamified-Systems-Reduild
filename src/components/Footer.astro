@@ -1,5 +1,5 @@
 ---
-import site, { productHref, serviceHref } from "../lib/site";
+import site, { productHref, productsHref, serviceHref, featuresHref, downloadHref } from "../lib/site";
 import { legalDocs } from "../content/legal";
 
 const year = new Date().getFullYear();
@@ -13,6 +13,24 @@ const legal = legalDocs.map((doc) => ({ href: `/${doc.slug}`, label: doc.title }
 // makes a visitor go back up a level to find anything, and gives a crawler one
 // link where it could have eight.
 const products = site.products.map((p) => ({ href: productHref(p.slug), label: p.name }));
+
+/*
+ * With one product on the homepage, a column of one link pointing back at "/"
+ * is a dead entry. The walkthrough is what that column should offer instead —
+ * it is the page a visitor who scrolled this far is looking for.
+ */
+const installer = site.products[0] ? downloadHref(site.products[0]) : null;
+
+const productLinks = site.productOnHome
+  ? [
+      ...(site.pages?.features?.moreLabel
+        ? [{ href: featuresHref, label: site.pages.features.moreLabel }]
+        : []),
+      ...(installer && site.downloads?.label
+        ? [{ href: installer, label: site.downloads.label }]
+        : []),
+    ]
+  : products;
 const services = site.services.map((s) => ({ href: serviceHref(s.slug), label: s.name }));
 ---
 
@@ -45,9 +63,9 @@ const services = site.services.map((s) => ({ href: serviceHref(s.slug), label: s
       </div>
 
       <div>
-        <p class="eyebrow"><a href="/products">{site.pages?.products?.heading}</a></p>
+        <p class="eyebrow"><a href={productsHref()}>{site.pages?.products?.heading}</a></p>
         <ul class="plain">
-          {products.map((link) => (
+          {productLinks.map((link) => (
             <li><a href={link.href}>{link.label}</a></li>
           ))}
         </ul>

@@ -1,0 +1,90 @@
+---
+/**
+ * /features — the application, screen by screen.
+ *
+ * The homepage sells the product; this page proves it. Every screen in
+ * GlamifiedHR with a caption describing what it does, which is both the thing
+ * a buyer asks for and the page most likely to be found by someone searching
+ * for a capability rather than for a product name.
+ *
+ * Builds from `products[0].walkthrough`. A variant with no walkthrough renders
+ * the header and the call to action, and nothing between them.
+ */
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+import StructuredData from "../components/StructuredData.astro";
+import Walkthrough from "../components/sections/Walkthrough.astro";
+import Faq from "../components/sections/Faq.astro";
+import site, { whatsappHref, downloadHref, soleProduct } from "../lib/site";
+
+const copy = site.pages?.features ?? {};
+const heading = copy.heading ?? "Features";
+const product = soleProduct();
+const download = product ? downloadHref(product) : null;
+const wa = whatsappHref();
+
+const crumbs = [
+  { name: "Home", path: "/" },
+  { name: heading, path: "/features" },
+];
+---
+
+<Base
+  title={copy.seo?.title ?? `${heading} | ${site.brand.name}`}
+  description={copy.seo?.description ?? copy.standfirst}
+>
+  <StructuredData breadcrumbs={crumbs} />
+
+  <PageHeader
+    heading={heading}
+    standfirst={copy.standfirst}
+    eyebrow={product?.name}
+  />
+
+  <Walkthrough mode="light" itemHeading="h2" />
+
+  {/* The tour ends where it should: on the download, not on a dead end. */}
+  {copy.endHeading && (
+  <section class="section mode-inverse">
+    <div class="container tour-end">
+      <h2>{copy.endHeading}</h2>
+      <p class="lead">{site.downloads?.trial}</p>
+      <div class="actions">
+        {download && (
+          <a class="btn btn--primary" href={download} download>
+            {site.downloads?.label}
+          </a>
+        )}
+        <a class="btn btn--ghost" href={wa} rel="noopener">
+          {site.contact.ctaLabel}
+        </a>
+      </div>
+    </div>
+  </section>
+  )}
+
+  {/* The questions a buyer has after seeing the screens are the same ones the
+      homepage answers, and the answers are long-form copy about exactly what
+      this page shows. Markup is not repeated: FAQPage JSON-LD is emitted on
+      the homepage only. */}
+  <Faq mode="light" />
+</Base>
+
+<style>
+  .tour-end {
+    text-align: center;
+    max-width: var(--measure);
+  }
+
+  .tour-end .lead {
+    margin-inline: auto;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    justify-content: center;
+    margin-top: var(--s-5);
+  }
+</style>

@@ -64,7 +64,7 @@ export const privacy: LegalDoc = {
     {
       heading: "What our software does not send us",
       body: [
-        "GlamifiedHR, GlamifiedSales and GlamifiedFleet are desktop applications. They run on your own computer and store their data there, in a database on that machine.",
+        "GlamifiedHR is a desktop application. It runs on your own computer and stores its data there, in a database on that machine.",
         "Your payroll figures, employee records, customer details, invoices and vehicle costs are not transmitted to us, are not stored on our servers, and are not accessible to us. We cannot read them, and we cannot produce them if asked to.",
         "The practical consequence is that you remain the controller of that data. Backing it up, restricting who can open the machine, and deciding how long to keep it are yours to manage.",
       ],
@@ -163,22 +163,22 @@ export const terms: LegalDoc = {
       body: [
         "Our products are licensed, not sold. Paying for a licence gives you a perpetual right to use that version of the software for your own business. It does not transfer ownership of the software itself.",
         "A licence is issued to the business named on the invoice, and is activated with a licence key we supply. You may not resell, sublicense, rent out or redistribute the software or your key.",
-        "Each product runs free for 30 days from installation so that you can evaluate it on your own data before buying. After 30 days it requires a valid licence key to continue running.",
+        "GlamifiedHR runs free for 30 days from installation, for up to 50 employees, so that you can evaluate it on your own data before buying. After 30 days it requires a valid licence key to continue running.",
         "You may not decompile or reverse engineer the software except to the extent the law expressly permits despite this restriction.",
       ],
     },
     {
       heading: "Updates and statutory changes",
       body: [
-        "Our payroll and invoicing products calculate against Zambian statutory rules, and those rules change. Where rates or thresholds change we issue an update.",
+        "GlamifiedHR calculates against Zambian statutory rules, and those rules change. Where rates or thresholds change we issue an update.",
         "We take reasonable care that these calculations are correct, but responsibility for what you file and what you pay remains yours. Check figures against the current guidance from the relevant authority before relying on them, particularly after a statutory change.",
       ],
     },
     {
       heading: "Your data and your backups",
       body: [
-        "Our desktop products store your data on your own machine, so we hold no copy of it and cannot retrieve it for you if that machine is lost, stolen or damaged.",
-        "Each product includes backup and restore. A backup is a single file you can keep on a memory stick or in any cloud folder you already use, and the software warns you when one is overdue. Taking those backups, and keeping a copy somewhere other than the machine itself, remains yours to do.",
+        "GlamifiedHR stores your data on your own machine, so we hold no copy of it and cannot retrieve it for you if that machine is lost, stolen or damaged.",
+        "GlamifiedHR includes backup and restore. A backup is a single file you can keep on a memory stick or in any cloud folder you already use, and the software warns you when one is overdue. Taking those backups, and keeping a copy somewhere other than the machine itself, remains yours to do.",
         "We are not liable for data lost where no backup existed.",
       ],
     },
@@ -244,7 +244,7 @@ export const refund: LegalDoc = {
     {
       heading: "Software licences",
       body: [
-        "Every product runs free for 30 days before it needs a licence key. That trial is the intended way to decide whether the software suits your business, on your own data, at no cost and no risk.",
+        "GlamifiedHR runs free for 30 days before it needs a licence key. That trial is the intended way to decide whether the software suits your business, on your own data, at no cost and no risk.",
         "Because of that, a licence fee is not generally refundable once a key has been issued. The software is not a subscription, so there is nothing to cancel.",
         "If the software does not do something we told you it does, tell us. We will fix it, or refund the licence fee in full.",
       ],

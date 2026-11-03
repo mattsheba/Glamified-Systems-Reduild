@@ -133,11 +133,55 @@ if (enabled.has("products")) {
       fail(`products[${i}].slug must be kebab-case, got: "${p.slug}"`);
     imageExists(p?.image, `products[${i}].image`);
     (p?.screenshots ?? []).forEach((s, j) => imageExists(s, `products[${i}].screenshots[${j}]`));
+
+    /*
+     * The walkthrough is the page a buyer checks against the trial, so a
+     * screen with no caption, or a caption pointing at an image that is not
+     * there, is worse than no walkthrough at all.
+     */
+    (p?.walkthrough ?? []).forEach((w, j) => {
+      ["image", "title", "caption"].forEach((f) => {
+        if (!w?.[f])
+          fail(`products[${i}].walkthrough[${j}] is missing required field: ${f}`);
+      });
+      imageExists(w?.image, `products[${i}].walkthrough[${j}].image`);
+    });
   });
 
   const slugs = (site.products ?? []).map((p) => p?.slug).filter(Boolean);
   const dupes = slugs.filter((s, i) => slugs.indexOf(s) !== i);
   if (dupes.length) fail(`duplicate product slugs: ${[...new Set(dupes)].join(", ")}`);
+}
+
+/*
+ * Single-product mode. The homepage carries the product, so a second product
+ * would quietly go unpublished: nothing links to /products while this is set.
+ */
+if (site.productOnHome) {
+  if (!site.products?.length) {
+    fail("productOnHome is set but products[] is empty — there is no product to put on the homepage");
+  } else if (site.products.length > 1) {
+    fail(
+      `productOnHome is set but products[] holds ${site.products.length} products. ` +
+        `Only the first would be published. Clear productOnHome, restore the ` +
+        `/products links in nav, and remove the force redirects from public/_redirects.`
+    );
+  }
+
+  if ((site.nav ?? []).some((n) => n?.childrenFrom === "products")) {
+    warn(
+      'nav has a "products" dropdown while productOnHome is set — every entry ' +
+        "in it will point at the homepage."
+    );
+  }
+}
+
+if (enabled.has("walkthrough") && !site.products?.[0]?.walkthrough?.length) {
+  warn('sections includes "walkthrough" but products[0] has no walkthrough — section will be skipped');
+}
+
+if (enabled.has("product") && !site.products?.length) {
+  warn('sections includes "product" but products[] is empty — section will be skipped (EC-2)');
 }
 
 if (enabled.has("services")) {
@@ -305,6 +349,7 @@ if (errors.length) {
 
 console.log(
   `  site.config.js OK — ${site.sections.length} sections, ` +
-    `${site.products?.length ?? 0} products, ${site.services?.length ?? 0} services` +
+    `${site.products?.length ?? 0} products, ${site.services?.length ?? 0} services, ` +
+    `${site.products?.[0]?.walkthrough?.length ?? 0} walkthrough screens` +
     (warnings.length ? `, ${warnings.length} warning(s)` : "")
 );

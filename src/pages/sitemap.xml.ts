@@ -26,17 +26,31 @@ export const GET: APIRoute = () => {
 
   // priority is a hint, not a ranking lever. Product pages carry the commercial
   // intent, so they sit just under the homepage.
+  /*
+   * Single-product mode publishes the product on "/" and 301s the product
+   * routes there, so listing them here would hand the crawler a list of
+   * redirects — which Search Console files under "Page with redirect" and
+   * declines to index. That cost this site every URL but the homepage once
+   * already; do not add them back without clearing `productOnHome`.
+   */
+  const productRoutes = site.productOnHome
+    ? []
+    : [
+        { path: "/products", priority: "0.9", changefreq: "monthly" },
+        ...site.products.map((p) => ({
+          path: `/products/${p.slug}`,
+          priority: "0.9",
+          changefreq: "monthly",
+        })),
+      ];
+
   const routes: Array<{ path: string; priority: string; changefreq: string }> = [
     { path: "/", priority: "1.0", changefreq: "weekly" },
-    { path: "/products", priority: "0.9", changefreq: "monthly" },
-    { path: "/services", priority: "0.9", changefreq: "monthly" },
+    ...productRoutes,
+    { path: "/features", priority: "0.9", changefreq: "monthly" },
+    { path: "/services", priority: "0.8", changefreq: "monthly" },
     { path: "/about", priority: "0.6", changefreq: "yearly" },
     { path: "/contact", priority: "0.7", changefreq: "yearly" },
-    ...site.products.map((p) => ({
-      path: `/products/${p.slug}`,
-      priority: "0.9",
-      changefreq: "monthly",
-    })),
     ...site.services.map((s) => ({
       path: `/services/${s.slug}`,
       priority: "0.8",

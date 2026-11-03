@@ -349,7 +349,10 @@ img {
  * Faq.astro.
  * ------------------------------------------------------------------ */
 
-.home-titles > section:not(#faq) h2 {
+/* #faq and #enquiry are working sections: their heading sits above a
+   left-aligned standfirst and a column of controls, so centring it leaves the
+   heading floating over copy that starts at the left edge. */
+.home-titles > section:not(#faq):not(#enquiry) h2 {
   font-size: var(--t-display);
   line-height: 1.06;
   letter-spacing: -0.025em;

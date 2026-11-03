@@ -42,10 +42,35 @@ export function guideHref(product: Product): string | null {
   return `${base.replace(/\/+$/, "")}/${product.guide.file}`;
 }
 
-/** FR-8: product detail route. */
+/**
+ * FR-8: product detail route.
+ *
+ * Collapses to the homepage in single-product mode, so every link the footer,
+ * the 404 page and the menu build points at the page that actually holds the
+ * product rather than at a URL that 301s to it.
+ */
 export function productHref(slug: string): string {
-  return `/products/${slug}`;
+  return site.productOnHome ? "/" : `/products/${slug}`;
 }
+
+/** The product listing route, or the homepage when it stands in for it. */
+export function productsHref(): string {
+  return site.productOnHome ? "/" : "/products";
+}
+
+/**
+ * The product this site is about, in single-product mode.
+ *
+ * Typed as possibly undefined because a variant may carry no products at all
+ * (variants/lodge.config.js does), and a section that reads this has to render
+ * nothing rather than fail the build.
+ */
+export function soleProduct(): Product | undefined {
+  return site.products[0];
+}
+
+/** FR-9 sibling: the walkthrough route. */
+export const featuresHref = "/features";
 
 /**
  * Minimal inline emphasis for config copy: `**bold**` and nothing else.

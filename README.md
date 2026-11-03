@@ -76,7 +76,7 @@ src/
   layouts/Base.astro
   components/sections/  one file per section
   content/legal.ts      legal templates, parameterised by config
-  pages/                index, /products/[slug], /privacy /terms /refund
+  pages/                index, features, /products/[slug], /privacy /terms /refund
 scripts/                build-time verification
 ```
 
@@ -96,12 +96,18 @@ is in `design-tokens.md`.
 
 ## Routes
 
+This site runs in **single-product mode** (`productOnHome` in `site.config.js`):
+it sells GlamifiedHR, so the homepage *is* the product page and the product
+routes redirect to it. The routes still build, because the engine also serves
+variants with several products.
+
 | Route | What it is |
 |---|---|
-| `/` | Homepage — a summary. Hero, proof, products, services, process, contact. |
-| `/products` | All three products |
-| `/products/[slug]` | One page per product, generated from config |
-| `/services` | All five services |
+| `/` | Homepage — the GlamifiedHR page. Hero, proof, the product in full, four walkthrough screens, clients, services, process, FAQ, enquiry form. |
+| `/features` | The whole application, screen by screen, from `products[0].walkthrough` |
+| `/products` | Product listing. **Force-redirected to `/`** while `productOnHome` is set |
+| `/products/[slug]` | One page per product, generated from config. **Force-redirected to `/`**, and `noindex`, while `productOnHome` is set |
+| `/services` | Both services |
 | `/services/[slug]` | One page per service — full detail, generated from config |
 | `/about` | Who we are, how we work, proof |
 | `/contact` | Contact details and the qualifying form |

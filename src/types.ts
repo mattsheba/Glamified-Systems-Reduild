@@ -13,6 +13,10 @@ export type SectionKey =
   | "proofStrip"
   | "logoMarquee"
   | "products"
+  /** The single product, rendered in full. See `productOnHome`. */
+  | "product"
+  /** The screen-by-screen tour, from `products[0].walkthrough`. */
+  | "walkthrough"
   | "services"
   | "proof"
   | "custom"
@@ -94,6 +98,15 @@ export interface Product {
    * neither of them the obvious one.
    */
   guide?: { file: string };
+  /**
+   * The application, screen by screen.
+   *
+   * Rendered in full on /features and truncated on the homepage. Each caption
+   * must describe something visible in its own image: this is the part of the
+   * site a buyer checks against the trial, so an unsupported sentence here
+   * costs more than it gains.
+   */
+  walkthrough?: Array<{ image: string; title: string; caption: string }>;
 }
 
 export interface Service {
@@ -226,6 +239,19 @@ export interface AboutCopy extends PageCopy {
   };
 }
 
+/**
+ * Copy for the walkthrough route.
+ *
+ * The two extra labels exist so the homepage link into this page and the band
+ * that closes the tour are not baked into the templates (FR-1).
+ */
+export interface FeaturesCopy extends PageCopy {
+  /** Label on the homepage link into the full walkthrough. */
+  moreLabel?: string;
+  /** Heading on the closing call-to-action band. */
+  endHeading?: string;
+}
+
 export interface ServicesCopy extends PageCopy {
   /** Heading above the "who this is for" card on a service detail page. */
   forWhoLabel?: string;
@@ -266,6 +292,15 @@ export interface SiteConfig {
     mapUrl?: string;
   };
 
+  /**
+   * One product, shown on the homepage instead of on its own route.
+   *
+   * When set, productHref() returns "/", the sitemap omits the product routes
+   * and the detail page renders noindex, so a single product does not split
+   * its ranking across /, /products and /products/<slug>. See site.config.js.
+   */
+  productOnHome?: boolean;
+
   nav: NavItem[];
 
   /** Homepage composition. Order is render order. */
@@ -274,6 +309,12 @@ export interface SiteConfig {
     mode?: BandMode;
     heading?: string;
     subheading?: string;
+    /**
+     * Caps how many items a list section renders, where it has a dedicated
+     * page holding the rest. Used by `walkthrough`, which shows a few screens
+     * on the homepage and all of them on /features.
+     */
+    limit?: number;
   }>;
 
   /**
@@ -283,6 +324,8 @@ export interface SiteConfig {
    */
   pages?: {
     products?: PageCopy;
+    /** Copy for /features, the screen-by-screen walkthrough route. */
+    features?: FeaturesCopy;
     services?: ServicesCopy;
     about?: AboutCopy;
     contact?: PageCopy;
@@ -299,8 +342,15 @@ export interface SiteConfig {
     /** Sectors, set as a list under the headline. */
     capabilities?: string[];
     standfirst: string;
-    primaryCta: { label: string; type: "whatsapp" | "link"; href?: string };
-    secondaryCta?: { label: string; type?: "whatsapp" | "link"; href?: string };
+    /**
+     * "download" resolves to the first product's installer at build time, so
+     * the hero can offer the download without repeating the bucket host that
+     * already lives in `downloads.baseUrl`. It falls back to the secondary
+     * action's target when there is no installer configured, so a hero is
+     * never left with a button that goes nowhere.
+     */
+    primaryCta: { label: string; type: "whatsapp" | "link" | "download"; href?: string };
+    secondaryCta?: { label: string; type?: "whatsapp" | "link" | "download"; href?: string };
     image?: string;
   };
 

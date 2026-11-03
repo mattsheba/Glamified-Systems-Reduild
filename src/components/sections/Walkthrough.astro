@@ -1,0 +1,162 @@
+---
+/**
+ * The application, screen by screen.
+ *
+ * Every entry is a capture of the running software with a caption describing
+ * something visible in it. This is the section that answers "what does it
+ * actually do" — the question a feature list never quite answers, and the one
+ * that decides a payroll purchase.
+ *
+ * `limit` truncates the list for the homepage, which carries the first few
+ * screens and a link to the full tour at /features. Without a limit every
+ * screen renders, which is what /features does.
+ *
+ * Images below the first are lazy (FR-25) — twenty screenshots eagerly loaded
+ * would blow the homepage weight budget (NFR-4) on their own.
+ */
+import site, { soleProduct, featuresHref } from "../../lib/site";
+
+interface Props {
+  mode: "light" | "inverse";
+  heading?: string;
+  limit?: number;
+  /** Heading level for each screen. h3 under a section h2, h2 on /features
+   *  where the page header carries the h1 and there is no section heading. */
+  itemHeading?: "h2" | "h3";
+}
+
+const { mode, heading, limit, itemHeading = "h3" } = Astro.props;
+const ItemHeading = itemHeading;
+
+const product = soleProduct();
+const all = product?.walkthrough ?? [];
+const screens = limit ? all.slice(0, limit) : all;
+
+/*
+ * The link into the full tour, shown only where screens were held back — on
+ * /features the list is complete and a link to itself would be noise.
+ *
+ * Resolved here rather than in the template because a "greater than" inside
+ * markup reads as an opening tag to the engine-leak scanner.
+ */
+const moreLabel =
+  all.length > screens.length ? site.pages?.features?.moreLabel : undefined;
+---
+
+{screens.length > 0 && (
+  <section class:list={["section", `mode-${mode}`]} id="walkthrough">
+    <div class="container">
+      {heading && <h2>{heading}</h2>}
+
+      <ol class="screens">
+        {screens.map((screen, i) => (
+          <li class="screen">
+            {/* Eager only for the screen that opens the full tour, where it
+                is the first thing under the page header. On the homepage this
+                band is far below the fold and every screen waits (FR-25,
+                NFR-4). */}
+            <figure>
+              <img
+                src={screen.image}
+                alt={`GlamifiedHR — ${screen.title}`}
+                width="1200"
+                height="629"
+                loading={i === 0 && !limit ? "eager" : "lazy"}
+                decoding="async"
+              />
+              <figcaption>
+                <ItemHeading>{screen.title}</ItemHeading>
+                <p>{screen.caption}</p>
+              </figcaption>
+            </figure>
+          </li>
+        ))}
+      </ol>
+
+      {moreLabel && (
+        <p class="more">
+          <a class="btn btn--ghost" href={featuresHref}>{moreLabel}</a>
+        </p>
+      )}
+
+      {site.screenshotNote && <p class="shot-note">{site.screenshotNote}</p>}
+    </div>
+  </section>
+)}
+
+<style>
+  h2 {
+    margin-bottom: var(--s-6);
+  }
+
+  .screens {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-7);
+    max-width: 1040px;
+    margin-inline: auto;
+  }
+
+  /* The screenshot runs the full column and the words sit under it.
+     Side by side was tried first and halved the image: at 580px the figures
+     inside a payroll table stop being legible, and an illegible screenshot
+     makes the opposite point to the one this section exists to make. */
+  .screen figure {
+    margin: 0;
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .screen img {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: var(--surface-tint);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-sm);
+    padding: var(--s-1);
+  }
+
+  .screen figcaption :global(h2),
+  .screen figcaption :global(h3) {
+    font-size: var(--t-h3);
+    margin: 0 0 var(--s-2);
+  }
+
+  .screen figcaption p {
+    margin: 0;
+    /* Capped at the reading measure even though the image above is wider:
+       a 1040px line is unreadable, and the caption is the half of this that
+       carries the detail. */
+    max-width: var(--measure);
+    font-size: var(--t-small);
+    line-height: 1.6;
+    color: var(--band-ink-muted, var(--ink-muted));
+  }
+
+  /* Both override the global paragraph measure: centred text inside a 68ch
+     box that starts at the left edge is not centred on the page. */
+  .more {
+    max-width: none;
+    margin: var(--s-6) 0 0;
+    text-align: center;
+  }
+
+  .shot-note {
+    max-width: none;
+    margin: var(--s-6) 0 0;
+    font-size: var(--t-meta);
+    color: var(--band-ink-muted, var(--ink-muted));
+    text-align: center;
+  }
+
+  /* One column early: a screenshot squeezed into half a tablet is unreadable,
+     and unreadable is the one thing this section cannot be. */
+  @media (max-width: 1024px) {
+    .screens {
+      gap: var(--s-6);
+    }
+  }
+</style>

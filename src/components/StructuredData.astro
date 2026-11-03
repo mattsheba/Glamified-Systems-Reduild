@@ -18,6 +18,13 @@ import type { Product, Service } from "../types";
 interface Props {
   /** Product page: emits SoftwareApplication. */
   product?: Product;
+  /**
+   * The URL the product is actually published at, where that is not
+   * /products/<slug> — "/" in single-product mode, where the homepage is the
+   * product page. Naming a URL that redirects elsewhere is the fastest way to
+   * have a rich result declined.
+   */
+  productUrl?: string;
   /** Service page: emits Service. */
   service?: Service;
   /** Emit FAQPage from config.faq (homepage only, to avoid duplicate FAQ markup). */
@@ -26,7 +33,7 @@ interface Props {
   breadcrumbs?: Array<{ name: string; path: string }>;
 }
 
-const { product, service, includeFaq, breadcrumbs } = Astro.props;
+const { product, service, productUrl, includeFaq, breadcrumbs } = Astro.props;
 
 const origin = site.seo.domain.replace(/\/$/, "");
 const abs = (path: string) => `${origin}${path.startsWith("/") ? path : `/${path}`}`;
@@ -57,7 +64,7 @@ if (product) {
     name: product.name,
     applicationCategory: "BusinessApplication",
     operatingSystem: "Windows",
-    url: abs(`/products/${product.slug}`),
+    url: abs(productUrl ?? `/products/${product.slug}`),
     description: product.summary,
     image: abs(product.image),
     publisher: { "@id": `${origin}/#organisation` },

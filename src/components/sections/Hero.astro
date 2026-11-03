@@ -1,15 +1,31 @@
 ---
-import site, { whatsappHref } from "../../lib/site";
+import site, { whatsappHref, downloadHref, soleProduct } from "../../lib/site";
 
 interface Props { mode: "light" | "inverse" }
 const { mode } = Astro.props;
 
 const { headline, capabilities, standfirst, primaryCta, secondaryCta, image } = site.hero;
-// Either slot can be the WhatsApp action now that the hero leads with the
-// products, so both resolve their href the same way.
-const hrefFor = (cta: { type?: string; href?: string }) =>
-  cta.type === "whatsapp" ? whatsappHref() : cta.href;
+/*
+ * Either slot can be any of the three actions, so both resolve the same way.
+ *
+ * A "download" with no installer configured falls back to WhatsApp rather than
+ * rendering a button with an empty href: lib/site returns null until
+ * downloads.baseUrl is a real host, and a dead primary action on the first
+ * screen is worse than a conversation.
+ */
+const product = soleProduct();
+const installer = product ? downloadHref(product) : null;
+
+const hrefFor = (cta: { type?: string; href?: string }) => {
+  if (cta.type === "whatsapp") return whatsappHref();
+  if (cta.type === "download") return installer ?? whatsappHref();
+  return cta.href;
+};
+
 const primaryHref = hrefFor(primaryCta);
+// Only a real installer link gets the download attribute; the WhatsApp
+// fallback must not be marked as one.
+const primaryIsDownload = primaryCta.type === "download" && Boolean(installer);
 ---
 
 <section class:list={["section", "hero", `mode-${mode}`, image && "hero--image"]}>
@@ -38,7 +54,14 @@ const primaryHref = hrefFor(primaryCta);
     <p class="standfirst">{standfirst}</p>
 
     <div class="hero-ctas">
-      <a class="btn btn--primary" href={primaryHref} rel="noopener">{primaryCta.label}</a>
+      <a
+        class="btn btn--primary"
+        href={primaryHref}
+        rel="noopener"
+        download={primaryIsDownload || undefined}
+      >
+        {primaryCta.label}
+      </a>
       {secondaryCta && (
         <a class="btn btn--ghost" href={hrefFor(secondaryCta)} rel="noopener">
           {secondaryCta.label}

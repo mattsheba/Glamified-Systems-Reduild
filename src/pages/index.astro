@@ -1,12 +1,14 @@
 ---
 import Base from "../layouts/Base.astro";
 import StructuredData from "../components/StructuredData.astro";
-import site, { sectionModes } from "../lib/site";
+import site, { sectionModes, soleProduct } from "../lib/site";
 
 import Hero from "../components/sections/Hero.astro";
 import ProofStrip from "../components/sections/ProofStrip.astro";
 import LogoMarquee from "../components/sections/LogoMarquee.astro";
 import Products from "../components/sections/Products.astro";
+import Product from "../components/sections/Product.astro";
+import Walkthrough from "../components/sections/Walkthrough.astro";
 import Services from "../components/sections/Services.astro";
 import Proof from "../components/sections/Proof.astro";
 import Custom from "../components/sections/Custom.astro";
@@ -20,6 +22,8 @@ const REGISTRY = {
   proofStrip: ProofStrip,
   logoMarquee: LogoMarquee,
   products: Products,
+  product: Product,
+  walkthrough: Walkthrough,
   services: Services,
   proof: Proof,
   custom: Custom,
@@ -36,6 +40,8 @@ const isEmpty = (key: string) =>
   (key === "faq" && !site.faq?.items?.length) ||
   (key === "templates" && !site.templates?.length) ||
   (key === "products" && !site.products?.length) ||
+  (key === "product" && !site.products?.length) ||
+  (key === "walkthrough" && !soleProduct()?.walkthrough?.length) ||
   (key === "services" && !site.services?.length) ||
   (key === "process" && !site.process?.length) ||
   (key === "proof" &&
@@ -48,12 +54,20 @@ const modes = sectionModes();
 const blocks = site.sections
   .map((section, i) => ({ ...section, mode: modes[i] }))
   .filter((section) => !isEmpty(section.key));
+
+/*
+ * In single-product mode this page IS the product page, so it carries the
+ * SoftwareApplication markup and declares "/" as the product's URL. Without
+ * the override the markup would point a crawler at /products/<slug>, which
+ * redirects straight back here.
+ */
+const product = site.productOnHome ? soleProduct() : undefined;
 ---
 
 <Base>
   {/* FAQPage markup lives on the homepage only — the same questions marked up
       on several routes reads as duplicate structured data. */}
-  <StructuredData includeFaq />
+  <StructuredData includeFaq product={product} productUrl="/" />
 
   {/* `home-titles` drives the centred, uppercase section headings in
       tokens.css. It has to be a global rule rather than a scoped one —
@@ -63,7 +77,9 @@ const blocks = site.sections
     {
       blocks.map((block) => {
         const Section = REGISTRY[block.key as keyof typeof REGISTRY];
-        return <Section mode={block.mode} heading={block.heading} />;
+        return (
+          <Section mode={block.mode} heading={block.heading} limit={block.limit} />
+        );
       })
     }
   </div>

@@ -1,6 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
-import site, { whatsappHref } from "../lib/site";
+import site, { whatsappHref, productsHref } from "../lib/site";
 
 /**
  * Where Lenco returns the customer after payment.
@@ -34,7 +34,7 @@ const wa = whatsappHref();
         <a class="btn btn--primary" href={wa} rel="noopener">
           {site.contact.ctaLabel}
         </a>
-        <a class="btn btn--ghost" href="/products">{site.pages?.products?.heading}</a>
+        <a class="btn btn--ghost" href={productsHref()}>{site.pages?.products?.heading}</a>
       </div>
     </div>
   </section>
