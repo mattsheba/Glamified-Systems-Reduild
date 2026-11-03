@@ -261,7 +261,17 @@ export interface ServicesCopy extends PageCopy {
 
 export interface SiteConfig {
   brand: {
+    /**
+     * What the site is called. On a single-product site this is the product,
+     * not the company — see `company`.
+     */
     name: string;
+    /**
+     * The business behind the site, where that differs from `name`. Used as
+     * the Organization's alternate name in structured data; the registered
+     * entity itself comes from `legal.registeredName`.
+     */
+    company?: string;
     tagline: string;
     accent: string;
     /** Full lockup — used where there is room, e.g. the footer. */
@@ -352,6 +362,8 @@ export interface SiteConfig {
     primaryCta: { label: string; type: "whatsapp" | "link" | "download"; href?: string };
     secondaryCta?: { label: string; type?: "whatsapp" | "link" | "download"; href?: string };
     image?: string;
+    /** Product lockup shown above the headline. */
+    lockup?: string;
   };
 
   /**

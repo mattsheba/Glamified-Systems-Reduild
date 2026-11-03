@@ -42,7 +42,7 @@ const organisation = {
   "@type": "Organization",
   "@id": `${origin}/#organisation`,
   name: site.legal.registeredName,
-  alternateName: site.brand.name,
+  alternateName: site.brand.company ?? site.brand.name,
   url: origin,
   logo: abs(site.brand.logo),
   email: site.contact.email,

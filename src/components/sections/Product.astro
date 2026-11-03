@@ -23,21 +23,11 @@ const product = soleProduct();
     <div class="container">
       {heading && <h2>{heading}</h2>}
 
-      {/* The product's own lockup, above its name. The header carries the
-          company mark, so without this the product is never shown as a thing
-          with an identity of its own — which is what a brand search looks
-          for. */}
-      {product.logo && (
-        <img
-          class="product-mark"
-          src={product.logo}
-          alt={product.name}
-          width="320"
-          height="180"
-          loading="lazy"
-          decoding="async"
-        />
-      )}
+      {/* No lockup here. `hero.lockup` puts it at the top of the page and
+          this band's heading names the product again, so a third mark 700px
+          below the first was repetition rather than branding. The product's
+          own `logo` is still what the listing cards use in multi-product
+          variants. */}
 
       <ProductDetail product={product} groupHeading="h3" />
     </div>
@@ -48,19 +38,7 @@ const product = soleProduct();
   /* Gap belongs to the heading, not the block below it, so a band rendered
      without a heading has no dead space. */
   h2 {
-    margin-bottom: var(--s-5);
+    margin-bottom: var(--s-6);
   }
 
-  .product-mark {
-    display: block;
-    width: auto;
-    height: clamp(64px, 8vw, 96px);
-    margin: 0 auto var(--s-5);
-    /* The supplied lockup sits on a solid white ground, so on an inverse band
-       it needs a tile rather than being recoloured — altering a mark is not
-       ours to do. */
-    background: #fff;
-    border-radius: var(--r-sm);
-    padding: var(--s-2) var(--s-3);
-  }
 </style>

@@ -30,11 +30,22 @@
 
 export default {
   brand: {
-    name: "Glamified Systems",
+    /*
+     * The PRODUCT, not the company.
+     *
+     * This is a single-product site, so the name in the header, the browser
+     * tab and the footer lockup is GlamifiedHR. The company still owns the
+     * site and says so where it matters: `company` below carries it into the
+     * structured data, `legal.registeredName` into the copyright line and the
+     * legal pages, and the About page is headed "About Glamified Systems".
+     */
+    name: "GlamifiedHR",
+    /** The publisher, for structured data and anywhere the company is meant. */
+    company: "Glamified Systems",
     tagline: "Compliant by default. Offline by design.",
     accent: "#006C90",
-    logo: "/images/brand/logo.webp",
-    mark: "/images/brand/mark.webp",
+    logo: "/images/product/glamifiedhr-lockup.webp",
+    mark: "/images/brand/glamifiedhr-mark.webp",
     favicon: "/favicon.svg",
     /*
      * What the company is, in one place. Search engines and AI tools read this
@@ -105,7 +116,7 @@ export default {
   sections: [
     { key: "hero" },
     { key: "proofStrip", mode: "inverse" },
-    { key: "product", heading: "The software" },
+    { key: "product", heading: "Inside GlamifiedHR" },
     { key: "walkthrough", heading: "What it actually does", limit: 4 },
     { key: "logoMarquee", mode: "light", heading: "Trusted by" },
     { key: "proof", heading: "What our clients say" },
@@ -312,6 +323,16 @@ export default {
   },
 
   hero: {
+    /*
+     * The product lockup, above everything else on the page.
+     *
+     * A pain-led headline earns the click from search, but on arrival a
+     * visitor still has to learn what the thing is called — the name is what
+     * they type into Google next, and what they say on the phone. It sits on
+     * its own tile because the mark is dark ink on white and the hero band
+     * inverts in dark mode.
+     */
+    lockup: "/images/product/glamifiedhr-lockup.webp",
     headline: "Payroll that follows Zambian law, not a spreadsheet",
     /*
      * The statutory line. Set as its own field rather than folded into the
@@ -905,7 +926,14 @@ export default {
     title: "Zambian Payroll Software — PAYE, NAPSA, NHIMA | GlamifiedHR",
     description:
       "Payroll software for Zambian employers. PAYE, NAPSA and NHIMA calculated to current rules, statutory returns ready to file, and it runs offline. 30-day free trial.",
-    ogImage: "/images/brand/og.svg",
+    /*
+     * Built by scripts/make-og.mjs from the lockup and the dashboard capture.
+     * This replaced a literal PLACEHOLDER card, which is what every WhatsApp
+     * share of the site had been showing — on a site whose primary call to
+     * action is WhatsApp. PNG, because that is what the scrapers render most
+     * reliably.
+     */
+    ogImage: "/images/brand/og-glamifiedhr.png",
     domain: "https://glamifiedsystems.com",
   },
 };

@@ -4,7 +4,8 @@ import site, { whatsappHref, downloadHref, soleProduct } from "../../lib/site";
 interface Props { mode: "light" | "inverse" }
 const { mode } = Astro.props;
 
-const { headline, capabilities, standfirst, primaryCta, secondaryCta, image } = site.hero;
+const { headline, capabilities, standfirst, primaryCta, secondaryCta, image, lockup } =
+  site.hero;
 /*
  * Either slot can be any of the three actions, so both resolve the same way.
  *
@@ -42,6 +43,16 @@ const primaryIsDownload = primaryCta.type === "download" && Boolean(installer);
   )}
 
   <div class="container hero-body">
+    {lockup && (
+      <img
+        class="hero-lockup"
+        src={lockup}
+        alt={site.brand.name}
+        width="340"
+        height="269"
+        fetchpriority="high"
+      />
+    )}
     <p class="eyebrow">{site.brand.tagline}</p>
     <h1>{headline}</h1>
 
@@ -89,6 +100,20 @@ const primaryIsDownload = primaryCta.type === "download" && Boolean(installer);
   .hero-body {
     position: relative;
     z-index: 1;
+  }
+
+  /* The mark is dark ink on a white ground, and the hero band inverts with the
+     theme, so it carries its own tile rather than being recoloured — altering
+     a brand mark is not the engine's call. */
+  .hero-lockup {
+    display: block;
+    width: auto;
+    height: clamp(74px, 9vw, 104px);
+    margin: 0 auto var(--s-4);
+    background: #fff;
+    border-radius: var(--r-sm);
+    padding: var(--s-2) var(--s-4);
+    box-shadow: 0 1px 2px rgb(16 24 40 / 8%);
   }
 
   .hero-bg {
