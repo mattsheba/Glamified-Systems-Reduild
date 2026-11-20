@@ -161,7 +161,7 @@ export const terms: LegalDoc = {
     {
       heading: "Software licences",
       body: [
-        "Our products are licensed, not sold. Paying for a licence gives you a perpetual right to use that version of the software for your own business. It does not transfer ownership of the software itself.",
+        "Our products are licensed, not sold. Paying for a licence gives you the right to use that version of the software for five years from the date your licence key is issued. It does not transfer ownership of the software itself.",
         "A licence is issued to the business named on the invoice, and is activated with a licence key we supply. You may not resell, sublicense, rent out or redistribute the software or your key.",
         "GlamifiedHR runs free for 30 days from installation, for up to 50 employees, so that you can evaluate it on your own data before buying. After 30 days it requires a valid licence key to continue running.",
         "You may not decompile or reverse engineer the software except to the extent the law expressly permits despite this restriction.",
@@ -222,7 +222,7 @@ export const terms: LegalDoc = {
       heading: "Ending an engagement",
       body: [
         "Either of us may end a project engagement in writing. You are charged for work completed up to that point, and we hand over what has been paid for. The refund policy sets out how any balance is returned.",
-        "A perpetual software licence is not affected by ending a services engagement.",
+        "A software licence remains valid for its five-year term even if a services engagement ends.",
       ],
     },
     {
@@ -245,7 +245,7 @@ export const refund: LegalDoc = {
       heading: "Software licences",
       body: [
         "GlamifiedHR runs free for 30 days before it needs a licence key. That trial is the intended way to decide whether the software suits your business, on your own data, at no cost and no risk.",
-        "Because of that, a licence fee is not generally refundable once a key has been issued. The software is not a subscription, so there is nothing to cancel.",
+        "Because of that, a licence fee is not generally refundable once a key has been issued. The software is licensed for a fixed five-year term, not on a monthly subscription.",
         "If the software does not do something we told you it does, tell us. We will fix it, or refund the licence fee in full.",
       ],
     },
