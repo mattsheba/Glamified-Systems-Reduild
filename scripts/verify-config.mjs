@@ -168,7 +168,14 @@ if (site.productOnHome) {
     );
   }
 
-  if ((site.nav ?? []).some((n) => n?.childrenFrom === "products")) {
+  /*
+   * Indexed access, not dot access, throughout this block. `childrenFrom` is
+   * optional and no nav entry currently uses it, so TypeScript narrows the
+   * config literal to a union whose members lack the property and flags every
+   * mention of it. The validator still has to check for it, because the next
+   * variant to add a dropdown will.
+   */
+  if ((site.nav ?? []).some((n) => n?.["childrenFrom"] === "products")) {
     warn(
       'nav has a "products" dropdown while productOnHome is set — every entry ' +
         "in it will point at the homepage."
@@ -249,9 +256,10 @@ if (site.downloads) {
 (site.nav ?? []).forEach((item, i) => {
   if (!item?.label) fail(`nav[${i}] is missing a label`);
   if (!item?.href) fail(`nav[${i}] ("${item?.label ?? "?"}") is missing an href`);
-  if (item?.childrenFrom && !["products", "services"].includes(item.childrenFrom))
+  const childrenFrom = item?.["childrenFrom"];
+  if (childrenFrom && !["products", "services"].includes(childrenFrom))
     fail(
-      `nav[${i}].childrenFrom must be "products" or "services", got: "${item.childrenFrom}"`
+      `nav[${i}].childrenFrom must be "products" or "services", got: "${childrenFrom}"`
     );
   // FR-10: navigation points at routes, not on-page anchors.
   if (item?.href?.includes("#"))

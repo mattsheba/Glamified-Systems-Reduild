@@ -40,6 +40,45 @@ if (!targets.length) {
 const host = base.replace(/\/+$/, "");
 let failed = 0;
 
+/*
+ * HEAD with a timeout and two retries.
+ *
+ * A bare fetch() here reported the user guide as a broken link on a slow
+ * connection, when the file was present and served 200 — and this check is
+ * wired into `npm run build`, so a transient DNS or TLS stumble would have
+ * failed a deploy and sent someone hunting for a file that was never missing.
+ *
+ * Only genuine answers are trusted: an HTTP status, including 404, is returned
+ * immediately and never retried. Retries exist for connection failures alone.
+ */
+const ATTEMPTS = 3;
+const TIMEOUT_MS = 20000;
+
+async function head(url) {
+  let lastError;
+
+  for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
+    try {
+      return await fetch(url, {
+        method: "HEAD",
+        redirect: "follow",
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+      });
+    } catch (error) {
+      lastError = error;
+      // Back off a little before trying again; a retry fired instantly tends
+      // to hit exactly the same stalled connection.
+      if (attempt < ATTEMPTS) {
+        await new Promise((resolve) => setTimeout(resolve, 1500 * attempt));
+      }
+    }
+  }
+
+  throw new Error(
+    `${lastError?.message ?? "fetch failed"} (after ${ATTEMPTS} attempts)`
+  );
+}
+
 console.log("");
 
 for (const target of targets) {
@@ -48,7 +87,7 @@ for (const target of targets) {
 
   try {
     // HEAD, so a 119MB installer is not pulled down on every check.
-    const res = await fetch(url, { method: "HEAD", redirect: "follow" });
+    const res = await head(url);
 
     if (res.ok) {
       const bytes = Number(res.headers.get("content-length") ?? 0);

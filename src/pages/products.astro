@@ -1,4 +1,19 @@
 ---
+/**
+ * /products — the listing route.
+ *
+ * In single-product mode this is a leftover, exactly as /products/<slug> is:
+ * the homepage carries the product, public/_redirects force-301s this path to
+ * "/", and the page is built only because the engine serves variants that
+ * really do have several products.
+ *
+ * It renders noindex in that mode, which the detail route has always done. The
+ * listing not doing so was a real gap rather than an oversight to leave alone:
+ * `npm run verify:sitemap` requires every indexable built page to be in the
+ * sitemap, the sitemap deliberately omits this one, so the check failed on
+ * every run. A permanently red check is one nobody reads, which would have
+ * hidden the next genuine omission.
+ */
 import Base from "../layouts/Base.astro";
 import PageHeader from "../components/PageHeader.astro";
 import Products from "../components/sections/Products.astro";
@@ -11,6 +26,7 @@ const heading = copy.heading ?? site.brand.name;
 <Base
   title={copy.seo?.title ?? `${heading} | ${site.brand.name}`}
   description={copy.seo?.description ?? copy.standfirst}
+  noindex={site.productOnHome}
 >
   <PageHeader heading={heading} standfirst={copy.standfirst} />
   <Products mode="light" />
