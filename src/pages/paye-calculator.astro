@@ -1,0 +1,627 @@
+---
+/**
+ * /paye-calculator — PAYE, NAPSA and NHIMA on one salary.
+ *
+ * The page exists to be found by someone who has not heard of GlamifiedHR and
+ * is looking for a number, so it has to be genuinely useful before it sells
+ * anything: no sign-up, no email, the rates printed on the page and the
+ * arithmetic shown.
+ *
+ * It renders the rate table and a worked example on the server, so with
+ * JavaScript off a visitor still gets the bands, the ceiling and a full
+ * calculation (NFR-9). The script adds the live version on top of that.
+ *
+ * Everything here is read from `config.statutory`, which mirrors the product's
+ * own compliance engine — the site must never quote a rate the software does
+ * not apply.
+ */
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+import StructuredData from "../components/StructuredData.astro";
+import site, { whatsappHref, downloadHref, soleProduct, featuresHref } from "../lib/site";
+import {
+  calculate,
+  kwacha,
+  kwachaRound,
+  percent,
+  bandLabel,
+} from "../lib/payroll";
+
+const copy = site.pages?.calculator ?? {};
+const heading = copy.heading ?? "Calculator";
+const s = site.statutory;
+const c = site.calculator;
+
+const product = soleProduct();
+const download = product ? downloadHref(product) : null;
+const wa = whatsappHref();
+
+/*
+ * The worked example. A figure in the middle of the second band, so the
+ * example actually demonstrates a band boundary rather than landing in the
+ * tax-free slice where every line reads zero.
+ */
+const example = s ? calculate(8000, 2000, s) : null;
+
+const effective = s
+  ? new Date(s.effectiveFrom).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    })
+  : "";
+
+const crumbs = [
+  { name: "Home", path: "/" },
+  { name: heading, path: "/paye-calculator" },
+];
+
+// Passed to the inline script, so the browser applies exactly the rates this
+// page printed rather than a second copy of them.
+const rates = s
+  ? {
+      bands: s.paye.bands,
+      napsaEmployee: s.napsa.employeeRate,
+      napsaEmployer: s.napsa.employerRate,
+      ceiling: s.napsa.ceiling,
+      nhimaEmployee: s.nhima.employeeRate,
+      nhimaEmployer: s.nhima.employerRate,
+    }
+  : null;
+---
+
+<Base
+  title={copy.seo?.title ?? `${heading} | ${site.brand.name}`}
+  description={copy.seo?.description ?? copy.standfirst}
+>
+  <StructuredData breadcrumbs={crumbs} />
+
+  <PageHeader heading={heading} standfirst={copy.standfirst} eyebrow={s?.authority} />
+
+  {s && c && example && rates && (
+    <section class="section mode-light">
+      <div class="container calc">
+        <form class="calc-form" data-calc novalidate>
+          <div class="field">
+            <label for="calc-basic">{c.fields.basic.label}</label>
+            <input
+              id="calc-basic"
+              name="basic"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              step="0.01"
+              value="8000"
+              autocomplete="off"
+            />
+            {c.fields.basic.hint && <p class="hint">{c.fields.basic.hint}</p>}
+          </div>
+
+          <div class="field">
+            <label for="calc-allowances">{c.fields.allowances.label}</label>
+            <input
+              id="calc-allowances"
+              name="allowances"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              step="0.01"
+              value="2000"
+              autocomplete="off"
+            />
+            {c.fields.allowances.hint && (
+              <p class="hint">{c.fields.allowances.hint}</p>
+            )}
+          </div>
+
+          <p class="noscript-note" data-noscript>{c.noScript}</p>
+        </form>
+
+        {/* Server-rendered with the worked example in it, then updated in
+            place by the script. A visitor with no JavaScript reads a complete
+            calculation rather than a row of dashes. */}
+        <div class="calc-out" data-out aria-live="polite">
+          <h2>{c.results.heading}</h2>
+
+          <dl class="figures">
+            <div class="row">
+              <dt>{c.results.gross}</dt>
+              <dd data-f="gross">{kwacha(example.gross)}</dd>
+            </div>
+            <div class="row">
+              <dt>{c.results.paye}</dt>
+              <dd data-f="paye">{kwacha(example.paye)}</dd>
+            </div>
+            <div class="row">
+              <dt>{c.results.napsa}</dt>
+              <dd data-f="napsa">{kwacha(example.napsaEmployee)}</dd>
+            </div>
+            <div class="row">
+              <dt>{c.results.nhima}</dt>
+              <dd data-f="nhima">{kwacha(example.nhimaEmployee)}</dd>
+            </div>
+            <div class="row is-sum">
+              <dt>{c.results.deductions}</dt>
+              <dd data-f="deductions">{kwacha(example.totalDeductions)}</dd>
+            </div>
+            <div class="row is-net">
+              <dt>{c.results.net}</dt>
+              <dd data-f="net">{kwacha(example.netPay)}</dd>
+            </div>
+          </dl>
+
+          <p class="cap-note" data-cap hidden>{c.results.ceilingNote}</p>
+
+          <h3>{c.results.bandBreakdown}</h3>
+          <ul class="bands" data-bands>
+            {example.payeBands.map((charge, i) => (
+              <li>
+                <span class="band-name">
+                  {bandLabel(charge.band, i === 0)} · {percent(charge.band.rate)}
+                </span>
+                <span class="band-base">{kwacha(charge.taxable)}</span>
+                <span class="band-amount">{kwacha(charge.amount)}</span>
+              </li>
+            ))}
+          </ul>
+
+          <h3>{c.results.employerHeading}</h3>
+          <dl class="figures">
+            <div class="row">
+              <dt>{c.results.napsaEmployer}</dt>
+              <dd data-f="napsaEmployer">{kwacha(example.napsaEmployer)}</dd>
+            </div>
+            <div class="row">
+              <dt>{c.results.nhimaEmployer}</dt>
+              <dd data-f="nhimaEmployer">{kwacha(example.nhimaEmployer)}</dd>
+            </div>
+            <div class="row is-sum">
+              <dt>{c.results.employerTotal}</dt>
+              <dd data-f="employerCost">{kwacha(example.employerCost)}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+  )}
+
+  {s && c && (
+    <section class="section mode-inverse">
+      <div class="container rates">
+        <h2>{c.ratesHeading}</h2>
+
+        <div class="rate-grid">
+          <div>
+            <h3>{c.bandsHeading}</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">{c.bandsColumns.band}</th>
+                  <th scope="col" class="num">{c.bandsColumns.rate}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {s.paye.bands.map((band, i) => (
+                  <tr>
+                    <th scope="row">{bandLabel(band, i === 0)}</th>
+                    <td class="num">{percent(band.rate)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div>
+            <h3>{c.contributionsHeading}</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">{c.contributionsColumns.item}</th>
+                  <th scope="col" class="num">{c.contributionsColumns.employee}</th>
+                  <th scope="col" class="num">{c.contributionsColumns.employer}</th>
+                  <th scope="col">{c.contributionsColumns.base}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">{s.napsa.label}</th>
+                  <td class="num">{percent(s.napsa.employeeRate)}</td>
+                  <td class="num">{percent(s.napsa.employerRate)}</td>
+                  <td>{`${c.results.gross}, ${kwachaRound(s.napsa.ceiling)} ceiling`}</td>
+                </tr>
+                <tr>
+                  <th scope="row">{s.nhima.label}</th>
+                  <td class="num">{percent(s.nhima.employeeRate)}</td>
+                  <td class="num">{percent(s.nhima.employerRate)}</td>
+                  <td>{c.fields.basic.label}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <p class="effective">{`${s.paye.name} · ${s.napsa.name} · ${s.nhima.name} — ${effective}`}</p>
+      </div>
+    </section>
+  )}
+
+  {c && (
+    <section class="section mode-light">
+      <div class="container calc-foot">
+        <p class="disclaimer">{c.disclaimer}</p>
+
+        {c.cta && (
+          <div class="calc-cta">
+            <h2>{c.cta.heading}</h2>
+            <p class="lead">{c.cta.body}</p>
+            <div class="actions">
+              {download && (
+                <a class="btn btn--primary" href={download} download>
+                  {site.downloads?.label}
+                </a>
+              )}
+              <a class="btn btn--ghost" href={featuresHref}>
+                {site.pages?.features?.moreLabel}
+              </a>
+              <a class="btn btn--ghost" href={wa} rel="noopener">
+                {site.contact.ctaLabel}
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  )}
+
+  {rates && (
+    <script is:inline define:vars={{ rates }}>
+      /*
+       * The live calculator. Same arithmetic as src/lib/payroll.ts, which is
+       * itself a port of the product's compliance engine — the rates arrive
+       * from the page rather than being written in here, so the script cannot
+       * apply a figure the page did not print.
+       *
+       * It only ever rewrites text the server already rendered, so a failure
+       * here leaves the worked example standing.
+       */
+      (function () {
+        const form = document.querySelector("[data-calc]");
+        const out = document.querySelector("[data-out]");
+        if (!form || !out) return;
+
+        const note = form.querySelector("[data-noscript]");
+        if (note) note.hidden = true;
+
+        const round2 = (n) => Math.round(n * 100) / 100;
+        const money = (n) =>
+          "K" +
+          n.toLocaleString("en-ZM", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
+
+        const field = (name) => out.querySelector('[data-f="' + name + '"]');
+
+        function run() {
+          const basic = Math.max(parseFloat(form.basic.value) || 0, 0);
+          const allowances = Math.max(parseFloat(form.allowances.value) || 0, 0);
+          const gross = round2(basic + allowances);
+
+          const pensionable = Math.min(gross, rates.ceiling);
+          const napsa = round2(pensionable * rates.napsaEmployee);
+          const napsaEmployer = round2(pensionable * rates.napsaEmployer);
+          const nhima = round2(basic * rates.nhimaEmployee);
+          const nhimaEmployer = round2(basic * rates.nhimaEmployer);
+
+          const charges = rates.bands
+            .slice()
+            .sort((a, b) => a.from - b.from)
+            .map((band) => {
+              if (gross <= band.from) return { band: band, taxable: 0, amount: 0 };
+              const upper = band.to === null ? gross : Math.min(gross, band.to);
+              const taxable = round2(upper - band.from);
+              return { band: band, taxable: taxable, amount: round2(taxable * band.rate) };
+            });
+
+          const paye = round2(charges.reduce((sum, c) => sum + c.amount, 0));
+          const deductions = round2(paye + napsa + nhima);
+
+          const set = (name, value) => {
+            const el = field(name);
+            if (el) el.textContent = money(value);
+          };
+
+          set("gross", gross);
+          set("paye", paye);
+          set("napsa", napsa);
+          set("nhima", nhima);
+          set("deductions", deductions);
+          set("net", round2(gross - deductions));
+          set("napsaEmployer", napsaEmployer);
+          set("nhimaEmployer", nhimaEmployer);
+          set("employerCost", round2(gross + napsaEmployer + nhimaEmployer));
+
+          const cap = out.querySelector("[data-cap]");
+          if (cap) cap.hidden = gross <= rates.ceiling;
+
+          // Band rows are rewritten in place; the markup for them already
+          // exists, one row per band, in the same order.
+          const rows = out.querySelectorAll("[data-bands] li");
+          charges.forEach((charge, i) => {
+            const row = rows[i];
+            if (!row) return;
+            const base = row.querySelector(".band-base");
+            const amount = row.querySelector(".band-amount");
+            if (base) base.textContent = money(charge.taxable);
+            if (amount) amount.textContent = money(charge.amount);
+          });
+        }
+
+        form.addEventListener("input", run);
+        form.addEventListener("submit", (event) => event.preventDefault());
+        run();
+      })();
+    </script>
+  )}
+</Base>
+
+<style>
+  .calc {
+    display: grid;
+    gap: var(--s-7);
+    grid-template-columns: 1fr 1.1fr;
+    align-items: start;
+  }
+
+  .calc-form {
+    display: grid;
+    gap: var(--s-5);
+    align-content: start;
+    position: sticky;
+    top: calc(var(--header-h, 72px) + var(--s-4));
+  }
+
+  .calc-form label {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--t-small);
+    font-weight: 600;
+    margin-bottom: var(--s-2);
+  }
+
+  .calc-form input {
+    width: 100%;
+    padding: 14px 16px;
+    font: inherit;
+    font-size: var(--t-h3);
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-sm);
+  }
+
+  .calc-form input:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 1px;
+  }
+
+  .hint {
+    margin: var(--s-2) 0 0;
+    font-size: var(--t-meta);
+    line-height: 1.5;
+    color: var(--ink-muted);
+    max-width: none;
+  }
+
+  .noscript-note {
+    margin: 0;
+    font-size: var(--t-small);
+    color: var(--ink-muted);
+    max-width: none;
+  }
+
+  .calc-out h2 {
+    font-size: var(--t-h3);
+    margin: 0 0 var(--s-4);
+  }
+
+  .calc-out h3 {
+    font-size: var(--t-label);
+    letter-spacing: var(--tr-label);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin: var(--s-6) 0 var(--s-3);
+  }
+
+  .figures {
+    margin: 0;
+    display: grid;
+    gap: 0;
+  }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--s-4);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .row dt {
+    font-size: var(--t-small);
+    color: var(--ink-muted);
+  }
+
+  .row dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .row.is-sum dt,
+  .row.is-sum dd {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  /* The figure everyone came for. */
+  .row.is-net {
+    border-bottom: none;
+    padding-top: var(--s-3);
+  }
+
+  .row.is-net dt {
+    font-family: var(--font-display);
+    font-size: var(--t-small);
+    font-weight: 700;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: var(--tr-label);
+  }
+
+  .row.is-net dd {
+    font-size: var(--t-h2);
+    line-height: 1;
+    color: var(--accent);
+  }
+
+  .bands {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: var(--t-small);
+  }
+
+  .bands li {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: var(--s-3);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .band-base,
+  .band-amount {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    min-width: 7ch;
+  }
+
+  .band-base {
+    color: var(--ink-muted);
+  }
+
+  .band-amount {
+    font-weight: 700;
+  }
+
+  .cap-note {
+    margin: var(--s-3) 0 0;
+    font-size: var(--t-small);
+    color: var(--ink-muted);
+  }
+
+  /* ---- rates band ---- */
+
+  .rates h2 {
+    margin-bottom: var(--s-6);
+  }
+
+  .rate-grid {
+    display: grid;
+    gap: var(--s-6) var(--s-7);
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  }
+
+  .rates h3 {
+    font-size: var(--t-label);
+    letter-spacing: var(--tr-label);
+    text-transform: uppercase;
+    margin: 0 0 var(--s-3);
+  }
+
+  .rates table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--t-small);
+  }
+
+  .rates th,
+  .rates td {
+    text-align: left;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--band-hairline, var(--hairline));
+    font-weight: 400;
+  }
+
+  .rates thead th {
+    font-family: var(--font-display);
+    font-size: var(--t-meta);
+    text-transform: uppercase;
+    letter-spacing: var(--tr-label);
+    color: var(--band-ink-muted, var(--ink-muted));
+  }
+
+  .rates tbody th {
+    font-weight: 600;
+  }
+
+  .rates .num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .effective {
+    margin: var(--s-5) 0 0;
+    font-size: var(--t-meta);
+    color: var(--band-ink-muted, var(--ink-muted));
+    max-width: none;
+  }
+
+  /* ---- foot ---- */
+
+  .calc-foot {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  .disclaimer {
+    margin: 0;
+    font-size: var(--t-small);
+    line-height: 1.6;
+    color: var(--ink-muted);
+    max-width: var(--measure);
+  }
+
+  .calc-cta {
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--hairline);
+  }
+
+  .calc-cta h2 {
+    font-size: var(--t-h3);
+    margin: 0 0 var(--s-2);
+    max-width: 28ch;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 1024px) {
+    .calc {
+      grid-template-columns: 1fr;
+      gap: var(--s-6);
+    }
+    .calc-form {
+      position: static;
+    }
+  }
+</style>

@@ -1,0 +1,166 @@
+---
+/**
+ * /guides/<slug> — one payroll guide.
+ *
+ * Long-form copy from src/content/guides.ts, which is parameterised by
+ * `config.statutory` so the figures in the prose are the figures the product
+ * applies.
+ *
+ * These exist to be found by someone with a payroll problem who has never
+ * heard of GlamifiedHR. They answer the question first and sell afterwards, in
+ * one band at the end — a guide that withholds the answer to force an enquiry
+ * is worth nothing to the reader and, eventually, nothing to the ranking.
+ */
+import Base from "../../layouts/Base.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import StructuredData from "../../components/StructuredData.astro";
+import site, { whatsappHref, inlineBold } from "../../lib/site";
+import { guides } from "../../content/guides";
+
+export function getStaticPaths() {
+  return guides.map((guide) => ({
+    params: { slug: guide.slug },
+    props: { guide },
+  }));
+}
+
+const { guide } = Astro.props;
+const wa = whatsappHref();
+const indexHeading = site.pages?.guides?.heading ?? "Guides";
+
+// Everything except the one being read, so a guide always offers somewhere to
+// go next rather than ending on a call to action alone.
+const others = guides.filter((other) => other.slug !== guide.slug);
+
+const crumbs = [
+  { name: "Home", path: "/" },
+  { name: indexHeading, path: "/guides" },
+  { name: guide.title, path: `/guides/${guide.slug}` },
+];
+
+const updated = new Date(site.legal.lastUpdated).toLocaleDateString("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+---
+
+<Base title={guide.seoTitle} description={guide.seoDescription}>
+  <StructuredData breadcrumbs={crumbs} article={guide} />
+
+  <PageHeader heading={guide.title} standfirst={guide.standfirst} eyebrow={indexHeading} />
+
+  <article class="section mode-light">
+    <div class="container guide">
+      <p class="muted updated">{`${site.statutory?.effectiveFrom ? `Rates as at ${site.statutory.effectiveFrom}. ` : ""}Last reviewed ${updated}.`}</p>
+
+      {guide.sections.map((section) => (
+        <section>
+          <h2>{section.heading}</h2>
+          {/* `**bold**` only — config copy is plain text, not a markup
+              surface. See inlineBold in lib/site. */}
+          {section.body.map((paragraph) => (
+            <p set:html={inlineBold(paragraph)} />
+          ))}
+        </section>
+      ))}
+    </div>
+  </article>
+
+  <section class="section mode-inverse">
+    <div class="container next">
+      <div class="next-cta">
+        <h2>{site.calculator?.cta?.heading}</h2>
+        <p class="lead">{site.calculator?.cta?.body}</p>
+        <div class="actions">
+          <a class="btn btn--primary" href="/paye-calculator">
+            {site.pages?.calculator?.heading}
+          </a>
+          <a class="btn btn--ghost" href={wa} rel="noopener">
+            {site.contact.ctaLabel}
+          </a>
+        </div>
+      </div>
+
+      {others.length > 0 && (
+        <nav class="more-guides" aria-label={indexHeading}>
+          <p class="eyebrow">{indexHeading}</p>
+          <ul class="plain">
+            {others.map((other) => (
+              <li>
+                <a href={`/guides/${other.slug}`}>{other.title}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .guide {
+    max-width: 72ch;
+  }
+
+  .guide h2 {
+    margin-top: var(--s-6);
+    margin-bottom: var(--s-3);
+  }
+
+  .guide section:first-of-type h2 {
+    margin-top: var(--s-4);
+  }
+
+  .updated {
+    font-size: var(--t-small);
+  }
+
+  .next {
+    display: grid;
+    gap: var(--s-7);
+    grid-template-columns: 1.3fr 1fr;
+    align-items: start;
+  }
+
+  .next-cta h2 {
+    font-size: var(--t-h3);
+    margin: 0 0 var(--s-2);
+    max-width: 28ch;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-4);
+  }
+
+  .more-guides .plain {
+    list-style: none;
+    margin: var(--s-3) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .more-guides a {
+    color: var(--band-ink);
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.35;
+    display: inline-block;
+  }
+
+  .more-guides a:hover {
+    color: var(--band-accent);
+  }
+
+  @media (max-width: 1024px) {
+    .next {
+      grid-template-columns: 1fr;
+      gap: var(--s-6);
+    }
+  }
+</style>

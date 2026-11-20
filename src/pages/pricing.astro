@@ -1,0 +1,320 @@
+---
+/**
+ * /pricing — what the licence costs and how buying works.
+ *
+ * "payroll software price Zambia" is a buying search, and until now it had
+ * nowhere to land: the figure appeared in a homepage band and in one FAQ
+ * answer. This page is that landing place.
+ *
+ * The price is read from the product, not from this page's own config block,
+ * so the homepage and this page cannot quote different figures. What the
+ * licence includes is read from `licenceIncludes` for the same reason.
+ *
+ * NO OFFER MARKUP IS EMITTED HERE. The homepage already carries the product's
+ * SoftwareApplication and its offer; a second copy on a second URL is exactly
+ * the drift the StructuredData component exists to avoid.
+ */
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+import StructuredData from "../components/StructuredData.astro";
+import site, {
+  whatsappHref,
+  downloadHref,
+  soleProduct,
+  featuresHref,
+} from "../lib/site";
+import { kwachaRound } from "../lib/payroll";
+
+const copy = site.pages?.pricing ?? {};
+const heading = copy.heading ?? "Pricing";
+const p = site.pricing;
+
+const product = soleProduct();
+const price = product?.price;
+const download = product ? downloadHref(product) : null;
+const wa = whatsappHref();
+
+const crumbs = [
+  { name: "Home", path: "/" },
+  { name: heading, path: "/pricing" },
+];
+---
+
+<Base
+  title={copy.seo?.title ?? `${heading} | ${site.brand.name}`}
+  description={copy.seo?.description ?? copy.standfirst}
+>
+  <StructuredData breadcrumbs={crumbs} />
+
+  <PageHeader heading={heading} standfirst={copy.standfirst} />
+
+  {p && price && (
+    <section class="section mode-light">
+      <div class="container price-grid">
+        <div class="price-card">
+          <p class="amount">{kwachaRound(price.amount)}</p>
+          {price.note && <p class="note">{price.note}</p>}
+
+          <dl class="terms">
+            <div class="row">
+              <dt>{p.termLabel}</dt>
+              <dd>{p.term}</dd>
+            </div>
+            {p.headcount && p.headcountLabel && (
+              <div class="row">
+                <dt>{p.headcountLabel}</dt>
+                <dd>{p.headcount}</dd>
+              </div>
+            )}
+          </dl>
+
+          <p class="muted payment-note">{p.paymentNote}</p>
+
+          <div class="actions">
+            {download && site.downloads?.label && (
+              <a class="btn btn--primary" href={download} download>
+                {site.downloads.label}
+              </a>
+            )}
+            <a class="btn btn--ghost" href={wa} rel="noopener">
+              {site.contact.ctaLabel}
+            </a>
+          </div>
+
+          {site.downloads?.trial && (
+            <p class="muted trial-line">{site.downloads.trial}</p>
+          )}
+        </div>
+
+        {site.licenceIncludes && (
+          <div class="includes">
+            <h2>{site.licenceIncludes.label}</h2>
+            <ul class="ticks">
+              {site.licenceIncludes.items.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+            {site.pages?.features?.moreLabel && (
+              <p class="more">
+                <a href={featuresHref}>{site.pages.features.moreLabel}</a>
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    </section>
+  )}
+
+  {p && (
+    <section class="section mode-inverse">
+      <div class="container trial">
+        <h2>{p.trial.heading}</h2>
+        <div class="trial-body">
+          {p.trial.body.map((paragraph) => (
+            <p class="lead">{paragraph}</p>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {p && (
+    <section class="section mode-light">
+      <div class="container buy-grid">
+        <div>
+          <h2>{p.buy.heading}</h2>
+          <ol class="steps">
+            {p.buy.steps.map((step) => (
+              <li>{step}</li>
+            ))}
+          </ol>
+        </div>
+
+        {p.notes && (
+          <aside class="notes card">
+            <h2>{p.notes.heading}</h2>
+            <ul class="plain">
+              {p.notes.items.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </aside>
+        )}
+      </div>
+    </section>
+  )}
+
+  {p && (
+    <section class="section section--strip mode-light">
+      <div class="container">
+        <p class="muted disclaimer">{p.disclaimer}</p>
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .price-grid,
+  .buy-grid {
+    display: grid;
+    gap: var(--s-7);
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+
+  .price-card {
+    background: var(--band-surface);
+    border: 1px solid var(--band-hairline);
+    border-radius: var(--r-md);
+    padding: var(--s-5);
+  }
+
+  .amount {
+    font-family: var(--font-display);
+    font-size: var(--t-display);
+    font-weight: 800;
+    line-height: var(--lh-display);
+    letter-spacing: var(--tr-display);
+    margin: 0;
+    color: var(--band-accent);
+  }
+
+  .note {
+    font-family: var(--font-display);
+    font-weight: 600;
+    margin: var(--s-2) 0 0;
+  }
+
+  .terms {
+    margin: var(--s-4) 0 0;
+    border-top: 1px solid var(--band-hairline);
+  }
+
+  .terms .row {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: var(--s-3);
+    padding: var(--s-3) 0;
+    border-bottom: 1px solid var(--band-hairline);
+  }
+
+  .terms dt {
+    font-family: var(--font-display);
+    font-size: var(--t-small);
+    font-weight: 600;
+  }
+
+  .terms dd {
+    margin: 0;
+    font-size: var(--t-small);
+  }
+
+  .payment-note {
+    margin-top: var(--s-4);
+    font-size: var(--t-small);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-4);
+  }
+
+  .trial-line {
+    margin: var(--s-3) 0 0;
+    font-size: var(--t-small);
+  }
+
+  .includes h2,
+  .notes h2 {
+    font-size: var(--t-h3);
+    margin: 0 0 var(--s-3);
+  }
+
+  /* A tick that is drawn rather than typed: a literal character in the markup
+     would be copy baked into a template, and an <img> would be a request for
+     eleven pixels. */
+  .ticks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .ticks li {
+    position: relative;
+    padding-left: var(--s-5);
+    line-height: var(--lh-body);
+  }
+
+  .ticks li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 0.45em;
+    width: 11px;
+    height: 6px;
+    border-left: 2.5px solid var(--band-accent);
+    border-bottom: 2.5px solid var(--band-accent);
+    transform: rotate(-45deg);
+  }
+
+  .more {
+    margin: var(--s-4) 0 0;
+  }
+
+  .trial-body {
+    max-width: var(--measure);
+    display: grid;
+    gap: var(--s-3);
+    margin-top: var(--s-3);
+  }
+
+  .steps {
+    margin: var(--s-3) 0 0;
+    padding-left: var(--s-4);
+    display: grid;
+    gap: var(--s-3);
+    max-width: 56ch;
+  }
+
+  .steps li {
+    line-height: var(--lh-body);
+    padding-left: var(--s-2);
+  }
+
+  .steps li::marker {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--band-accent);
+  }
+
+  .notes .plain {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .notes .plain li {
+    font-size: var(--t-small);
+    line-height: var(--lh-body);
+  }
+
+  .disclaimer {
+    font-size: var(--t-small);
+    max-width: var(--measure);
+    margin: 0;
+  }
+
+  @media (max-width: 1024px) {
+    .price-grid,
+    .buy-grid {
+      grid-template-columns: 1fr;
+      gap: var(--s-6);
+    }
+  }
+</style>

@@ -1,0 +1,210 @@
+---
+/**
+ * /requirements — what it runs on, how it installs, where the data lives.
+ *
+ * The page a buyer checks before they commit, and the one an IT person is sent
+ * to. Every figure in the config block behind it is quoted from the product's
+ * own user guide rather than estimated, because this is the page someone reads
+ * before buying a machine.
+ *
+ * It also answers the two questions asked immediately after purchase — where
+ * are my records, and how do I back them up — which otherwise arrive on
+ * WhatsApp one at a time.
+ */
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+import StructuredData from "../components/StructuredData.astro";
+import site, {
+  whatsappHref,
+  downloadHref,
+  soleProduct,
+  inlineBold,
+} from "../lib/site";
+
+const copy = site.pages?.requirements ?? {};
+const heading = copy.heading ?? "System requirements";
+const r = site.requirements;
+
+const product = soleProduct();
+const download = product ? downloadHref(product) : null;
+const wa = whatsappHref();
+
+const crumbs = [
+  { name: "Home", path: "/" },
+  { name: heading, path: "/requirements" },
+];
+---
+
+<Base
+  title={copy.seo?.title ?? `${heading} | ${site.brand.name}`}
+  description={copy.seo?.description ?? copy.standfirst}
+>
+  <StructuredData breadcrumbs={crumbs} />
+
+  <PageHeader heading={heading} standfirst={copy.standfirst} />
+
+  {r && (
+    <section class="section mode-light">
+      <div class="container spec-grid">
+        <div>
+          <h2>{r.specsHeading}</h2>
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">{r.specsColumns.item}</th>
+                <th scope="col">{r.specsColumns.detail}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {r.specs.map((spec) => (
+                <tr>
+                  <th scope="row">{spec.item}</th>
+                  <td>{spec.detail}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div class="actions">
+            {download && site.downloads?.label && (
+              <a class="btn btn--primary" href={download} download>
+                {site.downloads.label}
+              </a>
+            )}
+            <a class="btn btn--ghost" href={wa} rel="noopener">
+              {site.contact.ctaLabel}
+            </a>
+          </div>
+
+          {site.downloads?.note && (
+            <p class="muted small">{site.downloads.note}</p>
+          )}
+        </div>
+
+        <div class="install">
+          <h2>{r.installHeading}</h2>
+          <ol class="steps">
+            {r.installSteps.map((step) => (
+              <li>{step}</li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </section>
+  )}
+
+  {r && (
+    <section class="section mode-inverse">
+      <div class="container data-grid">
+        <div class="prose">
+          <h2>{r.dataHeading}</h2>
+          {r.dataBody.map((paragraph) => (
+            <p set:html={inlineBold(paragraph)} />
+          ))}
+        </div>
+
+        <div class="prose">
+          <h2>{r.backupHeading}</h2>
+          {r.backupBody.map((paragraph) => (
+            <p set:html={inlineBold(paragraph)} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .spec-grid,
+  .data-grid {
+    display: grid;
+    gap: var(--s-7);
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+
+  h2 {
+    font-size: var(--t-h3);
+    margin: 0 0 var(--s-3);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  th,
+  td {
+    padding: var(--s-3) var(--s-3) var(--s-3) 0;
+    border-bottom: 1px solid var(--band-hairline);
+    vertical-align: top;
+    font-size: var(--t-small);
+    line-height: var(--lh-body);
+  }
+
+  thead th {
+    font-family: var(--font-display);
+    font-size: var(--t-label);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--tr-label);
+    color: var(--band-ink-muted);
+  }
+
+  tbody th {
+    font-family: var(--font-display);
+    font-weight: 600;
+    width: 11rem;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-5);
+  }
+
+  .small {
+    font-size: var(--t-small);
+    margin: var(--s-3) 0 0;
+  }
+
+  .steps {
+    margin: 0;
+    padding-left: var(--s-4);
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .steps li {
+    line-height: var(--lh-body);
+    padding-left: var(--s-2);
+  }
+
+  .steps li::marker {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--band-accent);
+  }
+
+  /* The database path is long and has no spaces to break at, so it is allowed
+     to break mid-token rather than widening the column on a phone. The bold
+     runs here carry both filenames and sentence lead-ins, so they are not
+     restyled beyond that. */
+  .prose :global(strong) {
+    overflow-wrap: anywhere;
+  }
+
+  .prose p {
+    max-width: var(--measure);
+  }
+
+  @media (max-width: 1024px) {
+    .spec-grid,
+    .data-grid {
+      grid-template-columns: 1fr;
+      gap: var(--s-6);
+    }
+  }
+</style>

@@ -59,14 +59,18 @@ const others = site.services.filter((s) => s.slug !== service.slug);
           </div>
         )}
 
-        <nav class="others" aria-label="Other services">
-          {copy.otherServicesLabel && <p class="eyebrow">{copy.otherServicesLabel}</p>}
-          <ul>
-            {others.map((other) => (
-              <li><a href={serviceHref(other.slug)}>{other.name}</a></li>
-            ))}
-          </ul>
-        </nav>
+        {/* Only when there is somewhere else to go. With one service on the
+            site this rendered a labelled heading above an empty list. */}
+        {others.length > 0 && (
+          <nav class="others" aria-label="Other services">
+            {copy.otherServicesLabel && <p class="eyebrow">{copy.otherServicesLabel}</p>}
+            <ul>
+              {others.map((other) => (
+                <li><a href={serviceHref(other.slug)}>{other.name}</a></li>
+              ))}
+            </ul>
+          </nav>
+        )}
       </aside>
       </div>
 

@@ -259,6 +259,150 @@ export interface ServicesCopy extends PageCopy {
   otherServicesLabel?: string;
 }
 
+/**
+ * One slice of the PAYE scale. `to: null` is the top, open-ended band.
+ *
+ * Mirrors PayeBand in the product's own compliance engine, deliberately: the
+ * calculator on this site and the payroll in the software must never disagree
+ * about what someone owes.
+ */
+export interface PayeBand {
+  from: number;
+  to: number | null;
+  rate: number;
+}
+
+/**
+ * Zambian statutory rates. Read by the calculator and by the guides, so a rate
+ * appears once and the prose cannot drift from the arithmetic.
+ */
+export interface Statutory {
+  /** ISO date this scale took effect. */
+  effectiveFrom: string;
+  authority: string;
+  paye: { label: string; name: string; bands: PayeBand[] };
+  napsa: {
+    label: string;
+    name: string;
+    employeeRate: number;
+    employerRate: number;
+    /** Monthly pensionable-earnings ceiling. */
+    ceiling: number;
+    portal?: string;
+  };
+  nhima: {
+    label: string;
+    name: string;
+    employeeRate: number;
+    employerRate: number;
+    portal?: string;
+  };
+  workingDaysPerMonth: number;
+  overtimeHoursPerMonth: number;
+  overtimeWeekdayRate: number;
+  overtimeRestDayRate: number;
+  employmentAct: string;
+}
+
+/** Every label on the public calculator. Markup carries none of them (FR-1). */
+export interface CalculatorCopy {
+  fields: Record<"basic" | "allowances", { label: string; hint?: string }>;
+  results: {
+    heading: string;
+    gross: string;
+    paye: string;
+    napsa: string;
+    nhima: string;
+    deductions: string;
+    net: string;
+    employerHeading: string;
+    napsaEmployer: string;
+    nhimaEmployer: string;
+    employerTotal: string;
+    bandBreakdown: string;
+    ceilingNote: string;
+  };
+  ratesHeading: string;
+  bandsHeading: string;
+  bandsColumns: { band: string; rate: string };
+  contributionsHeading: string;
+  contributionsColumns: {
+    item: string;
+    employee: string;
+    employer: string;
+    base: string;
+  };
+  workedHeading: string;
+  noScript: string;
+  disclaimer: string;
+  cta?: { heading: string; body: string };
+}
+
+/**
+ * /pricing. The price itself is not here — it lives on the product, so the
+ * homepage and this page cannot quote different figures.
+ */
+export interface Pricing {
+  termLabel: string;
+  term: string;
+  /**
+   * Employees the licence covers. Null while it is unconfirmed, and the page
+   * prints nothing rather than guessing: the software has 50, 100 and
+   * unlimited editions and the site quotes one price.
+   */
+  headcount?: string | null;
+  headcountLabel?: string;
+  paymentNote: string;
+  trial: { heading: string; body: string[] };
+  buy: { heading: string; steps: string[] };
+  notes?: { heading: string; items: string[] };
+  disclaimer: string;
+}
+
+/** /requirements. Figures come from the product's user guide, not estimates. */
+export interface Requirements {
+  specsHeading: string;
+  specsColumns: { item: string; detail: string };
+  specs: Array<{ item: string; detail: string }>;
+  installHeading: string;
+  installSteps: string[];
+  dataHeading: string;
+  /** `**bold**` is honoured; nothing else is. */
+  dataBody: string[];
+  backupHeading: string;
+  backupBody: string[];
+}
+
+/** /support. Channels are read from `contact` rather than repeated here. */
+export interface Support {
+  channelsHeading: string;
+  channelsNote: string;
+  coveredHeading: string;
+  covered: string[];
+  coveredNote?: string;
+  licenceHeading: string;
+  licenceItems: Array<{ q: string; a: string }>;
+  guideHeading: string;
+  guideBody: string;
+}
+
+/**
+ * /releases. Only versions that can actually be downloaded belong in `items`
+ * — the page marks whichever matches the product's download version as
+ * current, so an entry for a build that was never uploaded would advertise a
+ * release nobody can get.
+ */
+export interface Releases {
+  currentLabel: string;
+  items: Array<{
+    version: string;
+    /** ISO date. */
+    date: string;
+    summary: string;
+    changes: string[];
+  }>;
+}
+
 export interface SiteConfig {
   brand: {
     /**
@@ -336,6 +480,18 @@ export interface SiteConfig {
     products?: PageCopy;
     /** Copy for /features, the screen-by-screen walkthrough route. */
     features?: FeaturesCopy;
+    /** Copy for /paye-calculator. */
+    calculator?: PageCopy;
+    /** Copy for /guides and its index. */
+    guides?: PageCopy;
+    /** Copy for /pricing. */
+    pricing?: PageCopy;
+    /** Copy for /requirements. */
+    requirements?: PageCopy;
+    /** Copy for /support. */
+    support?: PageCopy;
+    /** Copy for /releases. */
+    releases?: PageCopy;
     services?: ServicesCopy;
     about?: AboutCopy;
     contact?: PageCopy;
@@ -422,6 +578,25 @@ export interface SiteConfig {
 
   products: Product[];
   services: Service[];
+
+  /**
+   * Zambian statutory rates. Optional because a variant in another trade has
+   * no use for them; the calculator route renders nothing without it.
+   */
+  statutory?: Statutory;
+
+  /** Labels for the public calculator. */
+  calculator?: CalculatorCopy;
+
+  /*
+   * The single-product support pages. All optional, because a variant selling
+   * services rather than a licensed application has no use for any of them —
+   * each route renders nothing when its block is absent.
+   */
+  pricing?: Pricing;
+  requirements?: Requirements;
+  support?: Support;
+  releases?: Releases;
 
   proof: {
     /**

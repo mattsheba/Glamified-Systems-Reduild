@@ -58,9 +58,17 @@ To start a new variant, copy `site.config.js`, edit it, and drop the images into
 | `verify:config` | Required fields present, WhatsApp number well-formed, every referenced image exists on disk, accent contrast measured |
 | `verify:engine` | No copy or image path baked into markup |
 | `astro check` | Components match the `SiteConfig` contract in `src/types.ts` |
+| `verify:sitemap` | Every indexable built page is in the sitemap, every sitemap URL matches that page's own canonical, and no `noindex` page is advertised |
+| `verify:downloads` | The installer and user guide URLs the site offers actually resolve |
 
-All three run on `npm run build`. A broken config fails loudly at build time
-rather than rendering the word `undefined` to a client.
+All five run on `npm run build`, in that order — the last two need `dist/`, so
+they run after `astro build`. A broken config fails loudly at build time rather
+than rendering the word `undefined` to a client.
+
+`verify:downloads` reaches the network. It retries a connection failure twice
+before giving up, because a slow link once reported a file as missing that was
+present and serving 200. An HTTP status is trusted immediately and never
+retried, so a genuine 404 still fails the build.
 
 ## Layout
 
@@ -107,11 +115,45 @@ variants with several products.
 | `/features` | The whole application, screen by screen, from `products[0].walkthrough` |
 | `/products` | Product listing. **Force-redirected to `/`** while `productOnHome` is set |
 | `/products/[slug]` | One page per product, generated from config. **Force-redirected to `/`**, and `noindex`, while `productOnHome` is set |
-| `/services` | Both services |
+| `/pricing` | What the licence costs, what it includes, the trial, and how buying works. Price is read from the product, so there is one figure on the site |
+| `/paye-calculator` | PAYE, NAPSA and NHIMA on one salary, with the bands and the working shown. Renders a full worked example server-side, so it still answers with JavaScript off |
+| `/guides` | The payroll guides, listed |
+| `/guides/[slug]` | One long-form guide, its figures parameterised by `config.statutory` |
+| `/requirements` | What it runs on, how it installs, where the data lives, and how backup and restore work |
+| `/support` | How to reach a person, what support covers, licence keys and reinstalls, the user guide |
+| `/releases` | Version history. The current release is derived from the download version, never typed |
+| `/services` | The services hub — one service while this site sells one |
 | `/services/[slug]` | One page per service — full detail, generated from config |
-| `/about` | Who we are, how we work, proof |
+| `/about` | **About GlamifiedHR.** The product leads; Glamified Systems is introduced as the company that builds it |
 | `/contact` | Contact details and the qualifying form |
 | `/privacy` `/terms` `/refund` | Legal, parameterised by config |
+
+Everything from `/pricing` down to `/releases` is conditional on its own config
+block (`pricing`, `statutory`, `requirements`, `support`, `releases`). A variant
+that carries none of them builds a site without those routes, and without the
+navigation, footer and sitemap entries that point at them.
+
+## Moving to a new domain
+
+The site is served from **glamifiedsystems.com** until a product domain is
+bought. The move is deliberately close to a one-line change:
+
+1. Change `seo.domain` in `site.config.js`. That single value feeds the Astro
+   `site` setting, every canonical, the sitemap, `robots.txt` and the
+   structured data — nothing else in the repository hard-codes the site origin.
+2. Decide about **`downloads.baseUrl`**. The installer and guide are served from
+   `downloads.glamifiedsystems.com` (Cloudflare R2). It can stay there after the
+   move, but if it does, note that the HSTS `includeSubDomains` comment in
+   `public/_headers` no longer describes a subdomain of this site.
+3. Set **`SITE_URL`** in the Netlify environment to the new origin, for the
+   payment function's return URLs.
+4. Re-verify the site in Bing and Google Search Console, and replace the two
+   verification files in `public/` — `BingSiteAuth.xml` and the IndexNow key
+   file — with ones issued for the new domain. The IndexNow plugin pings with
+   the key named by that file, so a stale one makes every ping fail silently.
+5. Add 301s from the old domain to the new one at the host, and keep them. The
+   redirect rules in `public/_redirects` are all site-relative and carry over
+   unchanged.
 
 ## Navigation
 
@@ -147,19 +189,41 @@ should never break a variant's build. The set lives in `src/components/Icon.astr
 
 These are real and tracked, not oversights:
 
-- **Product copy is real; testimonials are not.** Product descriptions come from
-  each product's own documentation. The testimonial still reads `PLACEHOLDER —`,
-  as do the logo and screenshots.
+- **No testimonial is a GlamifiedHR quote.** The three in `proof.testimonials`
+  are real, named clients in their own words, but every one is about company
+  registration, monthly statutory filing or branding — engagements this site no
+  longer sells. They are framed as evidence that the statutory side is handled
+  rather than as product testimonials, and `using:` says what each client
+  actually bought. On a single-product site they still pull towards the software
+  house the rebuild removed. **Decide one of:** replace them as payroll clients
+  agree to be quoted, re-head the section so it does not read as product praise,
+  or drop the section and keep the client logo strip, which is factual on its
+  own. Do not reword a client's quote to fit the positioning.
 - **Phone number conflict.** The playbook says +260 977 669 883; the GlamifiedHR
   user instructions say +260 77 002 9596. Config carries the first. Confirm which
   is right before launch.
 - **Legal pages are unreviewed templates.** They carry a visible warning banner.
   Have a lawyer check them before any client site goes live.
-- **`/api/enquiry` does not exist yet.** The form posts to it and degrades
-  handled by Netlify Forms: the build bot registers the form from the
-  deployed HTML, so there is no function to write or maintain.
-- **Accent on dark bands is derived, not chosen.** `#0F6E5C` measures 2.64:1 on
-  the inverse ground, which fails WCAG, so `--accent-inverse` lightens it via
-  `color-mix`. Worth a designer's eye before launch.
+- **Online payment is switched off.** `payments.enabled` is `false`, so no page
+  renders a buy button and `/pricing` describes the real flow instead: you ask,
+  we invoice, the licence key is emailed when the payment clears. The Lenco
+  function and `/payment-success` are wired and ready for the day it is turned
+  on.
+- **`pricing.headcount` is unset, on purpose.** The software has 50, 100 and
+  unlimited-employee editions; the site quotes one price of K5,000. Until it is
+  confirmed which edition that buys, `/pricing` publishes no headcount limit —
+  guessing it either turns away a business that could have bought or sells one a
+  licence that stops short. Set the field and the page prints it.
+- **The product is at 1.3.0; the site sells 1.2.0.** That is correct rather than
+  stale: `GlamifiedHR-Setup-1.3.0.zip` has never been uploaded, and
+  `downloads.glamifiedsystems.com` returns 404 for it, so the site advertises
+  what exists. To ship it: upload the installer and the rebuilt guide, point
+  `products[0].download` and `guide` at 1.3.0, and add its entry to
+  `releases.items` — its changes are listed in the config comment above that
+  block.
+- **Accent on dark bands is derived, not chosen.** The configured accent
+  (`#006C90`) measures 2.70:1 on the inverse ground, which fails WCAG, so
+  `--accent-inverse` lightens it via `color-mix`. `verify:config` prints this as
+  an expected note rather than an error. Worth a designer's eye before launch.
 - **No a11y audit run yet.** Phase 04 of the playbook calls for `a11y-audit` and
   `env-secrets-manager`; neither has been run.

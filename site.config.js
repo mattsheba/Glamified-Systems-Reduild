@@ -12,11 +12,13 @@
  * ONE PRODUCT, ON THE HOMEPAGE.
  *
  * This site sold three products and five services. Payroll enquiries had dried
- * up, so it now sells GlamifiedHR and the two things that sit either side of it:
- * running the payroll for you, and building a system you do not have yet.
+ * up, so it now sells GlamifiedHR and the one service that is the same work
+ * done for you: running the payroll on your behalf.
  * GlamifiedSales and GlamifiedFleet, IT support, business registration and
- * graphic design were removed from the site in November 2026 — they are in the
- * git history if any of them comes back.
+ * graphic design were removed from the site in November 2026, and custom
+ * software development followed them — a single-product site that also offers
+ * to build anything reads as a software house, which is what this rebuild was
+ * meant to stop. They are all in the git history if any of them comes back.
  *
  * `productOnHome` below is what makes the homepage the product page. Read its
  * comment before adding a second product.
@@ -54,7 +56,7 @@ export default {
      * product, and the product is what the site sells.
      */
     description:
-      "Glamified Systems is a software company in Lusaka, Zambia. It makes GlamifiedHR, payroll and HR software for Zambian employers: PAYE, NAPSA and NHIMA calculated to current rules, statutory returns ready to file, and terminal benefits worked out under the Employment Code Act. GlamifiedHR runs offline on your own computer. The company also runs payroll on behalf of businesses that would rather outsource it, and builds custom business systems to order.",
+      "Glamified Systems is a software company in Lusaka, Zambia. It makes GlamifiedHR, payroll and HR software for Zambian employers: PAYE, NAPSA and NHIMA calculated to current rules, statutory returns ready to file, and terminal benefits worked out under the Employment Code Act. GlamifiedHR runs offline on your own computer. The company also runs payroll on behalf of businesses that would rather outsource it.",
   },
 
   contact: {
@@ -97,7 +99,33 @@ export default {
   // logo already links there.
   nav: [
     { label: "What it does", href: "/features" },
-    { label: "Services", href: "/services", childrenFrom: "services" },
+    { label: "Pricing", href: "/pricing" },
+    { label: "PAYE calculator", href: "/paye-calculator" },
+    /*
+     * The reference pages, grouped. Each one earns its own URL — the guides and
+     * the calculator are found by people who have never heard of the product,
+     * and requirements and support are what a buyer checks before and after
+     * paying — but five more top-level entries would not fit the header.
+     *
+     * The parent links to the guides rather than being inert: a dropdown whose
+     * label goes nowhere is a dead end on a touch screen, where there is no
+     * hover to open it.
+     */
+    {
+      label: "Resources",
+      href: "/guides",
+      children: [
+        { label: "Payroll guides", href: "/guides" },
+        { label: "System requirements", href: "/requirements" },
+        { label: "Support", href: "/support" },
+        { label: "Release notes", href: "/releases" },
+      ],
+    },
+    /*
+     * One service, so no dropdown: `childrenFrom: "services"` would expand to a
+     * menu holding a single entry, which is clutter rather than navigation.
+     */
+    { label: "Services", href: "/services" },
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
   ],
@@ -165,33 +193,126 @@ export default {
       endHeading: "See it on your own payroll",
     },
 
+    calculator: {
+      heading: "Zambian PAYE, NAPSA and NHIMA calculator",
+      seo: {
+        title: "PAYE Calculator Zambia — NAPSA & NHIMA | GlamifiedHR",
+        description:
+          "Work out PAYE, NAPSA and NHIMA on a Zambian salary. Current ZRA bands, the NAPSA ceiling and employer contributions, with the arithmetic shown.",
+      },
+      standfirst:
+        "Put in a basic salary and what is paid on top of it. This runs the same calculation GlamifiedHR runs on a payroll of three hundred, and shows the working.",
+    },
+
+    guides: {
+      heading: "Payroll guides",
+      seo: {
+        title: "Zambian Payroll Guides — PAYE, NAPSA, NHIMA, Terminal Benefits",
+        description:
+          "Plain guides to running payroll in Zambia: how PAYE, NAPSA and NHIMA are calculated, what a leaver is owed under the Employment Code Act, and filing the returns.",
+      },
+      standfirst:
+        "What we had to get right to build the software, written down. No sign-up, no email address, no sales call at the end of it.",
+    },
+
+    pricing: {
+      heading: "Pricing",
+      seo: {
+        title: "GlamifiedHR Pricing — Payroll Software Price in Zambia",
+        description:
+          "What GlamifiedHR costs: a five-year licence at K5,000, including installation, migration of your records, staff training and the user guide. Free 30-day trial first.",
+      },
+      standfirst:
+        "One price, paid once, for a five-year licence. The trial comes first, so you decide on your own payroll rather than on a demonstration.",
+    },
+
+    requirements: {
+      /*
+       * Short, because this heading is also the footer and menu label. The
+       * install half of the page is headed by `requirements.installHeading`,
+       * and the title tag below carries both words for search.
+       */
+      heading: "System requirements",
+      seo: {
+        title: "GlamifiedHR System Requirements & Installation | Windows",
+        description:
+          "What a Windows PC needs to run GlamifiedHR, how to install it, where your data is kept, and how backup and restore work.",
+      },
+      standfirst:
+        "GlamifiedHR is a Windows desktop application. This is what it needs, how it installs, and where your records are kept.",
+    },
+
+    support: {
+      heading: "Support",
+      seo: {
+        title: "GlamifiedHR Support — Help with Zambian Payroll Software",
+        description:
+          "How to get help with GlamifiedHR: WhatsApp, phone and email, the user guide, and what to do about a licence key or a reinstall.",
+      },
+      standfirst:
+        "Support comes from the people who wrote the software. WhatsApp is the fastest way to reach us.",
+    },
+
+    releases: {
+      heading: "Release notes",
+      seo: {
+        title: "GlamifiedHR Release Notes — Version History",
+        description:
+          "What changed in each release of GlamifiedHR, newest first, with the version currently available to download.",
+      },
+      standfirst:
+        "What changed in each release, newest first. Statutory updates are part of the licence, so a rate change arrives as an update rather than a new purchase.",
+    },
+
+    /*
+     * The listing route, and the one service it lists, must not compete.
+     *
+     * This heading was briefly "Payroll outsourcing" — the same words as the
+     * service's own detail page, which gave two URLs one title and set them
+     * against each other for one phrase. The listing stays the generic hub and
+     * the detail page keeps the search term; `services[0].seo` carries it.
+     */
     services: {
       heading: "Services",
       seo: {
-        title: "Payroll Outsourcing & Custom Software in Lusaka, Zambia",
+        title: "Services | GlamifiedHR by Glamified Systems, Lusaka",
         description:
-          "Two services from Glamified Systems in Lusaka: outsourced payroll run by us each month, and custom business systems built to a written scope and a fixed price.",
+          "What Glamified Systems does besides licensing GlamifiedHR: running your payroll for you each month, on the same software.",
       },
       standfirst:
-        "Not every business wants to run its own payroll, and not every problem has a product. These two services sit either side of GlamifiedHR.",
+        "Not every business wants to run its own payroll. There is one service, and it is the same software run for you.",
       forWhoLabel: "Who this is for",
       otherServicesLabel: "Other services",
     },
 
+    /*
+     * ABOUT THE PRODUCT, NOT THE COMPANY.
+     *
+     * This page used to be headed "About Glamified Systems" and opened with the
+     * company. On a single-product site that is the page that most makes the
+     * site read as a software house: a visitor arriving from "payroll software
+     * Zambia" wants to know what GlamifiedHR is and who stands behind it, in
+     * that order.
+     *
+     * So the product leads and the company is introduced as its maker — which
+     * is also the honest reading while the site is served from
+     * glamifiedsystems.com. `brand.company` and `legal.registeredName` carry
+     * the company into the structured data, the footer and the legal pages.
+     */
     about: {
-      heading: "About Glamified Systems",
+      heading: "About GlamifiedHR",
       seo: {
-        title: "About Glamified Systems | Payroll Software Company, Lusaka",
+        title: "About GlamifiedHR | Zambian Payroll Software, Built in Lusaka",
         description:
-          "Glamified Systems is a Lusaka software company. It builds GlamifiedHR, payroll and HR software for Zambian employers, and runs payroll on behalf of businesses.",
+          "GlamifiedHR is payroll and HR software for Zambian employers, built in Lusaka by Glamified Systems. Why it runs offline, how it handles PAYE, NAPSA, NHIMA and the Employment Code Act.",
       },
       standfirst:
-        "A Lusaka software company, building payroll software around the way Zambian employers actually work.",
+        "Payroll software built around Zambian rules and the way Zambian employers actually work — not adapted to them afterwards.",
       body: [
-        "Glamified Systems is a Zambian software company based in Lusaka. We build **GlamifiedHR**, payroll and HR software for Zambian employers, and we support the businesses that run it.",
-        "Our approach is simple: **understand the business first, then build the technology around it.**",
-        "Payroll in Zambia is not a generic problem. PAYE bands change, the NAPSA ceiling changes each year, NHIMA takes a percentage of basic pay, the portals want files in their own formats, and the Employment Code Act decides what someone is owed when they leave. Software written elsewhere treats all of that as a configuration exercise. We treat it as the job.",
-        "Around the product we run payroll on behalf of businesses that would rather outsource it, and we build custom business systems where no product fits. Both are done by the same people who write the software.",
+        "**GlamifiedHR** is payroll and HR software for Zambian employers. It holds your staff records, leave and attendance, runs the monthly payroll with PAYE, NAPSA and NHIMA worked out to current rules, and produces the return files the ZRA, NAPSA and NHIMA portals expect. It installs on a computer in your office and runs with no internet connection.",
+        "Payroll in Zambia is not a generic problem. PAYE bands change, the NAPSA ceiling changes each year, NHIMA takes a percentage of basic pay rather than gross, the portals want files in their own formats, and the Employment Code Act decides what someone is owed when they leave. Software written elsewhere treats all of that as a configuration exercise. **GlamifiedHR treats it as the job.**",
+        "It is built by **Glamified Systems**, a Zambian software company based in Lusaka. The same people write the software, install it, train your staff on it and answer the phone afterwards — support does not go through a reseller.",
+        "For businesses that would rather not run payroll at all, we also run it on your behalf, on this same software.",
       ],
       sections: [
         {
@@ -209,9 +330,9 @@ export default {
           aside: true,
           body: [
             "GlamifiedHR is a desktop application. It installs on a computer in your office and works with no internet connection at all.",
-            "That is a deliberate decision rather than a limitation. Payroll has a deadline, and a system that stops when the line goes down is not a system. Your payroll data also stays in the building, which is what most finance managers ask about first.",
+            "That is a deliberate decision rather than a limitation. Payroll has a deadline, and a system that stops when the line goes down is not a system.",
             "Backup and restore is built in: a backup is a single file, so it goes on a memory stick or into Google Drive like any other document, and it keeps working even after a licence has expired.",
-            "**We build the software, we install it, we train your people on it, and we answer the phone afterwards.**",
+            "**Your records are never on somebody else's server.** They sit in a single database file on your own machine, which is what most finance managers ask about first.",
           ],
         },
       ],
@@ -261,6 +382,335 @@ export default {
       standfirst:
         "WhatsApp is fastest. For anything larger, the form below reaches us directly.",
     },
+  },
+
+  /**
+   * Zambian statutory rates, in one place.
+   *
+   * MIRRORS THE SOFTWARE. Every figure here matches
+   * `Glamified HR V3/src/lib/zambian-compliance.ts`, which is what actually
+   * runs a customer's payroll. The calculator on /paye-calculator and the
+   * prose in the guides both read from here, so the site cannot quote a rate
+   * the product does not use — and a budget change is one edit in each
+   * repository rather than a hunt through paragraphs.
+   *
+   * Bases are not interchangeable, and getting them wrong is the usual way a
+   * payroll calculator is quietly wrong:
+   *   - PAYE   is charged on gross earnings. Neither NAPSA nor NHIMA reduces
+   *            chargeable income (this follows ZRA's own calculator).
+   *   - NAPSA  is 5% + 5% of gross, capped at the monthly earnings ceiling.
+   *   - NHIMA  is 1% + 1% of BASIC salary. Allowances are outside it.
+   */
+  statutory: {
+    /** The date this scale took effect, shown wherever the rates are quoted. */
+    effectiveFrom: "2026-01-01",
+    authority: "Zambia Revenue Authority",
+    paye: {
+      label: "PAYE",
+      name: "Pay As You Earn",
+      /** Charged on gross earnings, band by band. `to: null` is the top band. */
+      bands: [
+        { from: 0, to: 5100, rate: 0 },
+        { from: 5100, to: 7100, rate: 0.2 },
+        { from: 7100, to: 9200, rate: 0.3 },
+        { from: 9200, to: null, rate: 0.37 },
+      ],
+    },
+    napsa: {
+      label: "NAPSA",
+      name: "National Pension Scheme Authority",
+      employeeRate: 0.05,
+      employerRate: 0.05,
+      /** Monthly pensionable-earnings ceiling. Changes yearly. */
+      ceiling: 37236,
+      portal: "NAPSA iCare",
+    },
+    nhima: {
+      label: "NHIMA",
+      name: "National Health Insurance Management Authority",
+      employeeRate: 0.01,
+      employerRate: 0.01,
+      portal: "eNHIMA",
+    },
+    /*
+     * Used for a day's pay in the terminal-benefits guide, where accrued leave
+     * is paid out at basic ÷ working days.
+     *
+     * The overtime rates that used to sit here were removed: nothing read them.
+     * They were put in for an overtime guide that was never written, and a rate
+     * published on the site but used by nothing is a rate that silently goes
+     * stale. Add them back with the guide, not before.
+     */
+    workingDaysPerMonth: 22,
+    /** Named in the terminal-benefits guide. */
+    employmentAct: "the Employment Code Act No. 3 of 2019",
+  },
+
+  /**
+   * The public PAYE / NAPSA / NHIMA calculator.
+   *
+   * It runs the same arithmetic as GlamifiedHR, from the rates above. Every
+   * label is here rather than in the template (FR-1), and the page renders the
+   * rate table and a worked example server-side so it still tells a visitor
+   * something with JavaScript off (NFR-9).
+   */
+  calculator: {
+    fields: {
+      basic: {
+        label: "Basic salary (K per month)",
+        hint: "Before any deductions. NHIMA is charged on this figure alone.",
+      },
+      allowances: {
+        label: "Allowances (K per month)",
+        hint: "Housing, transport, lunch, and anything else paid on top of basic.",
+      },
+    },
+    results: {
+      heading: "This month",
+      gross: "Gross pay",
+      paye: "PAYE",
+      napsa: "NAPSA (employee)",
+      nhima: "NHIMA (employee)",
+      deductions: "Total deductions",
+      net: "Net pay",
+      employerHeading: "What it costs the employer",
+      napsaEmployer: "NAPSA (employer)",
+      nhimaEmployer: "NHIMA (employer)",
+      employerTotal: "Total cost of employment",
+      bandBreakdown: "How the PAYE is made up",
+      ceilingNote: "Gross is above the NAPSA ceiling, so NAPSA is capped.",
+    },
+    ratesHeading: "The rates it uses",
+    bandsHeading: "PAYE bands",
+    bandsColumns: { band: "Monthly income", rate: "Rate" },
+    contributionsHeading: "Contributions",
+    contributionsColumns: {
+      item: "Deduction",
+      employee: "Employee",
+      employer: "Employer",
+      base: "Charged on",
+    },
+    noScript: "The calculator needs JavaScript. The rates and the worked example below do not, and they are the same figures it uses.",
+    disclaimer:
+      "This calculator is for guidance. It uses the rates published above and the same arithmetic as GlamifiedHR, but your own circumstances may differ — confirm anything you are about to file with the Zambia Revenue Authority, NAPSA or NHIMA.",
+    cta: {
+      heading: "This is one employee. GlamifiedHR does the whole payroll.",
+      body: "The same calculation, run for every member of staff, with payslips, the statutory returns and the portal files at the end of it.",
+    },
+  },
+
+  /**
+   * /pricing — the one licence this site sells.
+   *
+   * The price and the term come from `products[0].price`, so there is one
+   * figure on the site and this page cannot disagree with the homepage. What
+   * the licence includes comes from `licenceIncludes` for the same reason.
+   *
+   * NOTHING IS PROMISED HERE THAT IS NOT PROMISED ELSEWHERE. Online card and
+   * mobile-money checkout is switched off (`payments.enabled`), so this page
+   * does not offer a buy button — it says how buying actually works today:
+   * you ask, we invoice, the key is emailed when the payment clears. That is
+   * the flow the refund policy and /payment-success already describe.
+   */
+  pricing: {
+    termLabel: "Licence term",
+    term: "Five years from the date your licence key is issued",
+    /*
+     * HEADCOUNT IS DELIBERATELY ABSENT.
+     *
+     * The software has three editions — 50, 100 and unlimited employees — and
+     * this site quotes a single price. Until it is confirmed which edition
+     * K5,000 buys, nothing is published about the limit: guessing it either
+     * turns away a 90-employee business that could have bought, or sells one a
+     * licence that stops at 50 and discovers it after paying. Set this and the
+     * page prints it; leave it null and the page stays quiet.
+     */
+    headcount: null,
+    headcountLabel: "Employees covered",
+    paymentNote:
+      "One payment, not a monthly subscription. The price covers installation, migration of your existing records from spreadsheets, staff training and the user guide.",
+
+    trial: {
+      heading: "Try it on your own payroll first",
+      body: [
+        "GlamifiedHR runs free for 30 days from installation, for up to 50 employees, with every feature switched on. It is not a demonstration or a sandbox: you install it, load your own staff and run your own month.",
+        "Nothing is taken at sign-up, because there is no sign-up. Download it, install it, and decide at the end of the month.",
+      ],
+    },
+
+    buy: {
+      heading: "How to buy",
+      steps: [
+        "Tell us on WhatsApp, by phone or by email how many staff you have.",
+        "We send an invoice to the business that will hold the licence.",
+        "Once the payment clears we email your licence key, usually the same working day.",
+        "You enter the key in the application and it stops asking.",
+      ],
+    },
+
+    /*
+     * The one thing people assume about a time-limited licence and get wrong,
+     * stated plainly. Taken from the activation ledger's documented behaviour:
+     * reactivating re-issues the ORIGINAL expiry rather than starting a new
+     * term, which is what stops a reinstall being read as a renewal.
+     */
+    notes: {
+      heading: "Worth knowing",
+      items: [
+        "Reinstalling, or restoring a backup, does not start your five years again — the original expiry date is kept.",
+        "Updates are part of the licence. When PAYE bands or the NAPSA ceiling change, that arrives as an update rather than a new purchase.",
+        "A backup you have already taken keeps working after a licence expires, so your records are never locked inside the software.",
+      ],
+    },
+
+    disclaimer:
+      "Ask us for the current licence terms in writing before you buy. The terms of service and the refund policy on this site are the ones that apply.",
+  },
+
+  /**
+   * /requirements — what it runs on, how it installs, where the data lives.
+   *
+   * EVERY FIGURE HERE IS FROM THE PRODUCT'S OWN USER GUIDE
+   * (`Glamified HR V3/docs/user-guide`), sections 02 and 24. The disk figure,
+   * the database path and the restore caveats are quoted from it rather than
+   * estimated — a requirements page that guesses is worse than none, because
+   * it is the page someone checks before buying a machine.
+   */
+  requirements: {
+    specsHeading: "What it needs",
+    specsColumns: { item: "Requirement", detail: "Details" },
+    specs: [
+      {
+        item: "Operating system",
+        detail: "Windows 10 or Windows 11, 64-bit",
+      },
+      { item: "Disk space", detail: "About 400 MB free" },
+      {
+        item: "Internet",
+        detail:
+          "Not required to run the application. Needed once, to activate your licence key.",
+      },
+      {
+        item: "Printer",
+        detail:
+          "Any Windows printer, for payslips and reports. Not required — they can be saved as PDF instead.",
+      },
+    ],
+
+    installHeading: "Installing it",
+    installSteps: [
+      "Download GlamifiedHR for Windows, then unzip it and run the setup program inside.",
+      "If Windows shows a blue “Windows protected your PC” screen, choose More info, then Run anyway. That warning appears for all independently distributed Windows software and is expected here.",
+      "Follow the setup wizard. You can choose the install folder; a desktop shortcut and a Start Menu entry are created for you.",
+      "GlamifiedHR launches when setup finishes. On first launch it takes a few seconds to start its internal engine, then asks you to register the first administrator account.",
+    ],
+
+    dataHeading: "Where your records are kept",
+    dataBody: [
+      "Everything you enter lives in a single database file at **%APPDATA%\\GlamifiedHR\\db\\custom.db**, kept separately from the program itself.",
+      "Because of that, reinstalling or upgrading GlamifiedHR never touches your data. When an upgrade adds new fields, they are added to your existing database automatically the first time it starts.",
+    ],
+
+    backupHeading: "Backup and restore",
+    backupBody: [
+      "**From inside the application.** Settings → Backup & Restore writes a copy of the whole database — employees, payroll, settings — to a folder you choose, without closing the program. Restoring from the same screen checks the file first, keeps your current data as a safety copy, then replaces the live database and asks everyone to sign in again.",
+      "**Keep the copies somewhere else.** A USB drive, a network folder, or a synced cloud folder such as Google Drive, OneDrive or Dropbox. A backup sitting on the same computer does not survive theft, fire or a failed disk.",
+      "**Copying the file by hand** works too, but close the application first, and copy **custom.db** together with **custom.db-wal** if one is there. To restore that way, delete **custom.db-wal** and **custom.db-shm** before putting your saved file back as **custom.db** — a leftover file from the old database damages the restored one. The in-app backup avoids all of this.",
+      "The Full Data Export report gives you a spreadsheet copy of your records. It is useful for inspection, but it is not a restorable backup.",
+    ],
+  },
+
+  /**
+   * /support — how to reach a person, and the two things people write in about.
+   *
+   * The channels are read from `contact`, so they are not repeated here. This
+   * block holds only what support covers and the licence-key answers, which
+   * are drawn from the terms of service and from the product's documented
+   * activation behaviour.
+   */
+  support: {
+    channelsHeading: "Reaching us",
+    channelsNote:
+      "WhatsApp is fastest and reaches the same people as the phone. Email is best when you need to send a file, such as a report that looks wrong.",
+
+    coveredHeading: "What support covers",
+    covered: [
+      "Installing GlamifiedHR, and moving your records in from spreadsheets",
+      "Training your staff on it, and a handover document",
+      "Questions about how the software calculates something",
+      "Anything the software does that this site says it does not do",
+      "Updates when statutory rates change",
+    ],
+    coveredNote:
+      "Support comes from the people who wrote the software, not a reseller or a call centre.",
+
+    licenceHeading: "Licence keys and reinstalls",
+    licenceItems: [
+      {
+        q: "I have paid but have no key yet",
+        a: "Keys are emailed once the payment clears, usually the same working day. If a working day has passed, send us the payment reference on WhatsApp and we will look it up.",
+      },
+      {
+        q: "I am reinstalling on the same computer",
+        a: "Use the same key. Reactivating keeps your original expiry date, so a reinstall does not consume or renew your term.",
+      },
+      {
+        q: "I need to move it to a different computer",
+        a: "Talk to us before you do. A key is activated against the machine it is installed on, so a move has to be handled at our end rather than by re-entering the key.",
+      },
+      {
+        q: "I have lost my key",
+        a: "We can reissue it. The licence belongs to the business named on the invoice, so ask from an address or number we already hold for you.",
+      },
+    ],
+
+    guideHeading: "The user guide",
+    guideBody:
+      "The full user guide is a PDF covering every screen, from the dashboard to the statutory returns. It is written for the person who will actually run the payroll.",
+  },
+
+  /**
+   * /releases — version history.
+   *
+   * ONLY VERSIONS THAT ARE ACTUALLY DOWNLOADABLE GO HERE. The entries are
+   * drawn from the product repository's own history, and the current release
+   * is whichever `products[0].download.version` points at — so this page
+   * cannot quietly advertise a build nobody can get.
+   *
+   * NOT LISTED, DELIBERATELY: 1.3.0. It was built on 13 October 2026 (leave
+   * allowances taken per type, unpaid absence taken out of pay earned rather
+   * than net pay, staff paid only from their start date, a Sunday public
+   * holiday kept on the Monday after, the licence counting only active
+   * employees, and a number of validation and security fixes) but the
+   * installer has never been uploaded — downloads.glamifiedsystems.com returns
+   * 404 for it. Upload it, point `products[0].download` at 1.3.0, and add its
+   * entry here. Until then the site sells what exists.
+   */
+  releases: {
+    currentLabel: "Current release",
+    items: [
+      {
+        version: "1.2.0",
+        date: "2026-10-03",
+        summary:
+          "Leave counted the way the Employment Code Act counts it, and a warning before a month is closed too early.",
+        changes: [
+          "Leave is counted in working days rather than calendar days, so a weekend inside a leave request no longer comes off the balance.",
+          "Overtime can be paid at an hourly rate. It is off by default, because most payrolls do not use it.",
+          "A leading zero is kept on phone and bank account numbers imported from Excel, instead of being dropped as a number.",
+          "Running or approving a payroll for a month that has not finished yet now warns first.",
+          "Settings is arranged in tabs, with the long explanations folded away.",
+        ],
+      },
+      {
+        version: "1.1.0",
+        date: "2026-09-16",
+        summary: "Leave accrual that starts when the employee did.",
+        changes: [
+          "Leave accrues from an employee's start date rather than from January, so someone who joined in August is no longer credited with a full year.",
+        ],
+      },
+    ],
   },
 
   /*
@@ -385,7 +835,7 @@ export default {
         // The live site ranks on this URL — keep it working (see public/_redirects).
         previousPath: "/glamifiedhr",
       },
-      price: { amount: 15000, currency: "ZMW", note: "One-time licence. No subscription." },
+      price: { amount: 5000, currency: "ZMW", note: "Five-year licence. No monthly subscription." },
       summary:
         "HR and payroll for Zambian businesses, with NAPSA, PAYE and NHIMA calculated for you.",
       description:
@@ -655,42 +1105,6 @@ export default {
         },
       ],
     },
-
-    {
-      slug: "web-software-development",
-      name: "Custom systems",
-      icon: "code",
-      seo: {
-        title: "Custom Business Software Development in Lusaka, Zambia",
-        description:
-          "Custom business systems, web applications and Android apps built in Lusaka, to a written scope and a fixed price agreed before any code is written.",
-      },
-      summary: "Business systems built to a written scope, where no product fits.",
-      description:
-        "GlamifiedHR started as work like this: a business with a problem no product solved properly, and a system built around how the work is actually done.\n\nA loan management system, a property register, a hospitality system, an asset register or a procurement and approvals workflow are all the same kind of job. So are the web and Android applications that sit alongside them.",
-      forWho:
-        "Businesses that need a system built around how they actually work, rather than bending the work to fit software bought off a shelf.",
-      groups: [
-        {
-          title: "What we build",
-          items: [
-            "Desktop systems that work without internet, like GlamifiedHR",
-            "Web applications",
-            "Android applications",
-            "Integration with systems you already run",
-          ],
-        },
-        {
-          title: "How it runs",
-          items: [
-            "A written scope and a fixed price agreed before any code is written",
-            "Working software shown early and often, not a demo at the end",
-            "Deployment, staff training and a handover document",
-            "Support afterwards, from the people who built it",
-          ],
-        },
-      ],
-    },
   ],
 
   proof: {
@@ -831,7 +1245,7 @@ export default {
       },
       {
         q: "Is this a subscription?",
-        a: "No. You pay once for the licence rather than a monthly fee, and the price covers installation, migration of your existing records, training and the user guide. Ask us for the current licence terms in writing before you buy.",
+        a: "No. K5,000 buys a five-year licence rather than a monthly subscription, and the price covers installation, migration of your existing records, training and the user guide. Ask us for the current licence terms in writing before you buy.",
       },
       {
         q: "Can you move our existing records into the system?",
@@ -888,11 +1302,16 @@ export default {
     standfirst:
       "How many staff you have and how payroll is handled now is enough to start. Prefer WhatsApp for a fast answer.",
     organisationTypes: ["NGO / NFP", "Enterprise", "SME", "Startup", "Other"],
+    /*
+     * "A custom system" was removed with the service itself. Offering it here
+     * would invite the one enquiry the site no longer answers, and the person
+     * sending it would hear nothing useful back.
+     */
     serviceOptions: [
       "GlamifiedHR licence",
       "A demonstration first",
       "Payroll outsourcing",
-      "A custom system",
+      "Something else",
     ],
     /*
      * No longer rendered. Asking for a budget on a first contact is a barrier:

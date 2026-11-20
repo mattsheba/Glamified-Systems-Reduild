@@ -1,0 +1,102 @@
+---
+/**
+ * /guides — the payroll guides, listed.
+ *
+ * Deliberately a short page: its job is to get a reader into a guide, and to
+ * give the three of them one parent URL to be found under.
+ */
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+import StructuredData from "../components/StructuredData.astro";
+import site from "../lib/site";
+import { guides } from "../content/guides";
+
+const copy = site.pages?.guides ?? {};
+const heading = copy.heading ?? "Guides";
+
+const crumbs = [
+  { name: "Home", path: "/" },
+  { name: heading, path: "/guides" },
+];
+---
+
+<Base
+  title={copy.seo?.title ?? `${heading} | ${site.brand.name}`}
+  description={copy.seo?.description ?? copy.standfirst}
+>
+  <StructuredData breadcrumbs={crumbs} />
+
+  <PageHeader heading={heading} standfirst={copy.standfirst} />
+
+  <section class="section mode-light">
+    <div class="container">
+      <ul class="grid guide-list" style="--col: 320px">
+        {guides.map((guide) => (
+          <li class="card guide-card">
+            <h2>
+              <a href={`/guides/${guide.slug}`}>{guide.title}</a>
+            </h2>
+            <p class="muted">{guide.summary}</p>
+          </li>
+        ))}
+      </ul>
+
+      {site.calculator && (
+        <p class="to-calc">
+          <a class="btn btn--ghost" href="/paye-calculator">
+            {site.pages?.calculator?.heading}
+          </a>
+        </p>
+      )}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .guide-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .guide-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    padding: var(--s-5);
+    /* The whole card is the target; the anchor stretches over it below. */
+    position: relative;
+  }
+
+  .guide-card h2 {
+    font-size: var(--t-h3);
+    margin: 0;
+    line-height: 1.25;
+  }
+
+  .guide-card h2 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .guide-card h2 a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .guide-card:hover h2 a {
+    color: var(--accent);
+  }
+
+  .guide-card p {
+    margin: 0;
+    font-size: var(--t-small);
+  }
+
+  .to-calc {
+    margin: var(--s-6) 0 0;
+    max-width: none;
+    text-align: center;
+  }
+</style>

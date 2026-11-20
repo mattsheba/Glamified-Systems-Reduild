@@ -32,3 +32,12 @@
 /glamified-sales          /                            301
 /glamifiedfleet           /                            301
 /glamified-fleet          /                            301
+
+# Custom software development was removed when the site became a single-product
+# GlamifiedHR site. The page ranked and was linked, so it goes to the one
+# service that remains rather than 404ing — a visitor who followed it wanted
+# something built or run for them, and payroll outsourcing is still that
+# conversation. Change this to /contact if the service never comes back.
+/services/web-software-development    /services/payroll-outsourcing    301
+/web-software-development             /services/payroll-outsourcing    301
+/custom-systems                       /services/payroll-outsourcing    301

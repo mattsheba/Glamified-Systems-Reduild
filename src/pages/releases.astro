@@ -1,0 +1,183 @@
+---
+/**
+ * /releases — version history.
+ *
+ * Two jobs. A buyer evaluating a desktop application wants to see that it is
+ * still being worked on, and an existing customer wants to know whether the
+ * copy they are running is the current one. Both are answered by the same list.
+ *
+ * WHICH RELEASE IS CURRENT IS NOT TYPED ANYWHERE. It is whichever entry
+ * matches the version the download actually points at, so the badge cannot
+ * drift from the file being served. An entry with no matching download gets no
+ * badge — and per the config block, entries exist only for builds that have
+ * been uploaded.
+ */
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+import StructuredData from "../components/StructuredData.astro";
+import site, { whatsappHref, downloadHref, soleProduct } from "../lib/site";
+
+const copy = site.pages?.releases ?? {};
+const heading = copy.heading ?? "Release notes";
+const r = site.releases;
+
+const product = soleProduct();
+const download = product ? downloadHref(product) : null;
+const current = product?.download?.version;
+const wa = whatsappHref();
+
+const when = (iso: string) =>
+  new Date(iso).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+const crumbs = [
+  { name: "Home", path: "/" },
+  { name: heading, path: "/releases" },
+];
+---
+
+<Base
+  title={copy.seo?.title ?? `${heading} | ${site.brand.name}`}
+  description={copy.seo?.description ?? copy.standfirst}
+>
+  <StructuredData breadcrumbs={crumbs} />
+
+  <PageHeader heading={heading} standfirst={copy.standfirst} />
+
+  {r && r.items.length > 0 && (
+    <section class="section mode-light">
+      <div class="container">
+        <ol class="releases">
+          {r.items.map((item) => (
+            <li class="release">
+              <div class="meta">
+                <p class="version">{item.version}</p>
+                <p class="date">
+                  <time datetime={item.date}>{when(item.date)}</time>
+                </p>
+                {current === item.version && (
+                  <p class="badge">{r.currentLabel}</p>
+                )}
+              </div>
+
+              <div class="body">
+                <p class="lead">{item.summary}</p>
+                <ul class="changes">
+                  {item.changes.map((change) => (
+                    <li>{change}</li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  )}
+
+  <section class="section mode-inverse">
+    <div class="container actions">
+      {download && site.downloads?.label && (
+        <a class="btn btn--primary" href={download} download>
+          {site.downloads.label}
+        </a>
+      )}
+      <a class="btn btn--ghost" href={wa} rel="noopener">
+        {site.contact.ctaLabel}
+      </a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .releases {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  .release {
+    display: grid;
+    grid-template-columns: 14rem minmax(0, 1fr);
+    gap: var(--s-6);
+    padding-bottom: var(--s-6);
+    border-bottom: 1px solid var(--band-hairline);
+  }
+
+  .releases li:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .version {
+    font-family: var(--font-display);
+    font-size: var(--t-h2);
+    font-weight: 800;
+    letter-spacing: var(--tr-heading);
+    margin: 0;
+  }
+
+  .date {
+    margin: var(--s-1) 0 0;
+    font-size: var(--t-small);
+    color: var(--band-ink-muted);
+  }
+
+  .badge {
+    display: inline-block;
+    margin: var(--s-3) 0 0;
+    padding: 4px 10px;
+    border: 1px solid var(--band-accent);
+    border-radius: var(--r-pill);
+    color: var(--band-accent);
+    font-family: var(--font-display);
+    font-size: var(--t-meta);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--tr-label);
+  }
+
+  .body .lead {
+    margin: 0 0 var(--s-3);
+    max-width: var(--measure);
+  }
+
+  .changes {
+    margin: 0;
+    padding-left: var(--s-4);
+    display: grid;
+    gap: var(--s-2);
+    max-width: var(--measure);
+  }
+
+  .changes li {
+    line-height: var(--lh-body);
+    padding-left: var(--s-1);
+  }
+
+  .changes li::marker {
+    color: var(--band-accent);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+  }
+
+  @media (max-width: 860px) {
+    .release {
+      grid-template-columns: 1fr;
+      gap: var(--s-3);
+    }
+
+    .badge {
+      margin-top: var(--s-2);
+    }
+  }
+</style>

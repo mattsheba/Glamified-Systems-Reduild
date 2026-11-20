@@ -27,13 +27,16 @@ interface Props {
   productUrl?: string;
   /** Service page: emits Service. */
   service?: Service;
+  /** Guide page: emits Article, attributed to the organisation. */
+  article?: { slug: string; title: string; standfirst: string; seoDescription: string };
   /** Emit FAQPage from config.faq (homepage only, to avoid duplicate FAQ markup). */
   includeFaq?: boolean;
   /** Trail for BreadcrumbList, root first. */
   breadcrumbs?: Array<{ name: string; path: string }>;
 }
 
-const { product, service, productUrl, includeFaq, breadcrumbs } = Astro.props;
+const { product, service, productUrl, article, includeFaq, breadcrumbs } =
+  Astro.props;
 
 const origin = site.seo.domain.replace(/\/$/, "");
 const abs = (path: string) => `${origin}${path.startsWith("/") ? path : `/${path}`}`;
@@ -97,6 +100,25 @@ if (service) {
     description: service.description ?? service.summary,
     provider: { "@id": `${origin}/#organisation` },
     areaServed: { "@type": "Country", name: site.legal.jurisdiction },
+  });
+}
+
+if (article) {
+  /*
+   * No author person and no fabricated publish date. The organisation is the
+   * author, and `dateModified` comes from legal.lastUpdated — the one date in
+   * config that is actually maintained. Inventing a datePublished to decorate
+   * a rich result is the sort of thing that gets a site's markup distrusted.
+   */
+  graph.push({
+    "@type": "Article",
+    headline: article.title,
+    description: article.seoDescription,
+    url: abs(`/guides/${article.slug}`),
+    author: { "@id": `${origin}/#organisation` },
+    publisher: { "@id": `${origin}/#organisation` },
+    dateModified: site.legal.lastUpdated,
+    inLanguage: "en",
   });
 }
 

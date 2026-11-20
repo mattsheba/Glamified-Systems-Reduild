@@ -21,6 +21,37 @@ const products = site.products.map((p) => ({ href: productHref(p.slug), label: p
  */
 const installer = site.products[0] ? downloadHref(site.products[0]) : null;
 
+/*
+ * Pricing, the calculator, the guides and the three support pages, where they
+ * exist. They sit in the product column rather than getting one of their own:
+ * the footer is already four columns wide, and a fifth collapses the grid on a
+ * laptop.
+ *
+ * Each entry is conditional on its config block, so a variant that carries no
+ * calculator or no releases simply has a shorter column — there is no link
+ * here to a route that renders nothing.
+ */
+const resourceLinks = [
+  ...(site.pricing && site.pages?.pricing?.heading
+    ? [{ href: "/pricing", label: site.pages.pricing.heading }]
+    : []),
+  ...(site.statutory && site.pages?.calculator?.heading
+    ? [{ href: "/paye-calculator", label: site.pages.calculator.heading }]
+    : []),
+  ...(site.pages?.guides?.heading
+    ? [{ href: "/guides", label: site.pages.guides.heading }]
+    : []),
+  ...(site.requirements && site.pages?.requirements?.heading
+    ? [{ href: "/requirements", label: site.pages.requirements.heading }]
+    : []),
+  ...(site.support && site.pages?.support?.heading
+    ? [{ href: "/support", label: site.pages.support.heading }]
+    : []),
+  ...(site.releases?.items?.length && site.pages?.releases?.heading
+    ? [{ href: "/releases", label: site.pages.releases.heading }]
+    : []),
+];
+
 const productLinks = site.productOnHome
   ? [
       ...(site.pages?.features?.moreLabel
@@ -29,6 +60,7 @@ const productLinks = site.productOnHome
       ...(installer && site.downloads?.label
         ? [{ href: installer, label: site.downloads.label }]
         : []),
+      ...resourceLinks,
     ]
   : products;
 const services = site.services.map((s) => ({ href: serviceHref(s.slug), label: s.name }));

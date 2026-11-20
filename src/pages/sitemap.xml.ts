@@ -9,6 +9,7 @@
 import type { APIRoute } from "astro";
 import site from "../lib/site";
 import { legalDocs } from "../content/legal";
+import { guides } from "../content/guides";
 
 export const GET: APIRoute = () => {
   const origin = site.seo.domain.replace(/\/$/, "");
@@ -48,6 +49,43 @@ export const GET: APIRoute = () => {
     { path: "/", priority: "1.0", changefreq: "weekly" },
     ...productRoutes,
     { path: "/features", priority: "0.9", changefreq: "monthly" },
+    /*
+     * Pricing carries buying intent, so it sits with the product pages rather
+     * than with the reference material below.
+     */
+    ...(site.pricing
+      ? [{ path: "/pricing", priority: "0.9", changefreq: "monthly" }]
+      : []),
+    /*
+     * The calculator and the guides are what someone with a payroll problem
+     * finds before they are looking for software, so they are listed at the
+     * same priority as the product pages rather than below them.
+     */
+    ...(site.statutory
+      ? [{ path: "/paye-calculator", priority: "0.9", changefreq: "monthly" }]
+      : []),
+    ...(guides.length
+      ? [{ path: "/guides", priority: "0.7", changefreq: "monthly" }]
+      : []),
+    ...guides.map((g) => ({
+      path: `/guides/${g.slug}`,
+      priority: "0.8",
+      changefreq: "monthly",
+    })),
+    /*
+     * Requirements, support and release notes are checked before and after a
+     * purchase rather than searched for cold, so they rank below the guides.
+     * Release notes change whenever a version ships, hence the weekly hint.
+     */
+    ...(site.requirements
+      ? [{ path: "/requirements", priority: "0.6", changefreq: "monthly" }]
+      : []),
+    ...(site.support
+      ? [{ path: "/support", priority: "0.6", changefreq: "monthly" }]
+      : []),
+    ...(site.releases?.items?.length
+      ? [{ path: "/releases", priority: "0.5", changefreq: "weekly" }]
+      : []),
     { path: "/services", priority: "0.8", changefreq: "monthly" },
     { path: "/about", priority: "0.6", changefreq: "yearly" },
     { path: "/contact", priority: "0.7", changefreq: "yearly" },

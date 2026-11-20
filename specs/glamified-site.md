@@ -18,6 +18,25 @@ development, IT support, business consultancy, payroll outsourcing, graphic desi
 existing site leads with services and was flagged in a prior audit as missing privacy,
 terms and refund pages.
 
+> **Superseded, November 2026 — this is now a single-product site.** Payroll enquiries
+> had dried up, so the site sells GlamifiedHR and one service: running the payroll for
+> you, on the same software. Glamified Fleet and Glamified Sales, IT support, business
+> registration, graphic design and custom software development have all been removed
+> from the site — the last of them because a single-product site that also offers to
+> build anything reads as a software house, which is what this rebuild exists to stop.
+> They are in the git history if any of them returns.
+>
+> The company itself has not changed, and the site is still served from
+> glamifiedsystems.com until a product domain is bought. `brand.name` is therefore the
+> *product* and `brand.company` the publisher: the header, tab and footer lockup say
+> GlamifiedHR, while the structured data, the copyright line and the legal pages carry
+> Glamified Systems Limited. `/about` leads with the product and introduces the company
+> as its maker.
+>
+> The sections below are kept as written, with the superseding requirement named inline,
+> because the engine still serves multi-product variants and those requirements still
+> govern them.
+
 Two decisions shape this build and make it unusual.
 
 **The homepage leads with products, not services.** That is a positioning decision
@@ -70,7 +89,7 @@ through NFR-4 carry hard numbers rather than aspirations.
 - FR-38: Product imagery MUST NOT expose third-party personal or commercial data — client names, tax identification numbers, contact details, or amounts owed. Screenshots MUST use demonstration data, or be cropped so that no such data is visible.
 - FR-36: Icons MUST be inline stroke-based SVG drawn with `currentColor`, selected by an `icon` key in config. Emoji MUST NOT be used. An unrecognised key MUST render nothing rather than a broken glyph.
 - FR-10: Primary navigation MUST derive from `config.nav[]` and MUST NOT be hardcoded. Navigation entries MUST point at real routes, not on-page anchors.
-- FR-26: The site MUST render standalone routes at `/products`, `/services`, `/about` and `/contact`, with their copy drawn from `config.pages`. Every field under `config.pages` MUST be optional, so a variant that omits one still builds.
+- FR-26: The site MUST render standalone routes at `/products`, `/services`, `/about` and `/contact`, with their copy drawn from `config.pages`. Every field under `config.pages` MUST be optional, so a variant that omits one still builds. **Extended November 2026** by the routes in FR-45 to FR-52: `/pricing`, `/paye-calculator`, `/guides`, `/requirements`, `/support` and `/releases`, each conditional on its own config block.
 - FR-27: The qualifying form MUST live on `/contact` rather than on the homepage, so the homepage stays a summary. **Relaxed under FR-39:** where the homepage is the product page it is no longer a summary, so the form MAY also render there. It MUST still render on `/contact`.
 - FR-28: A section component reused across routes MUST take its heading from config, never from a literal in the page template.
 - FR-11: Legal pages MUST render at `/privacy`, `/terms` and `/refund`, with client name, contact details and jurisdiction interpolated from config.
@@ -85,6 +104,60 @@ A site selling one product must not spend its ranking on three URLs describing i
 - FR-42: A product MAY declare `walkthrough[]` — one entry per application screen, each with an image, a title and a caption. The build MUST fail when an entry is missing any of the three, or names an image that is not on disk.
 - FR-43: The walkthrough MUST render in full at `/features` and MAY be truncated on the homepage via `sections[].limit`, with a link to the full tour. Every image below the first MUST be lazy (FR-25), so twenty screenshots cannot breach NFR-4.
 - FR-44: Walkthrough captions MUST describe something visible in their own image. A caption making a claim the screenshot does not show is a defect, because this is the page a buyer checks against the trial.
+
+### Reference and buying routes (added November 2026)
+
+A single-product site has to answer, on its own URLs, the questions a
+multi-product brochure site could leave to a sales call: what does it cost,
+will it run on my machine, how do I get help, and is it still being worked on.
+Two of these routes — the calculator and the guides — are also the only pages
+here that someone with a payroll problem finds before they are looking for
+software at all.
+
+Every config block named below is OPTIONAL. A variant in another trade carries
+none of them, and each route MUST render nothing rather than fail when its
+block is absent. Navigation, footer and sitemap entries MUST be conditional on
+the same blocks, so no variant links to a route that renders nothing.
+
+- FR-45: Zambian statutory rates MUST live in exactly one config block
+  (`config.statutory`), and that block MUST mirror the product's own compliance
+  engine (`Glamified HR V3/src/lib/zambian-compliance.ts`). The site MUST NOT
+  quote a rate the software does not apply. A rate published on the site but
+  read by nothing MUST be removed, because nothing proves it has gone stale.
+- FR-46: `/paye-calculator` MUST render the rate table, the contribution bases
+  and a full worked example server-side, so the page is useful with JavaScript
+  off (NFR-9). The live calculator MUST take its rates from the page rather
+  than holding a second copy, and MUST only rewrite figures the server already
+  rendered, so a script failure leaves a complete calculation standing.
+- FR-47: `/guides` and `/guides/[slug]` MUST draw their prose from
+  `src/content/guides.ts`, parameterised by `config.statutory` so a sentence
+  cannot quote a rate the arithmetic does not use. Every statutory claim MUST
+  be one the product implements. Filing deadlines MUST NOT be published: the
+  software tracks what has been marked as filed, it does not hold a calendar of
+  due dates.
+- FR-48: `/pricing` MUST read the price from `products[0].price` and the
+  licence inclusions from `config.licenceIncludes`, so there is one figure and
+  one list on the site. It MUST NOT emit `SoftwareApplication` or `Offer`
+  structured data, because the homepage already carries both. It MUST NOT state
+  a headcount limit while `pricing.headcount` is null — the software has 50,
+  100 and unlimited editions and this site quotes a single price, so the limit
+  is unknown rather than unstated.
+- FR-49: `/requirements` MUST take its figures — supported Windows versions,
+  disk space, the database path, and the backup and restore procedure — from
+  the product's own user guide rather than estimating them. This is the page
+  read before buying a machine.
+- FR-50: `/support` MUST read every contact channel from `config.contact`. It
+  MUST NOT restate a support commitment that is not already made elsewhere on
+  the site or in the terms of service.
+- FR-51: `/releases` MUST list only versions that are actually downloadable.
+  Which release is current MUST be derived by matching
+  `products[0].download.version`, never typed into the release list, so the
+  badge cannot drift from the file being served. A build that has not been
+  uploaded MUST NOT appear.
+- FR-52: The services listing route and a service detail page MUST NOT share a
+  heading. With one service configured, the listing stays the generic hub and
+  the detail page carries the search term; the "other services" block MUST be
+  omitted rather than rendering a label above an empty list.
 
 ### Conversion
 

@@ -1,0 +1,244 @@
+---
+/**
+ * /support — how to reach a person, and the answers that otherwise arrive on
+ * WhatsApp one at a time.
+ *
+ * The channels are read from `contact`, so this page cannot fall out of step
+ * with the footer and the contact page. The licence answers are the ones the
+ * terms of service and the product's activation behaviour already commit to —
+ * in particular that reactivating keeps the original expiry date, which is the
+ * thing customers most often assume works the other way.
+ *
+ * The user guide is linked here because the footer link to it is easy to miss,
+ * and "is there a manual" is a pre-sales question as often as a support one.
+ */
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+import StructuredData from "../components/StructuredData.astro";
+import site, { whatsappHref, guideHref, soleProduct } from "../lib/site";
+
+const copy = site.pages?.support ?? {};
+const heading = copy.heading ?? "Support";
+const s = site.support;
+
+const product = soleProduct();
+const guide = product ? guideHref(product) : null;
+const wa = whatsappHref();
+
+/*
+ * Built here rather than typed into the markup so that a changed number is one
+ * edit in `contact` (FR-1). The alternate phone is only listed when there is
+ * one, and the label comes from the exemption list the engine check allows for
+ * contact chrome.
+ */
+const channels = [
+  { label: "WhatsApp", value: site.contact.ctaLabel, href: wa, external: true },
+  { label: "Phone", value: site.contact.phone, href: `tel:${site.contact.phone.replace(/\s/g, "")}` },
+  ...(site.contact.phoneAlt
+    ? [
+        {
+          label: "Phone",
+          value: site.contact.phoneAlt,
+          href: `tel:${site.contact.phoneAlt.replace(/\s/g, "")}`,
+        },
+      ]
+    : []),
+  { label: "Email", value: site.contact.email, href: `mailto:${site.contact.email}` },
+  { label: "Hours", value: site.contact.hours, href: null },
+];
+
+const crumbs = [
+  { name: "Home", path: "/" },
+  { name: heading, path: "/support" },
+];
+---
+
+<Base
+  title={copy.seo?.title ?? `${heading} | ${site.brand.name}`}
+  description={copy.seo?.description ?? copy.standfirst}
+>
+  <StructuredData breadcrumbs={crumbs} />
+
+  <PageHeader heading={heading} standfirst={copy.standfirst} />
+
+  {s && (
+    <section class="section mode-light">
+      <div class="container support-grid">
+        <div>
+          <h2>{s.channelsHeading}</h2>
+          <dl class="channels">
+            {channels.map((channel) => (
+              <div class="row">
+                <dt>{channel.label}</dt>
+                <dd>
+                  {channel.href ? (
+                    <a href={channel.href} rel={channel.external ? "noopener" : undefined}>
+                      {channel.value}
+                    </a>
+                  ) : (
+                    <span>{channel.value}</span>
+                  )}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <p class="muted small">{s.channelsNote}</p>
+        </div>
+
+        <div>
+          <h2>{s.coveredHeading}</h2>
+          <ul class="ticks">
+            {s.covered.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+          {s.coveredNote && <p class="muted small">{s.coveredNote}</p>}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {s && (
+    <section class="section mode-inverse">
+      <div class="container">
+        <h2>{s.licenceHeading}</h2>
+        <div class="qa">
+          {s.licenceItems.map((item) => (
+            <div class="qa-item">
+              <h3>{item.q}</h3>
+              <p>{item.a}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {s && guide && site.downloads?.guideLabel && (
+    <section class="section mode-light">
+      <div class="container guide-band">
+        <div>
+          <h2>{s.guideHeading}</h2>
+          <p class="lead">{s.guideBody}</p>
+        </div>
+        <p class="guide-action">
+          <a class="btn btn--primary" href={guide} download>
+            {site.downloads.guideLabel}
+          </a>
+        </p>
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .support-grid,
+  .guide-band {
+    display: grid;
+    gap: var(--s-7);
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+
+  h2 {
+    font-size: var(--t-h3);
+    margin: 0 0 var(--s-3);
+  }
+
+  .channels {
+    margin: 0;
+    border-top: 1px solid var(--band-hairline);
+  }
+
+  .channels .row {
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr);
+    gap: var(--s-3);
+    padding: var(--s-3) 0;
+    border-bottom: 1px solid var(--band-hairline);
+  }
+
+  .channels dt {
+    font-family: var(--font-display);
+    font-size: var(--t-label);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--tr-label);
+    color: var(--band-ink-muted);
+  }
+
+  .channels dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+
+  .small {
+    font-size: var(--t-small);
+    margin: var(--s-4) 0 0;
+    max-width: var(--measure);
+  }
+
+  .ticks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .ticks li {
+    position: relative;
+    padding-left: var(--s-5);
+    line-height: var(--lh-body);
+  }
+
+  .ticks li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 0.45em;
+    width: 11px;
+    height: 6px;
+    border-left: 2.5px solid var(--band-accent);
+    border-bottom: 2.5px solid var(--band-accent);
+    transform: rotate(-45deg);
+  }
+
+  .qa {
+    display: grid;
+    gap: var(--s-5);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    margin-top: var(--s-4);
+  }
+
+  .qa-item h3 {
+    font-size: var(--t-body);
+    font-family: var(--font-display);
+    font-weight: 700;
+    margin: 0 0 var(--s-2);
+  }
+
+  .qa-item p {
+    margin: 0;
+    font-size: var(--t-small);
+    line-height: var(--lh-body);
+  }
+
+  .guide-band {
+    align-items: center;
+  }
+
+  .guide-action {
+    margin: 0;
+    justify-self: start;
+  }
+
+  @media (max-width: 1024px) {
+    .support-grid,
+    .guide-band {
+      grid-template-columns: 1fr;
+      gap: var(--s-6);
+    }
+  }
+</style>
