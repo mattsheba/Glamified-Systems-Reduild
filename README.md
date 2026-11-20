@@ -128,7 +128,7 @@ variants with several products.
 | `/paye-calculator` | PAYE, NAPSA and NHIMA on one salary, with the bands and the working shown. Renders a full worked example server-side, so it still answers with JavaScript off |
 | `/guides` | The payroll guides, listed |
 | `/guides/[slug]` | One long-form guide, its figures parameterised by `config.statutory` |
-| `/requirements` | What it runs on, how it installs, where the data lives, and how backup and restore work |
+| `/requirements` | What it runs on and how it installs. Deliberately **not** where the database file lives or how to restore one by hand — that is operator documentation and belongs in the user guide that ships with the software |
 | `/support` | How to reach a person, what support covers, licence keys and reinstalls, the user guide |
 | `/releases` | Version history. The current release is derived from the download version, never typed |
 | `/services` | The services hub — one service while this site sells one |
@@ -198,16 +198,17 @@ should never break a variant's build. The set lives in `src/components/Icon.astr
 
 These are real and tracked, not oversights:
 
-- **No testimonial is a GlamifiedHR quote.** The three in `proof.testimonials`
-  are real, named clients in their own words, but every one is about company
+- **There are no testimonials on the site.** `proof.testimonials` is empty and
+  the `proof` key is out of `sections`. The three that were there were real,
+  named clients in their own words, but every one was about company
   registration, monthly statutory filing or branding — engagements this site no
-  longer sells. They are framed as evidence that the statutory side is handled
-  rather than as product testimonials, and `using:` says what each client
-  actually bought. On a single-product site they still pull towards the software
-  house the rebuild removed. **Decide one of:** replace them as payroll clients
-  agree to be quoted, re-head the section so it does not read as product praise,
-  or drop the section and keep the client logo strip, which is factual on its
-  own. Do not reword a client's quote to fit the positioning.
+  longer sells — so on a single-product payroll site they pulled towards the
+  software house the rebuild removed. They are in git history and in
+  `content/testimonial-drafts.md`. **To bring the section back** you need a
+  GlamifiedHR payroll quote: add it to `proof.testimonials` and restore
+  `{ key: "proof", heading: ... }` to `sections`. Do not reword a client's own
+  words to fit the positioning. The client logo strip stays either way — it says
+  who the company works with, which is true whatever each engagement was.
 - **Phone number conflict.** The playbook says +260 977 669 883; the GlamifiedHR
   user instructions say +260 77 002 9596. Config carries the first. Confirm which
   is right before launch.
