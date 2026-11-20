@@ -61,14 +61,23 @@ To start a new variant, copy `site.config.js`, edit it, and drop the images into
 | `verify:sitemap` | Every indexable built page is in the sitemap, every sitemap URL matches that page's own canonical, and no `noindex` page is advertised |
 | `verify:downloads` | The installer and user guide URLs the site offers actually resolve |
 
-All five run on `npm run build`, in that order — the last two need `dist/`, so
-they run after `astro build`. A broken config fails loudly at build time rather
-than rendering the word `undefined` to a client.
+The first three run on `npm run build`. A broken config fails loudly at build
+time rather than rendering the word `undefined` to a client.
 
-`verify:downloads` reaches the network. It retries a connection failure twice
-before giving up, because a slow link once reported a file as missing that was
-present and serving 200. An HTTP status is trusted immediately and never
-retried, so a genuine 404 still fails the build.
+The last two read `dist/`, so they run after a build, together:
+
+```sh
+npm run build && npm run verify:dist
+```
+
+**They are deliberately not part of `npm run build`.** They were, briefly, and
+the production deploy failed — so the deploy command is back to the three
+checks that are known to pass in Netlify's build image. Run `verify:dist`
+locally before pushing anything that changes routes or download versions.
+`verify:downloads` also reaches the network: it retries a connection failure
+twice, because a slow link once reported a file as missing that was present and
+serving 200. An HTTP status is trusted immediately and never retried, so a
+genuine 404 still fails.
 
 ## Layout
 

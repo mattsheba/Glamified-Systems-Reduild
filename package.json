@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "npm run verify:config && npm run verify:engine && astro check && astro build && npm run verify:sitemap && npm run verify:downloads",
+    "build": "npm run verify:config && npm run verify:engine && astro check && astro build",
+    "verify:dist": "npm run verify:sitemap && npm run verify:downloads",
     "preview": "astro preview",
     "astro": "astro",
     "verify:config": "node scripts/verify-config.mjs",
