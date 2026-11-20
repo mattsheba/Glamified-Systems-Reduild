@@ -273,6 +273,33 @@ export interface PayeBand {
 }
 
 /**
+ * A scale that has been announced but is not in force yet.
+ *
+ * Nothing calculates with these bands. `Statutory.paye.bands` is always the
+ * scale in force, so the calculator and the guides stay correct for the month
+ * being run; this only lets the site say what is coming, with its status and
+ * its caveat attached. A proposal published as though it were settled is how a
+ * payroll gets filed on the wrong rate.
+ */
+export interface UpcomingStatutory {
+  /** ISO date the new scale takes effect. */
+  effectiveFrom: string;
+  /** `proposed` until the amending Act and the authority's tables confirm it. */
+  status: "proposed" | "enacted";
+  /** Eyebrow above the heading. Says the status, not the date. */
+  statusLabel: string;
+  /** Where it was announced, named in the copy. */
+  announcedIn: string;
+  heading: string;
+  /** The full scale that would replace `paye.bands`. */
+  bands: PayeBand[];
+  /** `**bold**` is honoured; nothing else is. */
+  body: string[];
+  /** Why a reader must not file on it yet. Required while status is proposed. */
+  caveat: string;
+}
+
+/**
  * Zambian statutory rates. Read by the calculator and by the guides, so a rate
  * appears once and the prose cannot drift from the arithmetic.
  */
@@ -297,11 +324,14 @@ export interface Statutory {
     employerRate: number;
     portal?: string;
   };
+  /** Divisor for a day's pay in the terminal-benefits guide. */
   workingDaysPerMonth: number;
-  overtimeHoursPerMonth: number;
-  overtimeWeekdayRate: number;
-  overtimeRestDayRate: number;
   employmentAct: string;
+  /**
+   * The next scale, where one has been announced. NEVER calculated with — see
+   * UpcomingStatutory.
+   */
+  upcoming?: UpcomingStatutory;
 }
 
 /** Every label on the public calculator. Markup carries none of them (FR-1). */

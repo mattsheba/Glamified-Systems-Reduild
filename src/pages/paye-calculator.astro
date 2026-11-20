@@ -18,7 +18,13 @@
 import Base from "../layouts/Base.astro";
 import PageHeader from "../components/PageHeader.astro";
 import StructuredData from "../components/StructuredData.astro";
-import site, { whatsappHref, downloadHref, soleProduct, featuresHref } from "../lib/site";
+import site, {
+  whatsappHref,
+  downloadHref,
+  soleProduct,
+  featuresHref,
+  inlineBold,
+} from "../lib/site";
 import {
   calculate,
   kwacha,
@@ -50,6 +56,15 @@ const effective = s
       year: "numeric",
     })
   : "";
+
+/*
+ * The announced scale's top rate, so the row that is actually new can be
+ * marked. Read off the band list rather than written down again, so
+ * highlighting the right row cannot fall out of step with the table.
+ */
+const topUpcomingRate = s?.upcoming
+  ? Math.max(...s.upcoming.bands.map((band) => band.rate))
+  : 0;
 
 const crumbs = [
   { name: "Home", path: "/" },
@@ -241,6 +256,51 @@ const rates = s
         </div>
 
         <p class="effective">{`${s.paye.name} · ${s.napsa.name} · ${s.nhima.name} — ${effective}`}</p>
+      </div>
+    </section>
+  )}
+
+  {/*
+    The announced scale, printed beside the one in force rather than instead of
+    it. Someone running a December payroll needs today's rates to file and next
+    month's to plan; a calculator that silently switched early would mis-state
+    the month they are actually paying.
+
+    The band table is rendered from `upcoming.bands`, so the figures in it
+    cannot drift from the ones that will be promoted into use.
+  */}
+  {s?.upcoming && (
+    <section class="section mode-light">
+      <div class="container upcoming">
+        <div class="upcoming-copy">
+          <p class="eyebrow">{s.upcoming.statusLabel}</p>
+          <h2>{s.upcoming.heading}</h2>
+          {s.upcoming.body.map((paragraph) => (
+            <p class="lead" set:html={inlineBold(paragraph)} />
+          ))}
+          <p class="caveat">{s.upcoming.caveat}</p>
+          <p class="muted announced">{`${s.upcoming.announcedIn}.`}</p>
+        </div>
+
+        <div class="upcoming-table">
+          <h3>{c?.bandsHeading}</h3>
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">{c?.bandsColumns.band}</th>
+                <th scope="col" class="num">{c?.bandsColumns.rate}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {s.upcoming.bands.map((band, i) => (
+                <tr class={band.rate === topUpcomingRate ? "is-new" : undefined}>
+                  <th scope="row">{bandLabel(band, i === 0)}</th>
+                  <td class="num">{percent(band.rate)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   )}
@@ -615,7 +675,61 @@ const rates = s
     margin-top: var(--s-4);
   }
 
+  /* ---- the announced scale ---- */
+
+  .upcoming {
+    display: grid;
+    gap: var(--s-7);
+    grid-template-columns: 1.25fr 1fr;
+    align-items: start;
+  }
+
+  .upcoming-copy h2 {
+    font-size: var(--t-h2);
+    margin: var(--s-2) 0 var(--s-3);
+    max-width: 30ch;
+  }
+
+  .upcoming-copy .lead {
+    max-width: var(--measure);
+    margin: 0 0 var(--s-3);
+  }
+
+  /* Reads as a caution without a coloured alert box: a left rule in the accent
+     and smaller type, so it is clearly an aside to the claim above it. */
+  .caveat {
+    border-left: 3px solid var(--band-accent);
+    padding-left: var(--s-3);
+    margin: var(--s-4) 0 0;
+    font-size: var(--t-small);
+    line-height: var(--lh-body);
+    max-width: var(--measure);
+  }
+
+  .announced {
+    margin: var(--s-3) 0 0;
+    font-size: var(--t-small);
+  }
+
+  .upcoming-table h3 {
+    font-size: var(--t-h3);
+    margin: 0 0 var(--s-3);
+  }
+
+  /* The row that is actually new. Marked with weight and the accent rather
+     than a background, so it still reads if the colour does not land. */
+  .upcoming-table tr.is-new th,
+  .upcoming-table tr.is-new td {
+    color: var(--band-accent);
+    font-weight: 700;
+  }
+
   @media (max-width: 1024px) {
+    .upcoming {
+      grid-template-columns: 1fr;
+      gap: var(--s-6);
+    }
+
     .calc {
       grid-template-columns: 1fr;
       gap: var(--s-6);

@@ -53,6 +53,26 @@ const nhimaRate = s ? percent(s.nhima.employeeRate) : "";
 const days = s?.workingDaysPerMonth ?? 22;
 const act = s?.employmentAct ?? "the Employment Code Act";
 
+/*
+ * The announced scale, where config carries one. Written as prose from the
+ * same band list the calculator prints, so the guide cannot name a rate or a
+ * threshold that the rest of the site does not.
+ *
+ * It is always framed by its status: this guide is read by people about to
+ * file, and a proposal presented as settled is how the wrong rate gets used.
+ */
+const up = s?.upcoming;
+const upWhen = up
+  ? new Date(up.effectiveFrom).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    })
+  : "";
+const upTop = up
+  ? [...up.bands].sort((a, b) => b.rate - a.rate)[0]
+  : undefined;
+
 /** The worked example, calculated rather than typed, so it cannot be wrong. */
 const eg = s ? calculate(8000, 2000, s) : null;
 const egBasic = kwachaRound(8000);
@@ -83,6 +103,20 @@ const statutoryGuide: Guide = {
         ...bandLines,
         `Neither NAPSA nor NHIMA reduces chargeable income. This follows the ${s?.authority ?? "Zambia Revenue Authority"}'s own calculator: the contributions are separate deductions from pay, not reliefs against tax. If your spreadsheet subtracts NAPSA before applying the bands, it is under-deducting PAYE, and the shortfall is the employer's problem rather than the employee's.`,
         `The bands change with the national budget. What matters as much as the current figures is which set you apply to a given month: re-running a past period should use the rates that were in force then, not today's. ${product} stores the bands against the date they took effect for exactly that reason.`,
+        ...(up && upTop
+          ? [
+              `**Coming on ${upWhen}.** ${up.announcedIn.charAt(0).toUpperCase()}${up.announcedIn.slice(1)} ${
+                up.status === "enacted" ? "sets" : "proposes"
+              } a further band: ${percent(upTop.rate)} on the part of a monthly salary above ${kwachaRound(
+                upTop.from
+              )}. The bands listed above are unchanged below that figure, and the rates on this page are the ones in force today — a payroll run for this month is charged on those, not on the new scale.`,
+              up.status === "proposed"
+                ? `That change is a proposal rather than law. It depends on the amending Act, the date it commences and the ${
+                    s?.authority ?? "Zambia Revenue Authority"
+                  }'s own published tables, so confirm the final figures there before filing on them. ${product} is updated when they are published, and stores the new band against the date it takes effect rather than applying it to months already run.`
+                : `${product} applies it from that date, and keeps the previous bands for months run before it.`,
+            ]
+          : []),
       ],
     },
     {

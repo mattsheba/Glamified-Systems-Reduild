@@ -457,6 +457,81 @@ export default {
     workingDaysPerMonth: 22,
     /** Named in the terminal-benefits guide. */
     employmentAct: "the Employment Code Act No. 3 of 2019",
+
+    /**
+     * THE NEXT SCALE, ANNOUNCED BUT NOT YET APPLIED.
+     *
+     * The 2027 Budget, delivered 6 November 2026, proposes a fifth PAYE band:
+     * 39.5% on monthly taxable income above K37,000. The tax-free threshold
+     * stays at K5,100 and the 20%, 30% and 37% bands are unchanged — the 37%
+     * band is capped at K37,000 instead of running to the top. ZRA estimates
+     * about 6.7% of employees are affected.
+     *
+     * NOTHING ON THIS SITE CALCULATES WITH THESE BANDS. The calculator and the
+     * guides read `paye.bands` above, which is the scale in force today. This
+     * block only lets the site SAY what is coming, which is what someone
+     * running a December payroll actually needs to know.
+     *
+     * WHY IT IS NOT LIVE YET. Two reasons, and both matter:
+     *
+     *   1. It is not law. The measure is subject to Parliamentary approval,
+     *      the Income Tax (Amendment) Act, its commencement provisions and
+     *      ZRA's own published tax tables. None of those were available when
+     *      this was written (20 November 2026).
+     *   2. Even once enacted it applies from 1 January 2027. Applying it now
+     *      would mis-state every November and December payroll, and PAYE is
+     *      charged on the bands in force for the month being run.
+     *
+     *   THE THRESHOLD IS NOT SETTLED. The Budget speech and ZRA's statements
+     *   say K37,000; the Budget annex is reported to say K34,000. K37,000 is
+     *   carried here because it is what the speech and the authority say, but
+     *   CONFIRM IT against the enacted Act and ZRA's tables before promoting
+     *   this scale. A calculator that is wrong by K3,000 of threshold is worse
+     *   than one that is openly a month out of date.
+     *
+     * TO PROMOTE IT, once the Act and the ZRA tables confirm the figures:
+     * replace `paye.bands` above with `upcoming.bands`, set `effectiveFrom` to
+     * "2027-01-01", and delete this block. Then do the same in the product's
+     * own compliance engine, or the two stop agreeing — see the note at the
+     * top of this block's parent.
+     *
+     * NHIMA IS DELIBERATELY UNTOUCHED. The Health Minister announced on
+     * 13 November 2026, with Cabinet approval, that contributions move from
+     * basic pay to GROSS pay in January 2027. That is a real announcement and
+     * it would reverse what this site teaches, but it is not in the Budget:
+     * payroll specialists reported no confirmed NHIMA change, and a second
+     * source still has it at 1% of basic. The product puts NHIMA on basic on
+     * direct written guidance from NHIMA in July 2026. Changing the base on
+     * the strength of a television interview would mis-deduct for every
+     * employee with an allowance, so it waits for NHIMA or a statutory
+     * instrument. Ask NHIMA directly.
+     */
+    upcoming: {
+      effectiveFrom: "2027-01-01",
+      status: "proposed",
+      /*
+       * The eyebrow. It says the status rather than repeating the date already
+       * in the heading, because "proposed" is the single most important word
+       * on this band — a reader who takes it as settled files on the wrong
+       * rate. Change it to "Confirmed change" when the Act is enacted.
+       */
+      statusLabel: "Proposed change",
+      announcedIn: "the 2027 Budget speech of 6 November 2026",
+      heading: "What changes on 1 January 2027",
+      bands: [
+        { from: 0, to: 5100, rate: 0 },
+        { from: 5100, to: 7100, rate: 0.2 },
+        { from: 7100, to: 9200, rate: 0.3 },
+        { from: 9200, to: 37000, rate: 0.37 },
+        { from: 37000, to: null, rate: 0.395 },
+      ],
+      body: [
+        "A fifth PAYE band is proposed: **39.5% on the part of a monthly salary above K37,000**. Everything below that is unchanged — the first K5,100 stays tax-free, and the 20%, 30% and 37% rates keep their current thresholds. The 37% band stops at K37,000 rather than running to the top.",
+        "Only the slice above K37,000 is taxed at the new rate, so nobody's whole salary moves to 39.5%. The Zambia Revenue Authority estimates it affects about 6.7% of employees.",
+      ],
+      caveat:
+        "This is a Budget proposal, not yet law. It depends on the Income Tax (Amendment) Act, its commencement date and ZRA's published tax tables, and the Budget annex has been reported as giving K34,000 rather than K37,000. The calculator above uses the rates in force now, which are the ones a November or December payroll is charged on. Confirm the final figures with the Zambia Revenue Authority before you file on them.",
+    },
   },
 
   /**
