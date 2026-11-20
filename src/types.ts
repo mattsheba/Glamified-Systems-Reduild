@@ -359,18 +359,20 @@ export interface Pricing {
   disclaimer: string;
 }
 
-/** /requirements. Figures come from the product's user guide, not estimates. */
+/**
+ * /requirements. Figures come from the product's user guide, not estimates.
+ *
+ * It carried a data-location and backup section too, removed in November 2026:
+ * the database path and the hand-restore procedure are operator documentation
+ * and belong in the guide that ships with the software, not on a page written
+ * for someone deciding whether to buy.
+ */
 export interface Requirements {
   specsHeading: string;
   specsColumns: { item: string; detail: string };
   specs: Array<{ item: string; detail: string }>;
   installHeading: string;
   installSteps: string[];
-  dataHeading: string;
-  /** `**bold**` is honoured; nothing else is. */
-  dataBody: string[];
-  backupHeading: string;
-  backupBody: string[];
 }
 
 /** /support. Channels are read from `contact` rather than repeated here. */

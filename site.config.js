@@ -147,10 +147,23 @@ export default {
     { key: "product", heading: "Inside GlamifiedHR" },
     { key: "walkthrough", heading: "What it actually does", limit: 4 },
     { key: "logoMarquee", mode: "light", heading: "Trusted by" },
-    { key: "proof", heading: "What our clients say" },
+    /*
+     * The quotes section is out for now — see `proof.testimonials` below for
+     * why. The key is removed from this list rather than left with an empty
+     * array, because band modes alternate across the CONFIGURED order: leaving
+     * a section here that renders nothing would put two light bands together.
+     * Put it back here when there is a payroll quote to carry it.
+     */
     { key: "services", heading: "Or let us run it for you" },
     { key: "process", heading: "How we get you running" },
-    { key: "faq", mode: "light" },
+    /*
+     * No explicit mode, so it alternates (FR-20). It was pinned light to sit
+     * correctly in the old order; with the quotes section gone that pin put
+     * two light bands together — process and faq ran into each other with
+     * nothing between them. Letting it alternate is the fix. Pin it again only
+     * by re-phasing the bands above it, not on its own.
+     */
+    { key: "faq" },
     { key: "form", heading: "Ask us about your payroll" },
   ],
 
@@ -605,19 +618,22 @@ export default {
       "GlamifiedHR launches when setup finishes. On first launch it takes a few seconds to start its internal engine, then asks you to register the first administrator account.",
     ],
 
-    dataHeading: "Where your records are kept",
-    dataBody: [
-      "Everything you enter lives in a single database file at **%APPDATA%\\GlamifiedHR\\db\\custom.db**, kept separately from the program itself.",
-      "Because of that, reinstalling or upgrading GlamifiedHR never touches your data. When an upgrade adds new fields, they are added to your existing database automatically the first time it starts.",
-    ],
-
-    backupHeading: "Backup and restore",
-    backupBody: [
-      "**From inside the application.** Settings → Backup & Restore writes a copy of the whole database — employees, payroll, settings — to a folder you choose, without closing the program. Restoring from the same screen checks the file first, keeps your current data as a safety copy, then replaces the live database and asks everyone to sign in again.",
-      "**Keep the copies somewhere else.** A USB drive, a network folder, or a synced cloud folder such as Google Drive, OneDrive or Dropbox. A backup sitting on the same computer does not survive theft, fire or a failed disk.",
-      "**Copying the file by hand** works too, but close the application first, and copy **custom.db** together with **custom.db-wal** if one is there. To restore that way, delete **custom.db-wal** and **custom.db-shm** before putting your saved file back as **custom.db** — a leftover file from the old database damages the restored one. The in-app backup avoids all of this.",
-      "The Full Data Export report gives you a spreadsheet copy of your records. It is useful for inspection, but it is not a restorable backup.",
-    ],
+    /*
+     * REMOVED FROM THE SITE, November 2026.
+     *
+     * "Where your records are kept" and "Backup and restore" used to sit here
+     * and render below the install steps. They named the database file's exact
+     * path, the -wal and -shm files beside it, and the order to delete them in
+     * when restoring a copy by hand.
+     *
+     * That is operator documentation, not a reason to buy, and it belongs in
+     * the user guide it was taken from — which ships with the software and is
+     * linked from /support. A marketing page that publishes the path to a
+     * customer's payroll database, and the way to break a restore, is telling
+     * the wrong audience the wrong things.
+     *
+     * The prose is in this file's git history if it is ever wanted back.
+     */
   },
 
   /**
@@ -1147,40 +1163,26 @@ export default {
     // Factual engagements. What each client uses, which is checkable.
     clients: [],
     /*
-     * Drafted from what each client actually uses and published with their
-     * name and mark — see content/testimonial-drafts.md.
+     * OUT FOR NOW. Taken off the site in November 2026.
      *
-     * NONE OF THESE IS A GLAMIFIEDHR QUOTE. They are compliance and
-     * registration engagements, which is why they are framed as evidence that
-     * the statutory side is handled rather than as product testimonials. The
-     * first payroll client who agrees to be quoted replaces one of them.
+     * The three quotes here were real, named clients in their own words, but
+     * every one was about company registration, monthly statutory filing or
+     * branding — engagements this site no longer sells. On a single-product
+     * payroll site they pulled a reader back towards the software house this
+     * rebuild exists to stop, under a heading that read as product praise.
+     *
+     * They are not lost: they are in this file's git history, and the drafts
+     * they came from are in content/testimonial-drafts.md.
+     *
+     * To bring the section back, put a quote in this array AND restore
+     * { key: "proof", heading: ... } to `sections` above. A GlamifiedHR
+     * payroll quote is what this slot is waiting for. Do not reword a
+     * client's own words to fit the positioning.
+     *
+     * The client logo strip stays. It says who the company works with, which
+     * is true regardless of what each engagement was.
      */
-    testimonials: [
-      {
-        quote:
-          "They handled our PACRA registration and got the TPIN and statutory registrations in order without us having to chase anyone. We always knew what stage it was at.",
-        organisation: "Amani Prestigious Ventures",
-        using: "Registration and statutory setup",
-        logo: "/images/logos/amani-prestigious-ventures.webp",
-      },
-      {
-        quote:
-          "They registered the company for us and have handled the monthly filings ever since. We hear from them before a deadline rather than after it, and that is the part we did not expect to matter as much as it does.",
-        organisation: "Rare Events",
-        using: "Monthly statutory compliance",
-        logo: "/images/logos/rare-events.webp",
-        // Gold and white on black, so it carries its own ground and must not
-        // sit on the light tile the other marks need.
-        logoTile: "none",
-      },
-      {
-        quote:
-          "They set up our registrations and then did our branding, so everything matched from the start. Having one company handle both saved us going back and forth between suppliers.",
-        organisation: "Ampindi Ventures",
-        using: "Registration and design",
-        logo: "/images/logos/ampindi-ventures.webp",
-      },
-    ],
+    testimonials: [],
   },
 
   process: [

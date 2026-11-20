@@ -14,12 +14,7 @@
 import Base from "../layouts/Base.astro";
 import PageHeader from "../components/PageHeader.astro";
 import StructuredData from "../components/StructuredData.astro";
-import site, {
-  whatsappHref,
-  downloadHref,
-  soleProduct,
-  inlineBold,
-} from "../lib/site";
+import site, { whatsappHref, downloadHref, soleProduct } from "../lib/site";
 
 const copy = site.pages?.requirements ?? {};
 const heading = copy.heading ?? "System requirements";
@@ -93,30 +88,15 @@ const crumbs = [
     </section>
   )}
 
-  {r && (
-    <section class="section mode-inverse">
-      <div class="container data-grid">
-        <div class="prose">
-          <h2>{r.dataHeading}</h2>
-          {r.dataBody.map((paragraph) => (
-            <p set:html={inlineBold(paragraph)} />
-          ))}
-        </div>
-
-        <div class="prose">
-          <h2>{r.backupHeading}</h2>
-          {r.backupBody.map((paragraph) => (
-            <p set:html={inlineBold(paragraph)} />
-          ))}
-        </div>
-      </div>
-    </section>
-  )}
+  {/* "Where your records are kept" and "Backup and restore" used to render
+      here. They were removed in November 2026: naming the database path, the
+      files beside it and the way a hand-restore goes wrong is operator
+      documentation, and it belongs in the user guide that ships with the
+      software. See the note in site.config.js under `requirements`. */}
 </Base>
 
 <style>
-  .spec-grid,
-  .data-grid {
+  .spec-grid {
     display: grid;
     gap: var(--s-7);
     grid-template-columns: 1fr 1fr;
@@ -188,21 +168,8 @@ const crumbs = [
     color: var(--band-accent);
   }
 
-  /* The database path is long and has no spaces to break at, so it is allowed
-     to break mid-token rather than widening the column on a phone. The bold
-     runs here carry both filenames and sentence lead-ins, so they are not
-     restyled beyond that. */
-  .prose :global(strong) {
-    overflow-wrap: anywhere;
-  }
-
-  .prose p {
-    max-width: var(--measure);
-  }
-
   @media (max-width: 1024px) {
-    .spec-grid,
-    .data-grid {
+    .spec-grid {
       grid-template-columns: 1fr;
       gap: var(--s-6);
     }
