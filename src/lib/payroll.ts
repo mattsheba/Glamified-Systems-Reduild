@@ -7,7 +7,11 @@
  *
  *   gross       = basic + allowances
  *   NAPSA       = 5% of min(gross, ceiling), employee and employer each
- *   NHIMA       = 1% of BASIC — allowances are outside the base
+ *   NHIMA       = 1% of the configured base — `statutory.nhima.base`, which is
+ *                 BASIC until 1 January 2027 and GROSS from it, at the same
+ *                 rates. Read from config rather than assumed here, so the
+ *                 change is one word in site.config.js and every figure and
+ *                 sentence on the site follows it
  *   PAYE        = the bands applied to gross; neither NAPSA nor NHIMA
  *                 reduces chargeable income (this follows ZRA's own calculator)
  *   net         = gross − (PAYE + employee NAPSA + employee NHIMA)
@@ -50,6 +54,8 @@ export interface Breakdown {
   netPay: number;
   /** Gross plus the employer's own contributions. */
   employerCost: number;
+  /** The figure NHIMA was charged on, for labelling the working. */
+  nhimaChargedOn: number;
 }
 
 /** PAYE on an income, band by band. */
@@ -77,8 +83,14 @@ export function calculate(
   const napsaEmployee = round2(pensionable * s.napsa.employeeRate);
   const napsaEmployer = round2(pensionable * s.napsa.employerRate);
 
-  const nhimaEmployee = round2(safeBasic * s.nhima.employeeRate);
-  const nhimaEmployer = round2(safeBasic * s.nhima.employerRate);
+  /*
+   * Allowances are outside the NHIMA base while it is "basic", and inside it
+   * once it is "gross". Nothing else about the contribution changes: there is
+   * no ceiling on either basis, so it rises with pay without limit.
+   */
+  const nhimaBase = s.nhima.base === "gross" ? gross : safeBasic;
+  const nhimaEmployee = round2(nhimaBase * s.nhima.employeeRate);
+  const nhimaEmployer = round2(nhimaBase * s.nhima.employerRate);
 
   const payeBands = payeFor(gross, s.paye.bands);
   const paye = round2(payeBands.reduce((sum, b) => sum + b.amount, 0));
@@ -99,6 +111,7 @@ export function calculate(
     totalDeductions,
     netPay: round2(gross - totalDeductions),
     employerCost: round2(gross + napsaEmployer + nhimaEmployer),
+    nhimaChargedOn: nhimaBase,
   };
 }
 

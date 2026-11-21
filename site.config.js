@@ -443,6 +443,20 @@ export default {
       name: "National Health Insurance Management Authority",
       employeeRate: 0.01,
       employerRate: 0.01,
+      /*
+       * THE BASE, AS A FIELD.
+       *
+       * "basic" until 1 January 2027, when NHIMA moves to gross pay at the
+       * same 1% + 1% rates (see `upcoming.changes`). It is config rather than
+       * something the arithmetic assumes, because the whole site reads it: the
+       * calculator picks the figure to charge, the rate table prints which one
+       * it is, and the guides word their sentences from it. Promoting the
+       * change is editing this one word.
+       *
+       * Do the same in the product's compliance engine on the same date, or
+       * the two stop agreeing.
+       */
+      base: "basic",
       portal: "eNHIMA",
     },
     /*
@@ -461,16 +475,20 @@ export default {
     /**
      * THE NEXT SCALE, ANNOUNCED BUT NOT YET APPLIED.
      *
+     * Two changes land on 1 January 2027: NHIMA moves to gross pay, and a
+     * fifth PAYE band is proposed. Each carries its own status in
+     * `changes` below, because one is confirmed and the other is not.
+     *
      * The 2027 Budget, delivered 6 November 2026, proposes a fifth PAYE band:
      * 39.5% on monthly taxable income above K37,000. The tax-free threshold
      * stays at K5,100 and the 20%, 30% and 37% bands are unchanged — the 37%
      * band is capped at K37,000 instead of running to the top. ZRA estimates
      * about 6.7% of employees are affected.
      *
-     * NOTHING ON THIS SITE CALCULATES WITH THESE BANDS. The calculator and the
-     * guides read `paye.bands` above, which is the scale in force today. This
-     * block only lets the site SAY what is coming, which is what someone
-     * running a December payroll actually needs to know.
+     * NOTHING ON THIS SITE CALCULATES WITH ANY OF IT. The calculator and the
+     * guides read `paye.bands` and `nhima.base` above, which are what is in
+     * force today. This block only lets the site SAY what is coming, which is
+     * what someone running a December payroll actually needs to know.
      *
      * WHY IT IS NOT LIVE YET. Two reasons, and both matter:
      *
@@ -495,42 +513,75 @@ export default {
      * own compliance engine, or the two stop agreeing — see the note at the
      * top of this block's parent.
      *
-     * NHIMA IS DELIBERATELY UNTOUCHED. The Health Minister announced on
-     * 13 November 2026, with Cabinet approval, that contributions move from
-     * basic pay to GROSS pay in January 2027. That is a real announcement and
-     * it would reverse what this site teaches, but it is not in the Budget:
-     * payroll specialists reported no confirmed NHIMA change, and a second
-     * source still has it at 1% of basic. The product puts NHIMA on basic on
-     * direct written guidance from NHIMA in July 2026. Changing the base on
-     * the strength of a television interview would mis-deduct for every
-     * employee with an allowance, so it waits for NHIMA or a statutory
-     * instrument. Ask NHIMA directly.
+     * NHIMA MOVES TO GROSS, AT THE SAME RATES. Confirmed by the business,
+     * which runs payroll for clients, after the Health Minister's 13 November
+     * 2026 announcement of Cabinet-approved reforms. The rates stay at 1% from
+     * each side; only the base changes, from basic pay to gross.
+     *
+     * Note for whoever reads this later: the public sources were split when it
+     * was written. Payroll specialists reported no confirmed NHIMA change in
+     * the Budget, and a second source still had it at 1% of basic, because it
+     * is not a Budget measure — it came through Cabinet and the Ministry of
+     * Health. The product has had NHIMA on basic since direct written guidance
+     * from NHIMA in July 2026, so get the new basis in writing from NHIMA too,
+     * and keep it on file. That reversal is worth a paper trail.
+     *
+     * It is still not live here, for the same reason as the PAYE band: it
+     * applies from 1 January 2027. NHIMA on gross in a December payroll
+     * over-deducts every employee who receives an allowance.
      */
     upcoming: {
       effectiveFrom: "2027-01-01",
-      status: "proposed",
-      /*
-       * The eyebrow. It says the status rather than repeating the date already
-       * in the heading, because "proposed" is the single most important word
-       * on this band — a reader who takes it as settled files on the wrong
-       * rate. Change it to "Confirmed change" when the Act is enacted.
-       */
-      statusLabel: "Proposed change",
-      announcedIn: "the 2027 Budget speech of 6 November 2026",
       heading: "What changes on 1 January 2027",
-      bands: [
-        { from: 0, to: 5100, rate: 0 },
-        { from: 5100, to: 7100, rate: 0.2 },
-        { from: 7100, to: 9200, rate: 0.3 },
-        { from: 9200, to: 37000, rate: 0.37 },
-        { from: 37000, to: null, rate: 0.395 },
+
+      /*
+       * One entry per change, each with ITS OWN STATUS. That matters here: the
+       * PAYE band is a Budget proposal that still needs an Act, while the
+       * NHIMA base change is confirmed. A single status for the whole block
+       * would have to lie about one of them.
+       *
+       * `base` on the NHIMA entry is the value `nhima.base` takes on the
+       * effective date. Promoting it is that one-word edit — the calculator
+       * and every sentence in the guides read the base from config, so none of
+       * the prose has to be rewritten.
+       */
+      changes: [
+        {
+          key: "nhima",
+          status: "confirmed",
+          statusLabel: "Confirmed",
+          heading: "NHIMA is charged on gross pay",
+          /** The base NHIMA moves to. Rates are unchanged. */
+          base: "gross",
+          body: [
+            "**The rates do not change** — still 1% from the employee and 1% from the employer. What changes is the figure they are charged on: **gross pay instead of basic pay**.",
+            "So allowances come into the NHIMA base for the first time. An employee on K8,000 basic with K2,000 of allowances is assessed on K10,000 rather than K8,000, and the contribution rises with every allowance paid on top of basic.",
+            "There is still no ceiling, so unlike NAPSA the contribution keeps rising with pay.",
+          ],
+          caveat:
+            "Until 1 January 2027 NHIMA is charged on basic pay, and that is what the calculator above uses. A December payroll assessed on gross over-deducts for everyone receiving an allowance.",
+        },
+        {
+          key: "paye",
+          status: "proposed",
+          statusLabel: "Proposed",
+          heading: "A fifth PAYE band",
+          announcedIn: "the 2027 Budget speech of 6 November 2026",
+          bands: [
+            { from: 0, to: 5100, rate: 0 },
+            { from: 5100, to: 7100, rate: 0.2 },
+            { from: 7100, to: 9200, rate: 0.3 },
+            { from: 9200, to: 37000, rate: 0.37 },
+            { from: 37000, to: null, rate: 0.395 },
+          ],
+          body: [
+            "A fifth band is proposed: **39.5% on the part of a monthly salary above K37,000**. Everything below that is unchanged — the first K5,100 stays tax-free, and the 20%, 30% and 37% rates keep their current thresholds. The 37% band stops at K37,000 rather than running to the top.",
+            "Only the slice above K37,000 is taxed at the new rate, so nobody's whole salary moves to 39.5%. The Zambia Revenue Authority estimates it affects about 6.7% of employees.",
+          ],
+          caveat:
+            "This one is a Budget proposal, not yet law. It depends on the Income Tax (Amendment) Act, its commencement date and ZRA's published tax tables, and the Budget annex has been reported as giving K34,000 rather than K37,000. Confirm the final figures with the Zambia Revenue Authority before you file on them.",
+        },
       ],
-      body: [
-        "A fifth PAYE band is proposed: **39.5% on the part of a monthly salary above K37,000**. Everything below that is unchanged — the first K5,100 stays tax-free, and the 20%, 30% and 37% rates keep their current thresholds. The 37% band stops at K37,000 rather than running to the top.",
-        "Only the slice above K37,000 is taxed at the new rate, so nobody's whole salary moves to 39.5%. The Zambia Revenue Authority estimates it affects about 6.7% of employees.",
-      ],
-      caveat:
-        "This is a Budget proposal, not yet law. It depends on the Income Tax (Amendment) Act, its commencement date and ZRA's published tax tables, and the Budget annex has been reported as giving K34,000 rather than K37,000. The calculator above uses the rates in force now, which are the ones a November or December payroll is charged on. Confirm the final figures with the Zambia Revenue Authority before you file on them.",
     },
   },
 

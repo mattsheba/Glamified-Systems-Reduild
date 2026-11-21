@@ -54,24 +54,50 @@ const days = s?.workingDaysPerMonth ?? 22;
 const act = s?.employmentAct ?? "the Employment Code Act";
 
 /*
- * The announced scale, where config carries one. Written as prose from the
- * same band list the calculator prints, so the guide cannot name a rate or a
- * threshold that the rest of the site does not.
+ * What is coming, where config carries it. Looked up per change, because the
+ * two due in January have different statuses and say different things.
  *
- * It is always framed by its status: this guide is read by people about to
- * file, and a proposal presented as settled is how the wrong rate gets used.
+ * Every figure is read from the same config the calculator prints, so a
+ * sentence here cannot name a rate or a threshold the rest of the site does
+ * not. Each is always framed by its status: this guide is read by people about
+ * to file, and a proposal presented as settled is how the wrong rate gets used.
  */
-const up = s?.upcoming;
-const upWhen = up
-  ? new Date(up.effectiveFrom).toLocaleDateString("en-GB", {
+const upcoming = s?.upcoming;
+const upWhen = upcoming
+  ? new Date(upcoming.effectiveFrom).toLocaleDateString("en-GB", {
       day: "numeric",
       month: "long",
       year: "numeric",
     })
   : "";
-const upTop = up
-  ? [...up.bands].sort((a, b) => b.rate - a.rate)[0]
+const change = (key: "paye" | "napsa" | "nhima") =>
+  upcoming?.changes.find((c) => c.key === key);
+
+const payeChange = change("paye");
+const payeTopBand = payeChange?.bands
+  ? [...payeChange.bands].sort((a, b) => b.rate - a.rate)[0]
   : undefined;
+/*
+ * NHIMA's base, in words, for the prose. "basic pay" until 1 January 2027 and
+ * "gross pay" from it — read from config so that one edit re-words every
+ * sentence below rather than leaving the guides teaching the old basis.
+ */
+const nhimaBase = s?.nhima.base ?? "basic";
+const nhimaBaseWords = nhimaBase === "gross" ? "gross pay" : "basic salary";
+const nhimaOtherWords = nhimaBase === "gross" ? "basic salary" : "gross pay";
+
+/*
+ * Only while it has NOT happened yet. Once `nhima.base` already equals the
+ * base the change moves to, the change is in force and announcing it would
+ * promise a move that has been made. This is what makes promoting it a
+ * one-word edit: flip `nhima.base` and every "coming on" sentence retires
+ * itself along with re-wording the rest.
+ */
+const nhimaChangeRaw = change("nhima");
+const nhimaChange =
+  nhimaChangeRaw?.base && nhimaChangeRaw.base !== nhimaBase
+    ? nhimaChangeRaw
+    : undefined;
 
 /** The worked example, calculated rather than typed, so it cannot be wrong. */
 const eg = s ? calculate(8000, 2000, s) : null;
@@ -93,7 +119,17 @@ const statutoryGuide: Guide = {
       heading: "Start with gross pay",
       body: [
         `Gross pay is everything the employee earns for the month: basic salary plus housing, transport, lunch, medical, risk and any other allowance, plus overtime. It is the figure the payslip foots to and the one net pay is worked back from.`,
-        `It is not, however, the base for all three deductions. PAYE and NAPSA are charged on gross. NHIMA is charged on basic salary alone. That single distinction is worth getting right before anything else, because an employee on a large housing allowance will be over-deducted all year if NHIMA is run on gross.`,
+        ...(nhimaBase === "basic"
+          ? [
+              `It is not, however, the base for all three deductions. PAYE and NAPSA are charged on gross. NHIMA is charged on basic salary alone. That single distinction is worth getting right before anything else, because an employee on a large housing allowance will be over-deducted all year if NHIMA is run on gross.${
+                nhimaChange?.base === "gross"
+                  ? ` That distinction disappears on ${upWhen}, when NHIMA moves to gross as well — see below.`
+                  : ""
+              }`,
+            ]
+          : [
+              `All three are charged on gross: PAYE, NAPSA and NHIMA. NAPSA is the only one with a ceiling, so it is the only one that stops rising as pay does.`,
+            ]),
       ],
     },
     {
@@ -103,14 +139,18 @@ const statutoryGuide: Guide = {
         ...bandLines,
         `Neither NAPSA nor NHIMA reduces chargeable income. This follows the ${s?.authority ?? "Zambia Revenue Authority"}'s own calculator: the contributions are separate deductions from pay, not reliefs against tax. If your spreadsheet subtracts NAPSA before applying the bands, it is under-deducting PAYE, and the shortfall is the employer's problem rather than the employee's.`,
         `The bands change with the national budget. What matters as much as the current figures is which set you apply to a given month: re-running a past period should use the rates that were in force then, not today's. ${product} stores the bands against the date they took effect for exactly that reason.`,
-        ...(up && upTop
+        ...(payeChange && payeTopBand
           ? [
-              `**Coming on ${upWhen}.** ${up.announcedIn.charAt(0).toUpperCase()}${up.announcedIn.slice(1)} ${
-                up.status === "enacted" ? "sets" : "proposes"
-              } a further band: ${percent(upTop.rate)} on the part of a monthly salary above ${kwachaRound(
-                upTop.from
+              `**Coming on ${upWhen}.** ${
+                payeChange.announcedIn
+                  ? `${payeChange.announcedIn.charAt(0).toUpperCase()}${payeChange.announcedIn.slice(1)} `
+                  : ""
+              }${
+                payeChange.status === "confirmed" ? "sets" : "proposes"
+              } a further band: ${percent(payeTopBand.rate)} on the part of a monthly salary above ${kwachaRound(
+                payeTopBand.from
               )}. The bands listed above are unchanged below that figure, and the rates on this page are the ones in force today — a payroll run for this month is charged on those, not on the new scale.`,
-              up.status === "proposed"
+              payeChange.status === "proposed"
                 ? `That change is a proposal rather than law. It depends on the amending Act, the date it commences and the ${
                     s?.authority ?? "Zambia Revenue Authority"
                   }'s own published tables, so confirm the final figures there before filing on them. ${product} is updated when they are published, and stores the new band against the date it takes effect rather than applying it to months already run.`
@@ -130,8 +170,26 @@ const statutoryGuide: Guide = {
     {
       heading: "NHIMA",
       body: [
-        `NHIMA is ${nhimaRate} from the employee and ${nhimaRate} from the employer, charged on basic salary. Allowances are outside the base, so a housing or transport allowance does not raise the contribution.`,
-        `There is no ceiling. The contribution rises with basic pay without limit.`,
+        `NHIMA is ${nhimaRate} from the employee and ${nhimaRate} from the employer, charged on ${nhimaBaseWords}.${
+          nhimaBase === "basic"
+            ? " Allowances are outside the base, so a housing or transport allowance does not raise the contribution."
+            : " Allowances are inside the base, so every allowance paid on top of basic raises the contribution."
+        }`,
+        `There is no ceiling. The contribution rises with pay without limit, unlike NAPSA.`,
+        ...(nhimaChange
+          ? [
+              `**Changing on ${upWhen}.** The rates stay the same — ${nhimaRate} from each side — but the figure they are charged on becomes ${
+                nhimaChange.base === "gross" ? "gross pay" : "basic salary"
+              } instead of ${nhimaBaseWords}. ${
+                nhimaChange.base === "gross"
+                  ? "Allowances come into the base for the first time, so anyone paid a housing or transport allowance will contribute more."
+                  : "Allowances leave the base, so anyone paid an allowance will contribute less."
+              }`,
+              `Until then it is charged on ${nhimaBaseWords}, which is what the calculator on this site uses and what a payroll run for this month is assessed on. Running the new basis early over-deducts${
+                nhimaChange.base === "gross" ? " from everyone receiving an allowance" : ""
+              }.`,
+            ]
+          : []),
       ],
     },
     {
@@ -147,7 +205,9 @@ const statutoryGuide: Guide = {
               )
               .join("; ")}. That totals ${kwacha(eg.paye)}.`,
             `**NAPSA.** ${kwacha(eg.gross)} is below the ${ceiling} ceiling, so the whole of it is pensionable: ${napsaRate} is ${kwacha(eg.napsaEmployee)} from the employee, and the employer pays the same again.`,
-            `**NHIMA.** ${nhimaRate} of the ${egBasic} basic — not of gross — is ${kwacha(eg.nhimaEmployee)}, with the same again from the employer.`,
+            `**NHIMA.** ${nhimaRate} of the ${kwacha(eg.nhimaChargedOn)} ${nhimaBaseWords} — not of ${nhimaOtherWords} — is ${kwacha(
+              eg.nhimaEmployee
+            )}, with the same again from the employer.`,
             `**Net pay.** ${kwacha(eg.gross)} less ${kwacha(eg.paye)}, ${kwacha(eg.napsaEmployee)} and ${kwacha(eg.nhimaEmployee)} leaves ${kwacha(eg.netPay)}.`,
             `**What it costs the employer.** ${kwacha(eg.gross)} of pay plus ${kwacha(eg.napsaEmployer)} of NAPSA and ${kwacha(eg.nhimaEmployer)} of NHIMA is ${kwacha(eg.employerCost)} — ${kwacha(eg.employerCost - eg.gross)} more than the salary on the contract.`,
           ]
@@ -156,7 +216,17 @@ const statutoryGuide: Guide = {
     {
       heading: "The four mistakes we are asked to fix",
       body: [
-        `**NHIMA charged on gross.** Costs the employee ${nhimaRate} of every allowance, every month, and nobody notices until someone checks a payslip against the rules.`,
+        ...(nhimaBase === "basic"
+          ? [
+              `**NHIMA charged on gross.** Costs the employee ${nhimaRate} of every allowance, every month, and nobody notices until someone checks a payslip against the rules.${
+                nhimaChange?.base === "gross"
+                  ? ` This one stops being a mistake on ${upWhen}, when gross becomes the correct base — but it is a mistake in every month before that.`
+                  : ""
+              }`,
+            ]
+          : [
+              `**NHIMA still charged on basic.** The base moved to gross, so assessing it on basic under-deducts ${nhimaRate} of every allowance, and the shortfall is the employer's to make good.`,
+            ]),
         `**NAPSA deducted before PAYE.** Under-deducts tax. The ZRA does not treat the contribution as a relief.`,
         `**The ceiling left at last year's figure.** NAPSA stops rising at ${ceiling}; an out-of-date ceiling either over- or under-deducts for everyone above it.`,
         `**Today's bands applied to last year's payroll.** A re-run of a prior month must use the rates that applied in that month, or the figures no longer agree with what was filed.`,
@@ -248,7 +318,19 @@ const returnsGuide: Guide = {
       heading: "What each return is asking for",
       body: [
         `**${s?.napsa.label ?? "NAPSA"}.** Pensionable earnings per employee for the month, with the ${napsaRate} employee contribution, the ${napsaRate} employer contribution and the total for each person. Pensionable earnings are gross pay capped at the ${ceiling} ceiling, so for anyone above it the figure in the return is the ceiling, not their salary.`,
-        `**${s?.nhima.label ?? "NHIMA"}.** Basic salary per employee, with ${nhimaRate} from each side. Allowances are not in this return at all, which is the usual reason an NHIMA return disagrees with a NAPSA return for the same month.`,
+        `**${s?.nhima.label ?? "NHIMA"}.** ${
+          nhimaBase === "gross" ? "Gross pay" : "Basic salary"
+        } per employee, with ${nhimaRate} from each side.${
+          nhimaBase === "basic"
+            ? " Allowances are not in this return at all, which is the usual reason an NHIMA return disagrees with a NAPSA return for the same month."
+            : " Allowances are in the base, so this return and the NAPSA return agree for anyone below the NAPSA ceiling and part company above it."
+        }${
+          nhimaChange
+            ? ` From ${upWhen} the base becomes ${
+                nhimaChange.base === "gross" ? "gross pay" : "basic salary"
+              }, at the same rates.`
+            : ""
+        }`,
         `**PAYE.** Gross pay, the NAPSA and NHIMA deducted, the chargeable income and the tax, per employee, totalled for the filing.`,
       ],
     },
@@ -271,7 +353,13 @@ const returnsGuide: Guide = {
       body: [
         `Check the headcount in the return against the payroll run it came from — a starter added after the run, or a leaver processed in the wrong month, shows up here first.`,
         `Check anyone above the NAPSA ceiling: their pensionable earnings should read ${ceiling}, not their gross.`,
-        `Check that the NHIMA figures track basic pay rather than gross. If the two returns move together when an allowance changes, something is assessed on the wrong base.`,
+        ...(nhimaBase === "basic"
+          ? [
+              `Check that the NHIMA figures track basic pay rather than gross. If the two returns move together when an allowance changes, something is assessed on the wrong base.`,
+            ]
+          : [
+              `Check that the NHIMA figures track gross pay. Below the NAPSA ceiling the two returns should move together when an allowance changes; if NHIMA does not, it is still being assessed on basic.`,
+            ]),
         `Keep the approved run. Once a payroll has been approved its figures are what you filed, and a system that lets a past month be edited after the fact leaves you unable to reconcile a query six months later.`,
       ],
     },

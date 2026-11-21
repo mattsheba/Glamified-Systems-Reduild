@@ -272,31 +272,51 @@ export interface PayeBand {
   rate: number;
 }
 
+/** What a contribution is charged on. */
+export type ContributionBase = "basic" | "gross";
+
 /**
- * A scale that has been announced but is not in force yet.
+ * One statutory change that has been announced but is not in force yet.
  *
- * Nothing calculates with these bands. `Statutory.paye.bands` is always the
- * scale in force, so the calculator and the guides stay correct for the month
- * being run; this only lets the site say what is coming, with its status and
- * its caveat attached. A proposal published as though it were settled is how a
- * payroll gets filed on the wrong rate.
+ * Each carries its OWN status, because they do not arrive together: at the
+ * time of writing the NHIMA base change is confirmed while the PAYE band is
+ * still a Budget proposal. A single status for a group of changes would have
+ * to misdescribe one of them, and on this subject that is how a payroll gets
+ * filed on the wrong figure.
  */
-export interface UpcomingStatutory {
-  /** ISO date the new scale takes effect. */
-  effectiveFrom: string;
-  /** `proposed` until the amending Act and the authority's tables confirm it. */
-  status: "proposed" | "enacted";
-  /** Eyebrow above the heading. Says the status, not the date. */
+export interface UpcomingChange {
+  /** Which rate this concerns. Also the render order key. */
+  key: "paye" | "napsa" | "nhima";
+  status: "proposed" | "confirmed";
+  /** Eyebrow. Says the status, never the date — the heading carries that. */
   statusLabel: string;
-  /** Where it was announced, named in the copy. */
-  announcedIn: string;
   heading: string;
-  /** The full scale that would replace `paye.bands`. */
-  bands: PayeBand[];
   /** `**bold**` is honoured; nothing else is. */
   body: string[];
-  /** Why a reader must not file on it yet. Required while status is proposed. */
+  /** Why a reader must not file on it yet. */
   caveat: string;
+  /** Where it was announced, named in the copy where it is known. */
+  announcedIn?: string;
+  /** The full scale that would replace `paye.bands`. Renders a band table. */
+  bands?: PayeBand[];
+  /** The base this contribution moves to, where that is what changes. */
+  base?: ContributionBase;
+}
+
+/**
+ * Changes due on one date.
+ *
+ * NOTHING CALCULATES WITH THIS. `Statutory.paye.bands` and
+ * `Statutory.nhima.base` are always what is in force, so the calculator and
+ * the guides stay correct for the month being run; this only lets the site say
+ * what is coming, with each change's status and caveat attached. A proposal
+ * published as though it were settled is how a payroll gets filed wrong.
+ */
+export interface UpcomingStatutory {
+  /** ISO date the changes take effect. */
+  effectiveFrom: string;
+  heading: string;
+  changes: UpcomingChange[];
 }
 
 /**
@@ -322,6 +342,15 @@ export interface Statutory {
     name: string;
     employeeRate: number;
     employerRate: number;
+    /**
+     * What NHIMA is charged on. "basic" until 1 January 2027, "gross" from it.
+     *
+     * A field rather than an assumption in the arithmetic, because the whole
+     * site reads it: the calculator charges the right figure, the rate table
+     * prints which one, and the guides word their sentences from it. Promoting
+     * the change is editing one word in config.
+     */
+    base: ContributionBase;
     portal?: string;
   };
   /** Divisor for a day's pay in the terminal-benefits guide. */

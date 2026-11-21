@@ -62,9 +62,21 @@ const effective = s
  * marked. Read off the band list rather than written down again, so
  * highlighting the right row cannot fall out of step with the table.
  */
-const topUpcomingRate = s?.upcoming
-  ? Math.max(...s.upcoming.bands.map((band) => band.rate))
-  : 0;
+/*
+ * Which field the NHIMA row names as its base. Derived from `nhima.base` so
+ * the table cannot say "basic" after the base has moved to gross.
+ */
+const nhimaChargedOnLabel =
+  s?.nhima.base === "gross" ? c?.results.gross : c?.fields.basic.label;
+
+/*
+ * The changes still ahead of us. A change whose base is already the one in
+ * force has happened, so it is dropped rather than announced — promoting it is
+ * then a one-word edit to `nhima.base`, with no second place to remember.
+ */
+const pendingChanges = (s?.upcoming?.changes ?? []).filter(
+  (ch) => !(ch.base && ch.base === s?.nhima.base)
+);
 
 const crumbs = [
   { name: "Home", path: "/" },
@@ -81,6 +93,10 @@ const rates = s
       ceiling: s.napsa.ceiling,
       nhimaEmployee: s.nhima.employeeRate,
       nhimaEmployer: s.nhima.employerRate,
+      /* "basic" today, "gross" from 1 January 2027. Sent rather than assumed,
+         so the live calculator cannot charge a different base from the one the
+         page prints in its rate table. */
+      nhimaBase: s.nhima.base,
     }
   : null;
 ---
@@ -248,7 +264,7 @@ const rates = s
                   <th scope="row">{s.nhima.label}</th>
                   <td class="num">{percent(s.nhima.employeeRate)}</td>
                   <td class="num">{percent(s.nhima.employerRate)}</td>
-                  <td>{c.fields.basic.label}</td>
+                  <td>{nhimaChargedOnLabel}</td>
                 </tr>
               </tbody>
             </table>
@@ -261,45 +277,66 @@ const rates = s
   )}
 
   {/*
-    The announced scale, printed beside the one in force rather than instead of
-    it. Someone running a December payroll needs today's rates to file and next
+    What is coming, printed beside what is in force rather than instead of it.
+    Someone running a December payroll needs today's figures to file and next
     month's to plan; a calculator that silently switched early would mis-state
     the month they are actually paying.
 
-    The band table is rendered from `upcoming.bands`, so the figures in it
-    cannot drift from the ones that will be promoted into use.
+    Each change carries its own status, because they do not arrive together —
+    one is confirmed and the other is a Budget proposal. Band tables are
+    rendered from the change's own `bands`, so a figure in the prose cannot
+    drift from the table beside it.
   */}
-  {s?.upcoming && (
+  {s?.upcoming && pendingChanges.length > 0 && (
     <section class="section mode-light">
-      <div class="container upcoming">
-        <div class="upcoming-copy">
-          <p class="eyebrow">{s.upcoming.statusLabel}</p>
-          <h2>{s.upcoming.heading}</h2>
-          {s.upcoming.body.map((paragraph) => (
-            <p class="lead" set:html={inlineBold(paragraph)} />
-          ))}
-          <p class="caveat">{s.upcoming.caveat}</p>
-          <p class="muted announced">{`${s.upcoming.announcedIn}.`}</p>
-        </div>
+      <div class="container">
+        <h2 class="upcoming-title">{s.upcoming.heading}</h2>
 
-        <div class="upcoming-table">
-          <h3>{c?.bandsHeading}</h3>
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">{c?.bandsColumns.band}</th>
-                <th scope="col" class="num">{c?.bandsColumns.rate}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {s.upcoming.bands.map((band, i) => (
-                <tr class={band.rate === topUpcomingRate ? "is-new" : undefined}>
-                  <th scope="row">{bandLabel(band, i === 0)}</th>
-                  <td class="num">{percent(band.rate)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div class="changes">
+          {pendingChanges.map((change) => (
+            <article class="change">
+              <div class="change-copy">
+                <p class={`eyebrow status status--${change.status}`}>
+                  {change.statusLabel}
+                </p>
+                <h3>{change.heading}</h3>
+                {change.body.map((paragraph) => (
+                  <p set:html={inlineBold(paragraph)} />
+                ))}
+                <p class="caveat">{change.caveat}</p>
+                {change.announcedIn && (
+                  <p class="muted announced">{`${change.announcedIn}.`}</p>
+                )}
+              </div>
+
+              {change.bands?.length && c ? (
+                <div class="change-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th scope="col">{c.bandsColumns.band}</th>
+                        <th scope="col" class="num">{c.bandsColumns.rate}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {change.bands.map((band, i, all) => (
+                        <tr
+                          class={
+                            band.rate === Math.max(...all.map((x) => x.rate))
+                              ? "is-new"
+                              : undefined
+                          }
+                        >
+                          <th scope="row">{bandLabel(band, i === 0)}</th>
+                          <td class="num">{percent(band.rate)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : null}
+            </article>
+          ))}
         </div>
       </div>
     </section>
@@ -370,8 +407,9 @@ const rates = s
           const pensionable = Math.min(gross, rates.ceiling);
           const napsa = round2(pensionable * rates.napsaEmployee);
           const napsaEmployer = round2(pensionable * rates.napsaEmployer);
-          const nhima = round2(basic * rates.nhimaEmployee);
-          const nhimaEmployer = round2(basic * rates.nhimaEmployer);
+          const nhimaOn = rates.nhimaBase === "gross" ? gross : basic;
+          const nhima = round2(nhimaOn * rates.nhimaEmployee);
+          const nhimaEmployer = round2(nhimaOn * rates.nhimaEmployer);
 
           const charges = rates.bands
             .slice()
@@ -675,35 +713,65 @@ const rates = s
     margin-top: var(--s-4);
   }
 
-  /* ---- the announced scale ---- */
+  /* ---- what is coming ---- */
 
-  .upcoming {
-    display: grid;
-    gap: var(--s-7);
-    grid-template-columns: 1.25fr 1fr;
-    align-items: start;
+  .upcoming-title {
+    font-size: var(--t-h2);
+    margin: 0 0 var(--s-5);
   }
 
-  .upcoming-copy h2 {
-    font-size: var(--t-h2);
+  .changes {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  .change {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: var(--s-6);
+    align-items: start;
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--band-hairline);
+  }
+
+  .change:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .change h3 {
+    font-size: var(--t-h3);
     margin: var(--s-2) 0 var(--s-3);
     max-width: 30ch;
   }
 
-  .upcoming-copy .lead {
+  .change-copy p {
     max-width: var(--measure);
-    margin: 0 0 var(--s-3);
+    line-height: var(--lh-body);
   }
 
-  /* Reads as a caution without a coloured alert box: a left rule in the accent
-     and smaller type, so it is clearly an aside to the claim above it. */
+  /* The status is the most important word in each card: one of these is
+     settled and one is not. Confirmed reads in the accent; proposed is muted,
+     so it cannot be mistaken for the firmer of the two at a glance. */
+  .status {
+    margin: 0;
+  }
+
+  .status--confirmed {
+    color: var(--band-accent);
+  }
+
+  .status--proposed {
+    color: var(--band-ink-muted);
+  }
+
+  /* A caution without a coloured alert box: a left rule and smaller type, so
+     it reads as an aside to the claim above it. */
   .caveat {
     border-left: 3px solid var(--band-accent);
     padding-left: var(--s-3);
     margin: var(--s-4) 0 0;
     font-size: var(--t-small);
-    line-height: var(--lh-body);
-    max-width: var(--measure);
   }
 
   .announced {
@@ -711,23 +779,18 @@ const rates = s
     font-size: var(--t-small);
   }
 
-  .upcoming-table h3 {
-    font-size: var(--t-h3);
-    margin: 0 0 var(--s-3);
-  }
-
-  /* The row that is actually new. Marked with weight and the accent rather
-     than a background, so it still reads if the colour does not land. */
-  .upcoming-table tr.is-new th,
-  .upcoming-table tr.is-new td {
+  /* The row that is actually new. Weight and the accent rather than a
+     background, so it still reads if the colour does not land. */
+  .change-table tr.is-new th,
+  .change-table tr.is-new td {
     color: var(--band-accent);
     font-weight: 700;
   }
 
   @media (max-width: 1024px) {
-    .upcoming {
+    .change {
       grid-template-columns: 1fr;
-      gap: var(--s-6);
+      gap: var(--s-4);
     }
 
     .calc {
